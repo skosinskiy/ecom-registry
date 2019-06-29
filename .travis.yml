@@ -1,0 +1,25 @@
+dist:
+  trusty
+
+language:
+  java
+
+jdk:
+  - oraclejdk8
+
+node_js:
+  - "10"
+
+cache:
+  directories:
+    - $HOME/.m2
+
+script:
+  - mvn clean package
+  - sonar-scanner
+
+addons:
+  sonarcloud:
+    organization: "skosinskiy-github"
+    token:
+      secure: ${SONAR_TOKEN}
