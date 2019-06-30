@@ -11,9 +11,9 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class BaseEntity extends Auditable {
+class BaseEntity extends Auditable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int id;
+  private Long id;
 }

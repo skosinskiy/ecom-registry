@@ -13,7 +13,7 @@ import java.util.Date;
 @Data
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class Auditable {
+class Auditable {
   @CreatedDate
   @Column(name = "date_created")
   private Date createdDate;
