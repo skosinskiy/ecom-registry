@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(SpringRunner.class)
@@ -95,6 +96,22 @@ public class AuthControllerTest {
 						.content(loginRequestJson)
 						.contentType(MediaType.APPLICATION_JSON))
 				.andReturn();
+
+		String responseErrorMessage = result.getResponse().getErrorMessage();
+		int responseErrorCode = result.getResponse().getStatus();
+
+		assertEquals(HttpServletResponse.SC_UNAUTHORIZED, responseErrorCode);
+		assertEquals(expectedErrorMessage, responseErrorMessage);
+	}
+
+	@Test
+	public void accessRestrictedResourceTest() throws Exception {
+		String expectedErrorMessage = "Full authentication is required to access this resource";
+		LoginRequest loginRequest = new LoginRequest();
+		loginRequest.setEmail("stanislav.kosinski@gmail.com");
+		loginRequest.setPassword("admin");
+
+		MvcResult result = mockMvc.perform(get("/")).andReturn();
 
 		String responseErrorMessage = result.getResponse().getErrorMessage();
 		int responseErrorCode = result.getResponse().getStatus();
