@@ -79,23 +79,23 @@ public class SecurityService {
     return StringUtils.hasText(jwt) && hasTokenPassedChecks(jwt);
   }
 
-	private boolean hasTokenPassedChecks(String jwt) {
-		try {
-			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt);
-			return true;
-		} catch (SignatureException ex) {
-			log.error("Invalid JWT signature");
-		} catch (MalformedJwtException ex) {
-			log.error("Invalid JWT token");
-		} catch (ExpiredJwtException ex) {
-			log.error("Expired JWT token");
-		} catch (UnsupportedJwtException ex) {
-			log.error("Unsupported JWT token");
-		} catch (IllegalArgumentException ex) {
-			log.error("JWT claims string is empty.");
-		}
-		return false;
-	}
+  private boolean hasTokenPassedChecks(String jwt) {
+    try {
+      Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt);
+      return true;
+    } catch (SignatureException ex) {
+      log.error("Invalid JWT signature");
+    } catch (MalformedJwtException ex) {
+      log.error("Invalid JWT token");
+    } catch (ExpiredJwtException ex) {
+      log.error("Expired JWT token");
+    } catch (UnsupportedJwtException ex) {
+      log.error("Unsupported JWT token");
+    } catch (IllegalArgumentException ex) {
+      log.error("JWT claims string is empty.");
+    }
+    return false;
+  }
 
   public void setAuthenticationFromJwt(String jwt, HttpServletRequest request) {
     Long userId = getUserIdFromJwt(jwt);
