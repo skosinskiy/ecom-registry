@@ -31,7 +31,7 @@ import java.util.Date;
 @Slf4j
 public class SecurityService {
 
-  static final String TOKEN_TYPE = "Bearer";
+  public static final String TOKEN_TYPE = "Bearer";
   private AuthenticationManager authenticationManager;
   private UserService userService;
 
@@ -50,11 +50,10 @@ public class SecurityService {
   public LoginResponse setAuthenticationAndGenerateJwt(LoginRequest loginRequest) {
     Authentication authentication = authenticateUser(loginRequest);
     SecurityContextHolder.getContext().setAuthentication(authentication);
-    return LoginResponse
-        .builder()
-        .jwt(generateToken(authentication))
-        .tokenType(TOKEN_TYPE)
-        .build();
+    LoginResponse loginResponse = new LoginResponse();
+    loginResponse.setJwt(generateToken(authentication));
+    loginResponse.setTokenType(TOKEN_TYPE);
+    return loginResponse;
   }
 
   private Authentication authenticateUser(LoginRequest loginRequest) {
@@ -76,11 +75,29 @@ public class SecurityService {
         .compact();
   }
 
-  boolean isTokenValid(String jwt) {
+  public boolean isTokenValid(String jwt) {
     return StringUtils.hasText(jwt) && hasTokenPassedChecks(jwt);
   }
 
-  void setAuthenticationFromJwt(String jwt, HttpServletRequest request) {
+	private boolean hasTokenPassedChecks(String jwt) {
+		try {
+			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt);
+			return true;
+		} catch (SignatureException ex) {
+			log.error("Invalid JWT signature");
+		} catch (MalformedJwtException ex) {
+			log.error("Invalid JWT token");
+		} catch (ExpiredJwtException ex) {
+			log.error("Expired JWT token");
+		} catch (UnsupportedJwtException ex) {
+			log.error("Unsupported JWT token");
+		} catch (IllegalArgumentException ex) {
+			log.error("JWT claims string is empty.");
+		}
+		return false;
+	}
+
+  public void setAuthenticationFromJwt(String jwt, HttpServletRequest request) {
     Long userId = getUserIdFromJwt(jwt);
     UserDetails userDetails = userService.loadUserById(userId);
     UsernamePasswordAuthenticationToken authentication =
@@ -90,7 +107,7 @@ public class SecurityService {
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 
-  private Long getUserIdFromJwt(String token) {
+  public Long getUserIdFromJwt(String token) {
     Claims claims = Jwts.parser()
         .setSigningKey(jwtSecret)
         .parseClaimsJws(token)
@@ -99,21 +116,5 @@ public class SecurityService {
     return Long.parseLong(claims.getSubject());
   }
 
-  private boolean hasTokenPassedChecks(String jwt) {
-    try {
-      Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt);
-      return true;
-    } catch (SignatureException ex) {
-      log.error("Invalid JWT signature");
-    } catch (MalformedJwtException ex) {
-      log.error("Invalid JWT token");
-    } catch (ExpiredJwtException ex) {
-      log.error("Expired JWT token");
-    } catch (UnsupportedJwtException ex) {
-      log.error("Unsupported JWT token");
-    } catch (IllegalArgumentException ex) {
-      log.error("JWT claims string is empty.");
-    }
-    return false;
-  }
+
 }
