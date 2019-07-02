@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -22,17 +23,20 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private UserService userService;
-  private JwtAuthenticationEntryPoint unauthorizedHandler;
+  private SecurityExceptionHandlerFilter securityExceptionHandlerFilter;
   private JwtAuthenticationFilter jwtAuthenticationFilter;
+  private JwtAuthenticationEntryPoint unauthorizedHandler;
 
   @Autowired
   public SecurityConfig(
       UserService userService,
-      JwtAuthenticationEntryPoint unauthorizedHandler,
-      JwtAuthenticationFilter jwtAuthenticationFilter) {
+      SecurityExceptionHandlerFilter securityExceptionHandlerFilter,
+      JwtAuthenticationFilter jwtAuthenticationFilter,
+      JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
     this.userService = userService;
-    this.unauthorizedHandler = unauthorizedHandler;
+    this.securityExceptionHandlerFilter = securityExceptionHandlerFilter;
     this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    this.unauthorizedHandler = jwtAuthenticationEntryPoint;
   }
 
   @Bean(BeanIds.AUTHENTICATION_MANAGER)
@@ -67,7 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .permitAll();
 
     http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
+    http.addFilterBefore(securityExceptionHandlerFilter, WebAsyncManagerIntegrationFilter.class);
   }
 
   @Override

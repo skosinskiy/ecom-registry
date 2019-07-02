@@ -5,12 +5,8 @@ import com.kosinskyi.ecom.registry.dto.response.LoginResponse;
 import com.kosinskyi.ecom.registry.entity.User;
 import com.kosinskyi.ecom.registry.service.UserService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,21 +76,8 @@ public class SecurityService {
   }
 
   private boolean hasTokenPassedChecks(String jwt) {
-    try {
-      Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt);
-      return true;
-    } catch (SignatureException ex) {
-      log.error("Invalid JWT signature");
-    } catch (MalformedJwtException ex) {
-      log.error("Invalid JWT token");
-    } catch (ExpiredJwtException ex) {
-      log.error("Expired JWT token");
-    } catch (UnsupportedJwtException ex) {
-      log.error("Unsupported JWT token");
-    } catch (IllegalArgumentException ex) {
-      log.error("JWT claims string is empty.");
-    }
-    return false;
+    Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt);
+    return true;
   }
 
   public void setAuthenticationFromJwt(String jwt, HttpServletRequest request) {

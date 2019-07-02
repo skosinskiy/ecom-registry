@@ -3,22 +3,23 @@ package com.kosinskyi.ecom.registry.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kosinskyi.ecom.registry.dto.request.LoginRequest;
 import com.kosinskyi.ecom.registry.dto.response.LoginResponse;
+import com.kosinskyi.ecom.registry.dto.response.error.UnauthorizedErrorResponse;
 import com.kosinskyi.ecom.registry.security.SecurityService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
-import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -75,13 +76,17 @@ public class AuthControllerTest {
 						.contentType(MediaType.APPLICATION_JSON))
 				.andReturn();
 
-		int statusCode = result.getResponse().getStatus();
-		String errorMessage = result.getResponse().getErrorMessage();
-		String responseBody = result.getResponse().getContentAsString();
+		MockHttpServletResponse response = result.getResponse();
+		UnauthorizedErrorResponse errorResponse =
+				objectMapper.readValue(response.getContentAsString(), UnauthorizedErrorResponse.class);
 
-		assertEquals(HttpServletResponse.SC_UNAUTHORIZED, statusCode);
-		assertEquals(expectedErrorMessage, errorMessage);
-		assertTrue(StringUtils.isEmpty(responseBody));
+		assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
+		assertEquals(HttpStatus.UNAUTHORIZED.name(), response.getErrorMessage());
+		assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatus());
+		assertEquals(HttpStatus.UNAUTHORIZED.name(), errorResponse.getError());
+		assertEquals(expectedErrorMessage, errorResponse.getMessage());
+		assertNotNull(errorResponse.getPath());
+		assertNotNull(errorResponse.getTimeStamp());
 	}
 
 	@Test
@@ -99,11 +104,17 @@ public class AuthControllerTest {
 						.contentType(MediaType.APPLICATION_JSON))
 				.andReturn();
 
-		String responseErrorMessage = result.getResponse().getErrorMessage();
-		int responseErrorCode = result.getResponse().getStatus();
+		MockHttpServletResponse response = result.getResponse();
+		UnauthorizedErrorResponse errorResponse =
+				objectMapper.readValue(response.getContentAsString(), UnauthorizedErrorResponse.class);
 
-		assertEquals(HttpServletResponse.SC_UNAUTHORIZED, responseErrorCode);
-		assertEquals(expectedErrorMessage, responseErrorMessage);
+		assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
+		assertEquals(HttpStatus.UNAUTHORIZED.name(), response.getErrorMessage());
+		assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatus());
+		assertEquals(HttpStatus.UNAUTHORIZED.name(), errorResponse.getError());
+		assertEquals(expectedErrorMessage, errorResponse.getMessage());
+		assertNotNull(errorResponse.getPath());
+		assertNotNull(errorResponse.getTimeStamp());
 	}
 
 	@Test
@@ -121,10 +132,16 @@ public class AuthControllerTest {
 						.contentType(MediaType.APPLICATION_JSON))
 				.andReturn();
 
-		String responseErrorMessage = result.getResponse().getErrorMessage();
-		int responseErrorCode = result.getResponse().getStatus();
+		MockHttpServletResponse response = result.getResponse();
+		UnauthorizedErrorResponse errorResponse =
+				objectMapper.readValue(response.getContentAsString(), UnauthorizedErrorResponse.class);
 
-		assertEquals(HttpServletResponse.SC_UNAUTHORIZED, responseErrorCode);
-		assertEquals(expectedErrorMessage, responseErrorMessage);
+		assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
+		assertEquals(HttpStatus.UNAUTHORIZED.name(), response.getErrorMessage());
+		assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatus());
+		assertEquals(HttpStatus.UNAUTHORIZED.name(), errorResponse.getError());
+		assertEquals(expectedErrorMessage, errorResponse.getMessage());
+		assertNotNull(errorResponse.getPath());
+		assertNotNull(errorResponse.getTimeStamp());
 	}
 }
