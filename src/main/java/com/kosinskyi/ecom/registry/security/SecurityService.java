@@ -62,7 +62,7 @@ public class SecurityService {
     );
   }
 
-  private String generateToken(Authentication authentication) {
+  public String generateToken(Authentication authentication) {
     User user = (User) authentication.getPrincipal();
     Date now = new Date();
     Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);

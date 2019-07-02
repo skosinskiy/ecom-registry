@@ -14,12 +14,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(SpringRunner.class)
@@ -61,6 +61,30 @@ public class AuthControllerTest {
 	}
 
 	@Test
+	public void signinExpiredUserTest() throws Exception {
+		String expectedErrorMessage = "User account has expired";
+		LoginRequest loginRequest = new LoginRequest();
+		loginRequest.setEmail("expiredUser@gmail.com");
+		loginRequest.setPassword("admin");
+
+		String loginRequestJson = objectMapper.writeValueAsString(loginRequest);
+
+		MvcResult result = mockMvc.perform(
+				post("/api/auth/signin")
+						.content(loginRequestJson)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andReturn();
+
+		int statusCode = result.getResponse().getStatus();
+		String errorMessage = result.getResponse().getErrorMessage();
+		String responseBody = result.getResponse().getContentAsString();
+
+		assertEquals(HttpServletResponse.SC_UNAUTHORIZED, statusCode);
+		assertEquals(expectedErrorMessage, errorMessage);
+		assertTrue(StringUtils.isEmpty(responseBody));
+	}
+
+	@Test
 	public void signinWrongPasswordTest() throws Exception {
 		String expectedErrorMessage = "Bad credentials";
 		LoginRequest loginRequest = new LoginRequest();
@@ -96,22 +120,6 @@ public class AuthControllerTest {
 						.content(loginRequestJson)
 						.contentType(MediaType.APPLICATION_JSON))
 				.andReturn();
-
-		String responseErrorMessage = result.getResponse().getErrorMessage();
-		int responseErrorCode = result.getResponse().getStatus();
-
-		assertEquals(HttpServletResponse.SC_UNAUTHORIZED, responseErrorCode);
-		assertEquals(expectedErrorMessage, responseErrorMessage);
-	}
-
-	@Test
-	public void accessRestrictedResourceTest() throws Exception {
-		String expectedErrorMessage = "Full authentication is required to access this resource";
-		LoginRequest loginRequest = new LoginRequest();
-		loginRequest.setEmail("stanislav.kosinski@gmail.com");
-		loginRequest.setPassword("admin");
-
-		MvcResult result = mockMvc.perform(get("/")).andReturn();
 
 		String responseErrorMessage = result.getResponse().getErrorMessage();
 		int responseErrorCode = result.getResponse().getStatus();

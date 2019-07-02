@@ -6,6 +6,6 @@ spring:
       sa
 app:
   jwtSecret:
-    JWTSuperSecretKey
+    05a7605ec52b437d9d4d0cb069ace784
   jwtExpirationInMs:
-    604800000
+    900000
