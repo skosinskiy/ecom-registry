@@ -1,7 +1,7 @@
 package com.kosinskyi.ecom.registry.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kosinskyi.ecom.registry.dto.response.error.UnauthorizedErrorResponse;
+import com.kosinskyi.ecom.registry.dto.response.ErrorResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -50,8 +50,8 @@ public class JwtAuthenticationEntryPointTest {
     ArgumentCaptor captor = ArgumentCaptor.forClass(String.class);
     verify(mockWriter, times(1))
         .write((String) captor.capture());
-    UnauthorizedErrorResponse captureErrorResponse =
-        objectMapper.readValue((String) captor.getValue(), UnauthorizedErrorResponse.class);
+    ErrorResponse captureErrorResponse =
+        objectMapper.readValue((String) captor.getValue(), ErrorResponse.class);
 
     assertEquals(errorMessage, captureErrorResponse.getMessage());
     assertEquals(HttpStatus.UNAUTHORIZED.name(), captureErrorResponse.getError());
