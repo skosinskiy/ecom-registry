@@ -65,7 +65,7 @@ public class SecurityService {
 
     return Jwts.builder()
         .setSubject(Long.toString(user.getId()))
-        .setIssuedAt(new Date())
+        .setIssuedAt(now)
         .setExpiration(expiryDate)
         .signWith(SignatureAlgorithm.HS512, jwtSecret)
         .compact();
