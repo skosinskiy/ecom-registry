@@ -1,6 +1,8 @@
 comment: off
 
 coverage:
+  target: 90%
+  threshold: 2%
   range: 90..100
   round: down
   precision: 2
