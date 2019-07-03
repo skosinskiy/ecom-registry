@@ -1,6 +1,7 @@
 package com.kosinskyi.ecom.registry.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kosinskyi.ecom.registry.dto.response.ErrorResponse;
 import com.kosinskyi.ecom.registry.dto.response.error.InternalErrorResponse;
 import com.kosinskyi.ecom.registry.dto.response.error.UnauthorizedErrorResponse;
 import org.junit.Test;
@@ -45,13 +46,13 @@ public class GenericExceptionHandlerTest {
     when(mockRequest.getServletPath()).thenReturn(path);
     when(mockResponse.getWriter()).thenReturn(mockWriter);
 
-    genericExceptionHandler.handleSecurityException(badCredentialsException, mockRequest, mockResponse);
+    genericExceptionHandler.handleException(badCredentialsException, mockRequest, mockResponse);
 
     ArgumentCaptor captor = ArgumentCaptor.forClass(String.class);
     verify(mockWriter, times(1))
         .write((String) captor.capture());
-    UnauthorizedErrorResponse captureErrorResponse =
-        objectMapper.readValue((String) captor.getValue(), UnauthorizedErrorResponse.class);
+    ErrorResponse captureErrorResponse =
+        objectMapper.readValue((String) captor.getValue(), ErrorResponse.class);
 
     assertEquals(errorMessage, captureErrorResponse.getMessage());
     assertEquals(HttpStatus.UNAUTHORIZED.name(), captureErrorResponse.getError());
@@ -80,8 +81,8 @@ public class GenericExceptionHandlerTest {
     ArgumentCaptor captor = ArgumentCaptor.forClass(String.class);
     verify(mockWriter, times(1))
         .write((String) captor.capture());
-    InternalErrorResponse captureErrorResponse =
-        objectMapper.readValue((String) captor.getValue(), InternalErrorResponse.class);
+    ErrorResponse captureErrorResponse =
+        objectMapper.readValue((String) captor.getValue(), ErrorResponse.class);
 
     assertEquals(errorMessage, captureErrorResponse.getMessage());
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.name(), captureErrorResponse.getError());

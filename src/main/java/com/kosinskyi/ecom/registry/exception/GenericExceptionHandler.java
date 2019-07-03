@@ -1,14 +1,13 @@
 package com.kosinskyi.ecom.registry.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kosinskyi.ecom.registry.dto.response.error.InternalErrorResponse;
-import com.kosinskyi.ecom.registry.dto.response.error.UnauthorizedErrorResponse;
+import com.kosinskyi.ecom.registry.dto.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -27,22 +26,24 @@ public class GenericExceptionHandler {
     this.objectMapper = objectMapper;
   }
 
-  @ExceptionHandler({AuthenticationException.class})
-  public void handleSecurityException(Exception exc, HttpServletRequest request, HttpServletResponse response)
-      throws IOException {
-    log.error(exc.getMessage(), exc);
-    UnauthorizedErrorResponse unauthorizedErrorResponse = new UnauthorizedErrorResponse(exc, request);
-    response.getWriter().write(objectMapper.writeValueAsString(unauthorizedErrorResponse));
-    response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.name());
-  }
-
   @ExceptionHandler
   public void handleException(Exception exc, HttpServletRequest request, HttpServletResponse response)
       throws IOException {
     log.error(exc.getMessage(), exc);
-    InternalErrorResponse internalErrorResponse = new InternalErrorResponse(exc, request);
+    HttpStatus httpStatus = getHttpStatusForException(exc);
+    ErrorResponse internalErrorResponse = new ErrorResponse(exc, request, httpStatus);
     response.getWriter().write(objectMapper.writeValueAsString(internalErrorResponse));
-    response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.name());
+    response.sendError(httpStatus.value(), httpStatus.name());
+  }
+
+  private HttpStatus getHttpStatusForException(Exception exc) {
+    if (exc instanceof AuthenticationException) {
+      return HttpStatus.UNAUTHORIZED;
+    }
+    if (exc instanceof AccessDeniedException) {
+      return HttpStatus.FORBIDDEN;
+    }
+    return HttpStatus.INTERNAL_SERVER_ERROR;
   }
 
 }

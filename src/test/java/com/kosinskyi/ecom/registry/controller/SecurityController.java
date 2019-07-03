@@ -1,7 +1,7 @@
 package com.kosinskyi.ecom.registry.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kosinskyi.ecom.registry.dto.response.error.UnauthorizedErrorResponse;
+import com.kosinskyi.ecom.registry.dto.response.ErrorResponse;
 import com.kosinskyi.ecom.registry.entity.User;
 import com.kosinskyi.ecom.registry.security.SecurityService;
 import org.junit.Test;
@@ -48,8 +48,8 @@ public class SecurityController {
 		MvcResult result = mockMvc.perform(get("/")).andReturn();
 
 		MockHttpServletResponse response = result.getResponse();
-		UnauthorizedErrorResponse errorResponse =
-				objectMapper.readValue(response.getContentAsString(), UnauthorizedErrorResponse.class);
+		ErrorResponse errorResponse =
+				objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
 
 		assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
 		assertEquals(HttpStatus.UNAUTHORIZED.name(), response.getErrorMessage());
@@ -88,8 +88,8 @@ public class SecurityController {
 		).andReturn();
 
 		MockHttpServletResponse response = result.getResponse();
-		UnauthorizedErrorResponse errorResponse =
-				objectMapper.readValue(response.getContentAsString(), UnauthorizedErrorResponse.class);
+		ErrorResponse errorResponse =
+				objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
 
 		assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
 		assertEquals(HttpStatus.UNAUTHORIZED.name(), response.getErrorMessage());
