@@ -18,3 +18,4 @@ coverage:
 
 ignore:
   - "**/com.kosinskyi.ecom.registry.ApplicationStarter.java"
+  - "**/com.kosinskyi.ecom.registry.aspect.*.java"
