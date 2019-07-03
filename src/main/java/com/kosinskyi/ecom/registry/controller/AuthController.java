@@ -39,8 +39,6 @@ public class AuthController {
 
   @GetMapping("test2")
   @PreAuthorize("hasAuthority('MISSING_AUTHORITY')")
-  public String test2() {
-    return "OK!";
-  }
+  public void test2() { }
 
 }

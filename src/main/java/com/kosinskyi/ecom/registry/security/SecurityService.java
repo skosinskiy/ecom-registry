@@ -72,12 +72,15 @@ public class SecurityService {
   }
 
   public boolean isTokenValid(String jwt) {
-    return StringUtils.hasText(jwt) && hasTokenPassedChecks(jwt);
+    if (StringUtils.hasText(jwt)) {
+      validateJwt(jwt);
+      return true;
+    }
+    return false;
   }
 
-  private boolean hasTokenPassedChecks(String jwt) {
+  private void validateJwt(String jwt) {
     Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt);
-    return true;
   }
 
   public void setAuthenticationFromJwt(String jwt, HttpServletRequest request) {
