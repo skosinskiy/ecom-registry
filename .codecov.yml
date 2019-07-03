@@ -1,6 +1,17 @@
 comment: off
 
 coverage:
+  status:
+    patch:
+      default:
+        target: 95%
+        threshold: 2%
+        base: auto
+    project:
+      default:
+        target: 95%
+        threshold: 2%
+        base: auto
   range: 90..100
   round: down
   precision: 2
