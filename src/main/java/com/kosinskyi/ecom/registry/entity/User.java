@@ -34,8 +34,8 @@ public class User extends BaseEntity implements UserDetails {
   @Column(name = "password")
   private String password;
 
-  @Column(name = "password_expire_date")
-  private Date passwordExpireDate;
+  @Column(name = "account_expire_date")
+  private Date accountExpireDate;
 
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "user_permissions", joinColumns = @JoinColumn(name = "user_id"))
@@ -54,7 +54,7 @@ public class User extends BaseEntity implements UserDetails {
 
   @Override
   public boolean isAccountNonExpired() {
-    return System.currentTimeMillis() < passwordExpireDate.getTime();
+    return System.currentTimeMillis() < accountExpireDate.getTime();
   }
 
   @Override

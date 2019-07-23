@@ -13,8 +13,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -22,17 +22,20 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private UserService userService;
-  private JwtAuthenticationFilter jwtAuthenticationFilter;
-  private JwtAuthenticationEntryPoint unauthorizedHandler;
+  private UnauthorizedHandler unauthorizedHandler;
+  private SecuritySuccessHandler successHandler;
+  private SecurityFailureHandler failureHandler;
 
   @Autowired
   public SecurityConfig(
       UserService userService,
-      JwtAuthenticationFilter jwtAuthenticationFilter,
-      JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
+      UnauthorizedHandler unauthorizedHandler,
+      SecuritySuccessHandler successHandler,
+      SecurityFailureHandler failureHandler) {
     this.userService = userService;
-    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    this.unauthorizedHandler = jwtAuthenticationEntryPoint;
+    this.unauthorizedHandler = unauthorizedHandler;
+    this.successHandler = successHandler;
+    this.failureHandler = failureHandler;
   }
 
   @Bean(BeanIds.AUTHENTICATION_MANAGER)
@@ -49,24 +52,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .disable()
       .and()
         .csrf()
-        .disable()
+        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+      .and()
         .exceptionHandling()
         .authenticationEntryPoint(unauthorizedHandler)
       .and()
-        .sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-      .and()
         .authorizeRequests()
-        .antMatchers("/**/static/**", "/h2-console/**", "/api/auth/**")
+        .antMatchers("/**/static/**", "/h2-console/**")
         .permitAll()
         .anyRequest()
         .authenticated()
       .and()
+        .formLogin()
+        .loginProcessingUrl("/auth")
+        .successHandler(successHandler)
+        .failureHandler(failureHandler)
+        .permitAll()
+      .and()
         .logout()
         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
-        .permitAll();
-
-    http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        .permitAll()
+      .and()
+        .rememberMe()
+        .key("uniqueKey")
+        .tokenValiditySeconds(86400);
   }
 
   @Override

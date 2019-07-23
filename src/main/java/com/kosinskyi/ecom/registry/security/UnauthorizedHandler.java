@@ -15,12 +15,12 @@ import java.io.IOException;
 
 @Component
 @Slf4j
-public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class UnauthorizedHandler implements AuthenticationEntryPoint {
 
   private ObjectMapper objectMapper;
 
   @Autowired
-  public JwtAuthenticationEntryPoint(ObjectMapper objectMapper) {
+  public UnauthorizedHandler(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
   }
 
