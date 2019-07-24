@@ -2,7 +2,7 @@ import React from 'react'
 import {Redirect, Route, Switch, withRouter} from 'react-router-dom'
 import LoginPage from '../../pages/LoginPage/LoginPage'
 import * as PropTypes from "prop-types";
-import MainPage from "../../pages/MainPage/MainPage";
+import AdminPage from "../../pages/AdminPage/AdminPage";
 import {connect} from "react-redux";
 
 const AppRoutes = props => {
@@ -11,7 +11,7 @@ const AppRoutes = props => {
     return (
         <Switch>
             <Route path="/login" component={LoginPage}/>
-            <ProtectedRoute path="/" component={MainPage} authenticated={!!currentUser}/>
+            <ProtectedRoute path="/" component={AdminPage} authenticated={!!currentUser}/>
         </Switch>
     )
 }

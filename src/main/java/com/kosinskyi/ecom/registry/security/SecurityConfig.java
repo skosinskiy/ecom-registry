@@ -11,9 +11,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -21,20 +22,17 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private UserService userService;
-  private UnauthorizedHandler unauthorizedHandler;
-  private SecuritySuccessHandler successHandler;
-  private SecurityFailureHandler failureHandler;
+  private JwtAuthenticationFilter jwtAuthenticationFilter;
+  private JwtAuthenticationEntryPoint unauthorizedHandler;
 
   @Autowired
   public SecurityConfig(
       UserService userService,
-      UnauthorizedHandler unauthorizedHandler,
-      SecuritySuccessHandler successHandler,
-      SecurityFailureHandler failureHandler) {
+      JwtAuthenticationFilter jwtAuthenticationFilter,
+      JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
     this.userService = userService;
-    this.unauthorizedHandler = unauthorizedHandler;
-    this.successHandler = successHandler;
-    this.failureHandler = failureHandler;
+    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    this.unauthorizedHandler = jwtAuthenticationEntryPoint;
   }
 
   @Bean(BeanIds.AUTHENTICATION_MANAGER)
@@ -49,32 +47,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .headers()
         .frameOptions()
         .disable()
-      .and()
+        .and()
         .csrf()
-        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-      .and()
+        .disable()
         .exceptionHandling()
         .authenticationEntryPoint(unauthorizedHandler)
-      .and()
+        .and()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
         .authorizeRequests()
-        .antMatchers("/**/static/**", "/h2-console/**")
+        .antMatchers("/**/static/**", "/h2-console/**", "/api/auth/**")
         .permitAll()
         .anyRequest()
         .authenticated()
-      .and()
-        .formLogin()
-        .loginProcessingUrl("/auth")
-        .successHandler(successHandler)
-        .failureHandler(failureHandler)
-        .permitAll()
-      .and()
+        .and()
         .logout()
         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
-        .permitAll()
-      .and()
-        .rememberMe()
-        .key("uniqueKey")
-        .tokenValiditySeconds(86400);
+        .permitAll();
+
+    http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
   }
 
   @Override

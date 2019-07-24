@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.management.relation.Role;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -36,6 +37,9 @@ public class User extends BaseEntity implements UserDetails {
 
   @Column(name = "account_expire_date")
   private Date accountExpireDate;
+
+  @Column(name = "role_id")
+  private Role role;
 
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "user_permissions", joinColumns = @JoinColumn(name = "user_id"))
