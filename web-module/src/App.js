@@ -8,36 +8,36 @@ import ToastrMessage from "./components/ToastrMessage/ToastrMessage";
 import Preloader from "./components/Preloader/Preloader";
 
 class App extends Component {
-    componentDidMount () {
-        this.props.getCurrentUser()
+  componentDidMount() {
+    this.props.getCurrentUser()
+  }
+
+  render() {
+
+    if (this.props.isCurrentUserLoading) {
+      return <Preloader/>
     }
 
-    render() {
-
-        if (this.props.isCurrentUserLoading) {
-            return <Preloader/>
-        }
-
-        return (
-            <>
-                <CssBaseline/>
-                <AppRoutes/>
-                <ToastrMessage/>
-            </>
-        );
-    }
+    return (
+        <>
+          <CssBaseline/>
+          <AppRoutes/>
+          <ToastrMessage/>
+        </>
+    );
+  }
 
 }
 
 const mapStateToProps = state => {
-    return {
-        currentUser: state.users.currentUser,
-        isCurrentUserLoading: state.users.isCurrentUserLoading
-    }
+  return {
+    currentUser: state.users.currentUser,
+    isCurrentUserLoading: state.users.isCurrentUserLoading
+  }
 }
 
 const mapDispatchToProps = dispatch => ({
-    getCurrentUser: () => dispatch(usersOperations.getCurrentUser())
+  getCurrentUser: () => dispatch(usersOperations.getCurrentUser())
 })
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));

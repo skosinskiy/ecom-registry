@@ -1,11 +1,13 @@
 package com.kosinskyi.ecom.registry.security;
 
 import com.kosinskyi.ecom.registry.dto.request.LoginRequest;
+import com.kosinskyi.ecom.registry.dto.request.RefreshRequest;
 import com.kosinskyi.ecom.registry.dto.response.LoginResponse;
-import com.kosinskyi.ecom.registry.dto.response.UserLoginResponse;
 import com.kosinskyi.ecom.registry.entity.User;
+import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.service.UserService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -23,20 +25,25 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 @Slf4j
 public class SecurityService {
 
-  public static final String TOKEN_TYPE = "Bearer";
+  public static final String AUTHORIZATION_HEADER = "Authorization";
+  public static final String TOKEN_TYPE = "Bearer ";
   private AuthenticationManager authenticationManager;
   private UserService userService;
 
   @Value("${app.jwtSecret}")
   private String jwtSecret;
 
-  @Value("${app.jwtExpirationInMs}")
-  private int jwtExpirationInMs;
+  @Value("${app.jwtAccessTokenExpirationInMs}")
+  private int jwtAccessTokenExpirationInMs;
+
+  @Value("${app.jwtRefreshTokenExpirationInMs}")
+  private int jwtRefreshTokenExpirationInMs;
 
   @Autowired
   public SecurityService(@Lazy AuthenticationManager authenticationManager, UserService userService) {
@@ -47,13 +54,22 @@ public class SecurityService {
   public LoginResponse setAuthenticationAndGenerateJwt(LoginRequest loginRequest) {
     Authentication authentication = authenticateUser(loginRequest);
     SecurityContextHolder.getContext().setAuthentication(authentication);
-    LoginResponse loginResponse = new LoginResponse();
-    loginResponse.setJwt(generateToken(authentication));
-    loginResponse.setTokenType(TOKEN_TYPE);
     User user = (User) authentication.getPrincipal();
-    UserLoginResponse userLoginResponse = new UserLoginResponse();
-    userLoginResponse.setRole("admin");
-    loginResponse.setUser(userLoginResponse);
+    Long userId = user.getId();
+    String jwtAccessToken = generateAccessToken(userId);
+    String jwtRefreshToken = generateRefreshToken();
+    long jwtRefreshTokenExpireTimeInMs = System.currentTimeMillis() + jwtRefreshTokenExpirationInMs;
+    userService.setRefreshToken(userId, jwtRefreshToken, jwtRefreshTokenExpireTimeInMs);
+    return getLoginResponse(jwtAccessToken, jwtRefreshToken, jwtRefreshTokenExpireTimeInMs);
+  }
+
+  private LoginResponse getLoginResponse(
+      String jwtAccessToken, String jwtRefreshToken, long jwtRefreshTokenExpireTimeInMs) {
+    LoginResponse loginResponse = new LoginResponse();
+    loginResponse.setJwtAccessToken(jwtAccessToken);
+    loginResponse.setJwtRefreshToken(jwtRefreshToken);
+    loginResponse.setJwtRefreshTokenExpireDate(jwtRefreshTokenExpireTimeInMs);
+    loginResponse.setTokenType(TOKEN_TYPE);
     return loginResponse;
   }
 
@@ -63,49 +79,46 @@ public class SecurityService {
     );
   }
 
-  public String generateToken(Authentication authentication) {
-    User user = (User) authentication.getPrincipal();
+  public String generateAccessToken(Long userId) {
     Date now = new Date();
-    Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+    Date expiryDate = new Date(now.getTime() + jwtAccessTokenExpirationInMs);
 
     return Jwts.builder()
-        .setSubject(Long.toString(user.getId()))
+        .setSubject(Long.toString(userId))
         .setIssuedAt(now)
         .setExpiration(expiryDate)
         .signWith(SignatureAlgorithm.HS512, jwtSecret)
         .compact();
   }
 
-  public boolean isTokenValid(String jwt) {
-    if (StringUtils.hasText(jwt)) {
-      validateJwt(jwt);
-      return true;
-    }
-    return false;
+  public String generateRefreshToken() {
+    return UUID.randomUUID().toString();
   }
 
-  private void validateJwt(String jwt) {
-    Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt);
+  public Claims getJwtClaims(String jwt) {
+    return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).getBody();
   }
 
-  public void setAuthenticationFromJwt(String jwt, HttpServletRequest request) {
-    Long userId = getUserIdFromJwt(jwt);
+  public void setAuthenticationFromClaims(Claims claims, HttpServletRequest request) {
+    Long userId = Long.parseLong(claims.getSubject());
     UserDetails userDetails = userService.loadUserById(userId);
     UsernamePasswordAuthenticationToken authentication =
         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 
-  public Long getUserIdFromJwt(String token) {
-    Claims claims = Jwts.parser()
-        .setSigningKey(jwtSecret)
-        .parseClaimsJws(token)
-        .getBody();
-
-    return Long.parseLong(claims.getSubject());
+  public LoginResponse refreshToken(RefreshRequest refreshRequest) {
+    String jwtRefreshToken = refreshRequest.getJwtRefreshToken();
+    User user = userService.findUserByRefreshToken(jwtRefreshToken);
+    if (user.getJwtRefreshTokenExpireDate().getTime() > System.currentTimeMillis()) {
+      String newJwtRefreshToken = generateRefreshToken();
+      String newJwtAccessToken = generateAccessToken(user.getId());
+      long jwtRefreshTokenExpireTimeInMs = System.currentTimeMillis() + jwtRefreshTokenExpirationInMs;
+      userService.setRefreshToken(user.getId(), newJwtRefreshToken, jwtRefreshTokenExpireTimeInMs);
+      return getLoginResponse(newJwtAccessToken, newJwtRefreshToken, jwtRefreshTokenExpireTimeInMs);
+    } else {
+      throw new ActionForbiddenException(String.format("Refresh token %s is expired", jwtRefreshToken));
+    }
   }
-
-
 }

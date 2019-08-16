@@ -1,5 +1,6 @@
 package com.kosinskyi.ecom.registry.security;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,16 +30,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
     String jwt = getJwtFromRequest(request);
-    if (securityService.isTokenValid(jwt)) {
-      securityService.setAuthenticationFromJwt(jwt, request);
+    if (StringUtils.hasText(jwt)) {
+      Claims jwtClaims = securityService.getJwtClaims(jwt);
+      securityService.setAuthenticationFromClaims(jwtClaims, request);
     }
     filterChain.doFilter(request, response);
   }
 
   private String getJwtFromRequest(HttpServletRequest request) {
-    String bearerToken = request.getHeader("Authorization");
+    String bearerToken = request.getHeader(SecurityService.AUTHORIZATION_HEADER);
     if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(SecurityService.TOKEN_TYPE)) {
-      return bearerToken.substring(7);
+      return bearerToken.substring(SecurityService.TOKEN_TYPE.length());
     }
     return null;
   }

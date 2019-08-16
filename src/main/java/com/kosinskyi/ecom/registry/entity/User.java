@@ -38,6 +38,12 @@ public class User extends BaseEntity implements UserDetails {
   @Column(name = "account_expire_date")
   private Date accountExpireDate;
 
+  @Column(name = "jwt_refresh_token")
+  private String jwtRefreshToken;
+
+  @Column(name = "jwt_refresh_token_expire_date")
+  private Date jwtRefreshTokenExpireDate;
+
   @Column(name = "role_id")
   private Role role;
 

@@ -10,6 +10,8 @@ server:
 
 app:
   jwtSecret:
-    05a7605ec52b437d9d4d0cb069ace784
-  jwtExpirationInMs:
-    90000000
+    ${random.uuid}
+  jwtRefreshTokenExpirationInMs:
+    120000
+  jwtAccessTokenExpirationInMs:
+    75000

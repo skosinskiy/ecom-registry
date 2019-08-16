@@ -1,6 +1,6 @@
 #Idea config files
 .idea/
-ecom_registry.iml
+registry.iml
 
 # Compiled class file
 *.class

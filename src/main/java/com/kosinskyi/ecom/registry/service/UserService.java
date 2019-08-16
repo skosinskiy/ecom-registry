@@ -1,14 +1,10 @@
 package com.kosinskyi.ecom.registry.service;
 
-import com.kosinskyi.ecom.registry.dto.response.UserResponse;
 import com.kosinskyi.ecom.registry.entity.User;
 import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.exception.NoDataFoundException;
 import com.kosinskyi.ecom.registry.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,8 +12,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService, CrudService<User> {
@@ -81,5 +77,19 @@ public class UserService implements UserDetailsService, CrudService<User> {
     User user = getById(id);
     userRepository.delete(user);
     return user;
+  }
+
+  public void setRefreshToken(Long userId, String jwtRefreshToken, long jwtRefreshTokenExpireTimeInMs) {
+    User user = getById(userId);
+    user.setJwtRefreshToken(jwtRefreshToken);
+    user.setJwtRefreshTokenExpireDate(new Date(jwtRefreshTokenExpireTimeInMs));
+    userRepository.save(user);
+  }
+
+  public User findUserByRefreshToken(String jwtRefreshToken) {
+    return userRepository
+        .findByJwtRefreshToken(jwtRefreshToken)
+        .orElseThrow(() ->
+            new NoDataFoundException(String.format("No user found with refresh token %s", jwtRefreshToken)));
   }
 }
