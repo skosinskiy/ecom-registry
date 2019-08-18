@@ -27,7 +27,7 @@ export class FetchData {
     return this.makeRequest(url, METHOD_DELETE, null, requestParams)
   }
 
-  makeRequest(url, method, body, reqParams) {
+  async makeRequest(url, method, body, reqParams) {
     const requestParams = {
       method: method || METHOD_GET,
       data: body,
@@ -44,14 +44,13 @@ export class FetchData {
       }
     }
 
-    return getJwtToken(requestParams, REQUEST_TIMEOUT, url).then(jwtAccessToken => {
-      if (jwtAccessToken) {
-        requestParams.headers = {
-          'Authorization': `Bearer ${jwtAccessToken}`
-        }
+    const jwtAccessToken = await getJwtToken(requestParams, REQUEST_TIMEOUT, url)
+    if (jwtAccessToken) {
+      requestParams.headers = {
+        'Authorization': `Bearer ${jwtAccessToken}`
       }
-      return this.sendRequest(url, requestParams)
-    })
+    }
+    return this.sendRequest(url, requestParams)
   }
 
   sendRequest(url, requestParams) {

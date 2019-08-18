@@ -1,27 +1,15 @@
 import jwt from "jsonwebtoken";
 import api from '../components/Axios/Axios'
 
-//TODO REFACTOR!!!!!!!!!!!!!!!!!!1
 export const getJwtToken = (requestParams, requestTimeout) => {
-  return new Promise(resolve => {
     const {jwtAccessToken, jwtRefreshToken, jwtRefreshTokenExpireTime} = getLocalStorageTokens()
-    if (isTokenUpdateRequired(jwtAccessToken, jwtRefreshToken, jwtRefreshTokenExpireTime, requestTimeout)) {
-      return api.sendRequest('api/auth/refresh', {
-        method: 'POST',
-        data: {
-          jwtRefreshToken: jwtRefreshToken
-        }
-      }).then(res => {
-        setLocalStorageTokens(res.data)
-        resolve(res.data.jwtAccessToken)
-      }).catch(() => {
-        window.localStorage.clear()
-        resolve(null)
-      })
-    } else {
-      resolve(jwtAccessToken)
+    if (!jwtAccessToken) {
+      return null;
     }
-  })
+    if (isTokenUpdateRequired(jwtAccessToken, jwtRefreshToken, jwtRefreshTokenExpireTime, requestTimeout)) {
+      return refreshAccessToken(jwtRefreshToken)
+    }
+    return jwtAccessToken;
 }
 
 const setLocalStorageTokens = jwtAccessTokens => {
@@ -40,14 +28,26 @@ const getLocalStorageTokens = () => {
 }
 
 const isTokenUpdateRequired = (jwtAccessToken, jwtRefreshToken, jwtRefreshTokenExpireTime, requestTimeout) => {
-  if (!jwtAccessToken) {
-    return false;
-  }
   const accessTokenExpireTime = jwt.decode(jwtAccessToken).exp * 1000
   const currentTime = new Date().getTime()
-  return jwtRefreshToken &&
-      currentTime > accessTokenExpireTime - requestTimeout &&
-      jwtRefreshTokenExpireTime - requestTimeout > currentTime
+  return currentTime > accessTokenExpireTime - requestTimeout &&
+      jwtRefreshTokenExpireTime - requestTimeout > currentTime &&
+      jwtRefreshToken
+}
+
+const refreshAccessToken = jwtRefreshToken => {
+  return api.sendRequest('api/auth/refresh', {
+    method: 'POST',
+    data: {
+      jwtRefreshToken: jwtRefreshToken
+    }
+  }).then(res => {
+    setLocalStorageTokens(res.data)
+    return res.data.jwtAccessToken
+  }).catch(() => {
+    window.localStorage.clear()
+    return null;
+  })
 }
 
 

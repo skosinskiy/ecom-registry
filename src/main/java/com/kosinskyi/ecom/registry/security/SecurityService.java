@@ -7,7 +7,6 @@ import com.kosinskyi.ecom.registry.entity.User;
 import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.service.UserService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -31,8 +29,8 @@ import java.util.UUID;
 @Slf4j
 public class SecurityService {
 
-  public static final String AUTHORIZATION_HEADER = "Authorization";
-  public static final String TOKEN_TYPE = "Bearer ";
+  static final String AUTHORIZATION_HEADER = "Authorization";
+  static final String TOKEN_TYPE = "Bearer ";
   private AuthenticationManager authenticationManager;
   private UserService userService;
 
