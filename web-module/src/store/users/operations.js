@@ -1,6 +1,7 @@
 import * as ACTIONS from './actions'
 import api from '../../components/Axios/Axios'
 import {toastr} from 'react-redux-toastr'
+import {setLocalStorageTokens} from "../../service/jwtService";
 
 export const submitLoginForm = (event, email, password) => dispatch => {
   event.preventDefault()
@@ -8,28 +9,23 @@ export const submitLoginForm = (event, email, password) => dispatch => {
 
   const data = {email, password}
 
-  api.post('/api/auth', data)
-  .then(res => {
-    if (res.status === 200) {
-      const {jwtAccessToken, jwtRefreshToken, jwtRefreshTokenExpireDate} = res.data
-      window.localStorage.setItem('jwt_access_token', jwtAccessToken);
-      window.localStorage.setItem('jwt_refresh_token', jwtRefreshToken);
-      window.localStorage.setItem('jwt_refresh_token_expire', jwtRefreshTokenExpireDate)
-      return dispatch(getCurrentUser())
-    }
+  return api.post('/api/auth', data).then(res => {
+    setLocalStorageTokens(res)
+    return dispatch(getCurrentUser())
   })
-  .catch(() => {
+  .catch(error => {
     dispatch(ACTIONS.currentUserLoading(false))
-    toastr.error('Error', 'Wrong password or email!')
+    window.localStorage.clear()
+    toastr.error('Login error', error.response.data.message)
   })
 }
 
 export const getCurrentUser = () => dispatch => {
   dispatch(ACTIONS.currentUserLoading(true))
   return api.get('/api/users/current')
-    .then(res => dispatch(ACTIONS.currentUserFetched(res.data)))
-    .catch(reason => toastr.error('Error', reason))
-    .finally(() => {
-      dispatch(ACTIONS.currentUserLoading(false))
+  .then(res => dispatch(ACTIONS.currentUserFetched(res)))
+  .catch(reason => toastr.error('Error', reason))
+  .finally(() => {
+    dispatch(ACTIONS.currentUserLoading(false))
   })
 }

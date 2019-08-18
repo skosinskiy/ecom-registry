@@ -12,7 +12,7 @@ export const getJwtToken = (requestParams, requestTimeout) => {
     return jwtAccessToken;
 }
 
-const setLocalStorageTokens = jwtAccessTokens => {
+export const setLocalStorageTokens = jwtAccessTokens => {
   const {jwtAccessToken, jwtRefreshToken, jwtRefreshTokenExpireDate} = jwtAccessTokens
   window.localStorage.setItem('jwt_access_token', jwtAccessToken)
   window.localStorage.setItem('jwt_refresh_token', jwtRefreshToken)
@@ -42,8 +42,8 @@ const refreshAccessToken = jwtRefreshToken => {
       jwtRefreshToken: jwtRefreshToken
     }
   }).then(res => {
-    setLocalStorageTokens(res.data)
-    return res.data.jwtAccessToken
+    setLocalStorageTokens(res)
+    return res.jwtAccessToken
   }).catch(() => {
     window.localStorage.clear()
     return null;

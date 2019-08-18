@@ -1,7 +1,7 @@
 import {toastr} from 'react-redux-toastr'
 import axios from 'axios'
 import 'react-redux-toastr/lib/css/react-redux-toastr.min.css'
-import {getJwtToken} from "../../service/jwtService";
+import {getJwtToken, JwtService} from "../../service/jwtService";
 
 const METHOD_GET = 'get'
 const METHOD_POST = 'post'
@@ -56,9 +56,9 @@ export class FetchData {
   sendRequest(url, requestParams) {
     return new Promise((resolve, reject) => {
       axios(url, requestParams)
-      .then(result => resolve(result))
+      .then(result => resolve(result.data))
       .catch(reason => {
-        if (reason.toString().startsWith('Error: Request failed with status code 401')) {
+        if (reason.response.status === 401) {
           window.localStorage.clear()
         }
         this.requestFailed(reason)

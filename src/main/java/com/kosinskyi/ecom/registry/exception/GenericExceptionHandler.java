@@ -31,8 +31,8 @@ public class GenericExceptionHandler {
     log.error(exc.getMessage(), exc);
     HttpStatus httpStatus = getHttpStatusForException(exc);
     ErrorResponse internalErrorResponse = new ErrorResponse(exc, request, httpStatus);
+    response.setStatus(httpStatus.value());
     response.getWriter().write(objectMapper.writeValueAsString(internalErrorResponse));
-    response.sendError(httpStatus.value(), httpStatus.name());
   }
 
   private HttpStatus getHttpStatusForException(Exception exc) {
