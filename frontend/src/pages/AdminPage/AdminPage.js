@@ -7,9 +7,7 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import {withStyles} from "@material-ui/core";
 import {withRouter} from "react-router-dom";
-import {connect} from "react-redux";
 import classNames from 'classnames'
-import {usersOperations} from '../../store/users/index'
 import PowerSetting from '@material-ui/icons/PowerSettingsNew'
 import SidebarMenu from './SidebarMenu/SidebarMenu'
 
@@ -86,7 +84,7 @@ const styles = theme => ({
 
 class AdminPage extends Component {
 
-  logoutUser() {
+  static logoutUser() {
     window.localStorage.clear()
     window.location.reload()
   }
@@ -108,7 +106,7 @@ class AdminPage extends Component {
               >
                 E-commerce Admin Panel
               </Typography>
-              <IconButton onClick={this.logoutUser} color="inherit" alt="Log out">
+              <IconButton onClick={AdminPage.logoutUser} color="inherit" alt="Log out">
                 <PowerSetting/>
               </IconButton>
             </Toolbar>

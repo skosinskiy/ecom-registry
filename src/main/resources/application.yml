@@ -12,6 +12,6 @@ app:
   jwtSecret:
     ${random.uuid}
   jwtRefreshTokenExpirationInMs:
-    120000
+    ‭1209600000‬
   jwtAccessTokenExpirationInMs:
-    75000
+    900000

@@ -2,8 +2,6 @@ import React, {Component} from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -26,6 +24,25 @@ const styles = theme => ({
     backgroundSize: 'cover',
     backgroundPosition: 'center',
   },
+  imageWrapper: {
+    width: '100%',
+    height: '100vh',
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)'
+  },
+  imageTitle: {
+    margin: '0 0 0 150px',
+    color: 'white',
+    fontSize: '40px',
+    fontWeight: 700
+  },
+  imageText: {
+    margin: '0 0 0 150px',
+    color: 'white',
+    fontSize: '25px'
+  },
   paper: {
     margin: theme.spacing(8, 4),
     display: 'flex',
@@ -38,11 +55,14 @@ const styles = theme => ({
   },
   form: {
     width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
+    marginTop: theme.spacing(1)
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  forgot: {
+    margin: theme.spacing(0, 0, 2),
+  }
 })
 
 class LoginForm extends Component {
@@ -72,8 +92,13 @@ class LoginForm extends Component {
 
     return (
         <Grid container className={classes.root}>
-          <Grid item xs={false} sm={4} md={9} className={classes.image}/>
-          <Grid item xs={12} sm={8} md={3} component={Paper} elevation={6} square>
+          <Grid item xs={1} sm={6} md={8} lg={9} className={classes.image}>
+            <div className={classes.imageWrapper}>
+              <h2 className={classes.imageTitle}>Welcome to E-commerce registry helper!</h2>
+              <p className={classes.imageText}>This application allows easily deal with everyday registry routine!</p>
+            </div>
+          </Grid>
+          <Grid item xs={11} sm={6} md={4} lg={3} component={Paper} elevation={6} square>
             <div className={classes.paper}>
               <Avatar className={classes.avatar}>
                 <LockOutlinedIcon/>
@@ -108,25 +133,25 @@ class LoginForm extends Component {
                     onChange={event => this.handleChange(event, 'password')}
                     value={password}
                 />
-                <FormControlLabel
-                    control={<Checkbox value="remember" color="primary"/>}
-                    label="Remember me"
-                />
                 <Button
                     type="submit"
                     fullWidth
                     variant="contained"
                     color="primary"
+                    disabled={email.length < 3 || password.length < 3}
                     className={classes.submit}
                 >
                   Sign In
                 </Button>
-                <Grid container>
-                  <Grid item xs>
-                    <Link href="#" variant="body2">
-                      Forgot password?
-                    </Link>
-                  </Grid>
+                <Button
+                    fullWidth
+                    variant="contained"
+                    color="secondary"
+                    className={classes.forgot}
+                >
+                  Forgot Password
+                </Button>
+                <Grid container direction={"column"} alignItems={"center"}>
                   <Grid item>
                     <Link href="#" variant="body2">
                       {"Don't have an account? Sign Up"}

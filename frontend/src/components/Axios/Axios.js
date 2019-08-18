@@ -1,7 +1,7 @@
 import {toastr} from 'react-redux-toastr'
 import axios from 'axios'
 import 'react-redux-toastr/lib/css/react-redux-toastr.min.css'
-import {getJwtToken, JwtService} from "../../service/jwtService";
+import {getJwtToken} from "../../service/jwtService";
 
 const METHOD_GET = 'get'
 const METHOD_POST = 'post'
