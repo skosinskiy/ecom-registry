@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +34,9 @@ public class SecurityService {
 
   static final String AUTHORIZATION_HEADER = "Authorization";
   static final String TOKEN_TYPE = "Bearer ";
+  private static final String EMAIL_CLAIM = "email";
+  private static final String PERMISSIONS_CLAIM = "permissions";
+  private static final String IS_ACCOUNT_NON_EXPIRED_CLAIM = "isAccountNonExpired";
   private AuthenticationManager authenticationManager;
   private UserService userService;
 
@@ -42,10 +44,10 @@ public class SecurityService {
   private String jwtSecret;
 
   @Value("${app.jwtAccessTokenExpirationInMs}")
-  private int jwtAccessTokenExpirationInMs;
+  private Long jwtAccessTokenExpirationInMs;
 
   @Value("${app.jwtRefreshTokenExpirationInMs}")
-  private int jwtRefreshTokenExpirationInMs;
+  private Long jwtRefreshTokenExpirationInMs;
 
   @Autowired
   public SecurityService(@Lazy AuthenticationManager authenticationManager, UserService userService) {
@@ -57,47 +59,37 @@ public class SecurityService {
     Authentication authentication = authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
     SecurityContextHolder.getContext().setAuthentication(authentication);
     User user = (User) authentication.getPrincipal();
-    Long userId = user.getId();
-    String jwtAccessToken = generateAccessToken(user);
-    String jwtRefreshToken = generateRefreshToken();
-    long jwtRefreshTokenExpireTimeInMs = System.currentTimeMillis() + jwtRefreshTokenExpirationInMs;
-    userService.setRefreshToken(userId, jwtRefreshToken, jwtRefreshTokenExpireTimeInMs);
-    return getLoginResponse(jwtAccessToken, jwtRefreshToken, jwtRefreshTokenExpireTimeInMs);
+    User userWithRefreshToken = userService.setRefreshToken(user, jwtRefreshTokenExpirationInMs);
+    return getLoginResponse(userWithRefreshToken);
+  }
+
+  private Authentication authenticateUser(String username, String password) {
+    return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
   }
 
   private LoginResponse getLoginResponse(
-      String jwtAccessToken, String jwtRefreshToken, long jwtRefreshTokenExpireTimeInMs) {
+      User userWithRefreshToken) {
     LoginResponse loginResponse = new LoginResponse();
-    loginResponse.setJwtAccessToken(jwtAccessToken);
-    loginResponse.setJwtRefreshToken(jwtRefreshToken);
-    loginResponse.setJwtRefreshTokenExpireDate(jwtRefreshTokenExpireTimeInMs);
+    loginResponse.setJwtAccessToken(generateAccessToken(userWithRefreshToken));
+    loginResponse.setJwtRefreshToken(userWithRefreshToken.getJwtRefreshToken());
+    loginResponse.setJwtRefreshTokenExpireDate(userWithRefreshToken.getJwtRefreshTokenExpireDate().getTime());
     loginResponse.setTokenType(TOKEN_TYPE);
     return loginResponse;
   }
 
-  private Authentication authenticateUser(String username, String password) {
-    return authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(username, password)
-    );
-  }
-
-  public String generateAccessToken(User user) {
+  private String generateAccessToken(User user) {
     Date now = new Date();
     Date expiryDate = new Date(now.getTime() + jwtAccessTokenExpirationInMs);
 
     return Jwts.builder()
         .setSubject(Long.toString(user.getId()))
+        .claim(EMAIL_CLAIM, user.getEmail())
+        .claim(PERMISSIONS_CLAIM, user.getPermissions())
+        .claim(IS_ACCOUNT_NON_EXPIRED_CLAIM, user.isAccountNonExpired())
         .setIssuedAt(now)
-        .claim("email", user.getEmail())
-        .claim("permissions", user.getPermissions())
-        .claim("isAccountNonExpired", user.isAccountNonExpired())
         .setExpiration(expiryDate)
         .signWith(SignatureAlgorithm.HS512, jwtSecret)
         .compact();
-  }
-
-  public String generateRefreshToken() {
-    return UUID.randomUUID().toString();
   }
 
   public Claims getJwtClaims(String jwt) {
@@ -105,15 +97,11 @@ public class SecurityService {
   }
 
   public void setAuthenticationFromClaims(Claims claims, HttpServletRequest request) {
-    boolean isAccountNonExpired = Boolean.parseBoolean(claims.get("isAccountNonExpired").toString()) ;
-    String userEmail = String.valueOf(claims.get("email"));
-    List<Permission> userPermissions = ((List<String>) claims.get("permissions"))
-        .stream().map(Permission::valueOf).collect(Collectors.toList());
     UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-        .username(userEmail)
+        .username(String.valueOf(claims.get(EMAIL_CLAIM)))
         .password("")
-        .authorities(userPermissions)
-        .accountExpired(!isAccountNonExpired)
+        .authorities(getUserPermissionsFromClaim(claims))
+        .accountExpired(!Boolean.parseBoolean(claims.get(IS_ACCOUNT_NON_EXPIRED_CLAIM).toString()))
         .build();
     UsernamePasswordAuthenticationToken authentication =
         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -121,20 +109,31 @@ public class SecurityService {
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 
+  @SuppressWarnings("ALL")
+  private List<Permission> getUserPermissionsFromClaim(Claims claims) {
+    return ((List<String>) claims.get(PERMISSIONS_CLAIM))
+        .stream()
+        .map(Permission::valueOf)
+        .collect(Collectors.toList());
+  }
+
   public LoginResponse refreshToken(RefreshRequest refreshRequest) {
-    String jwtRefreshToken = refreshRequest.getJwtRefreshToken();
-    User user = userService.findUserByRefreshToken(jwtRefreshToken);
+    User user = userService.findUserByRefreshToken(refreshRequest.getJwtRefreshToken());
+    checkIsUserExpired(user);
+    checkIsJwtRefreshTokenExpired(user);
+    User userWithRefreshToken = userService.setRefreshToken(user, jwtRefreshTokenExpirationInMs);
+    return getLoginResponse(userWithRefreshToken);
+  }
+
+  private void checkIsUserExpired(User user) {
     if (!user.isAccountNonExpired()) {
       throw new AccountExpiredException("User account is expired");
     }
-    if (user.getJwtRefreshTokenExpireDate().getTime() > System.currentTimeMillis()) {
-      String newJwtRefreshToken = generateRefreshToken();
-      String newJwtAccessToken = generateAccessToken(user);
-      long jwtRefreshTokenExpireTimeInMs = System.currentTimeMillis() + jwtRefreshTokenExpirationInMs;
-      userService.setRefreshToken(user.getId(), newJwtRefreshToken, jwtRefreshTokenExpireTimeInMs);
-      return getLoginResponse(newJwtAccessToken, newJwtRefreshToken, jwtRefreshTokenExpireTimeInMs);
-    } else {
-      throw new ActionForbiddenException(String.format("Refresh token %s is expired", jwtRefreshToken));
+  }
+
+  private void checkIsJwtRefreshTokenExpired(User user) {
+    if (user.getJwtRefreshTokenExpireDate().getTime() < System.currentTimeMillis()) {
+      throw new ActionForbiddenException(String.format("Refresh token %s is expired", user.getJwtRefreshToken()));
     }
   }
 }

@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 import java.security.Principal;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService, CrudService<User> {
@@ -79,11 +80,21 @@ public class UserService implements UserDetailsService, CrudService<User> {
     return user;
   }
 
-  public void setRefreshToken(Long userId, String jwtRefreshToken, long jwtRefreshTokenExpireTimeInMs) {
-    User user = getById(userId);
-    user.setJwtRefreshToken(jwtRefreshToken);
-    user.setJwtRefreshTokenExpireDate(new Date(jwtRefreshTokenExpireTimeInMs));
-    userRepository.save(user);
+  public User setRefreshToken(User user, long jwtRefreshTokenExpirationInMs) {
+    if (user.getId() == null) {
+      throw new ActionForbiddenException("User id must not be null when set refresh token");
+    }
+    user.setJwtRefreshToken(generateRefreshToken());
+    user.setJwtRefreshTokenExpireDate(getJwtRefreshTokenExpireTimeInMs(jwtRefreshTokenExpirationInMs));
+    return userRepository.save(user);
+  }
+
+  private String generateRefreshToken() {
+    return UUID.randomUUID().toString();
+  }
+
+  private Date getJwtRefreshTokenExpireTimeInMs(long jwtRefreshTokenExpirationInMs) {
+    return new Date(System.currentTimeMillis() + jwtRefreshTokenExpirationInMs);
   }
 
   public User findUserByRefreshToken(String jwtRefreshToken) {

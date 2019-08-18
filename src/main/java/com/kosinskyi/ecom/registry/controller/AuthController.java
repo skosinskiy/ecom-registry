@@ -38,16 +38,4 @@ public class AuthController {
     return ResponseEntity.ok(securityService.refreshToken(refreshRequest));
   }
 
-  //TODO remove after implementing real endpoints
-  @GetMapping("test")
-  @PreAuthorize("hasAuthority('MANAGE_REGISTRY')")
-  public String test() {
-    return "OK!";
-  }
-
-  @GetMapping("test2")
-  @PreAuthorize("hasAuthority('MISSING_AUTHORITY')")
-  public void test2() {
-  }
-
 }

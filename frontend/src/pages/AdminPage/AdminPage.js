@@ -10,6 +10,7 @@ import {withRouter} from "react-router-dom";
 import classNames from 'classnames'
 import PowerSetting from '@material-ui/icons/PowerSettingsNew'
 import SidebarMenu from './SidebarMenu/SidebarMenu'
+import AppRoutes from "../../components/AppRoutes/AppRoutes";
 
 const drawerWidth = 240;
 
@@ -122,7 +123,7 @@ class AdminPage extends Component {
           </Drawer>
           <main className={classes.content}>
             <div className={classes.appBarSpacer}/>
-            {/*<AdminRouter/>*/}
+            {/*<AdminRoutes/>*/}
           </main>
         </div>
     );
