@@ -10,47 +10,48 @@ import {withRouter} from "react-router-dom";
 import classNames from 'classnames'
 import PowerSetting from '@material-ui/icons/PowerSettingsNew'
 import SidebarMenu from './SidebarMenu/SidebarMenu'
-import AppRoutes from "../../components/AppRoutes/AppRoutes";
+import AdminRoutes from '../../components/AdminRoutes/AdminRoutes'
 
 const drawerWidth = 240;
 
 const styles = theme => ({
   root: {
-    display: 'flex',
+    display: 'flex'
   },
   toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
+    paddingRight: 24
   },
-  toolbarIcon: {
+  toolbarText: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     padding: '0 8px',
-    ...theme.mixins.toolbar,
+    ...theme.mixins.toolbar
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
+      duration: theme.transitions.duration.leavingScreen
+    })
   },
   appBarShift: {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
+      duration: theme.transitions.duration.enteringScreen
+    })
   },
   menuButton: {
-    marginRight: 36,
+    marginLeft: 12,
+    marginRight: 36
   },
   menuButtonHidden: {
-    display: 'none',
+    display: 'none'
   },
   title: {
-    flexGrow: 1,
+    flexGrow: 1
   },
   drawerPaper: {
     position: 'relative',
@@ -58,30 +59,37 @@ const styles = theme => ({
     width: drawerWidth,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
+      duration: theme.transitions.duration.enteringScreen
+    })
+  },
+  drawerPaperClose: {
+    overflowX: 'hidden',
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen
     }),
-    backgroundColor: theme.palette.grey["900"]
+    width: theme.spacing(7),
+    [theme.breakpoints.up('sm')]: {
+      width: theme.spacing(9)
+    }
   },
   appBarSpacer: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
+    padding: theme.spacing(3),
     height: '100vh',
-    overflow: 'auto',
+    overflow: 'auto'
   },
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
+  chartContainer: {
+    marginLeft: -22
   },
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
+  tableContainer: {
+    height: 320
   },
-  fixedHeight: {
-    height: 240,
-  },
-});
+  h5: {
+    marginBottom: theme.spacing(2)
+  }
+})
 
 class AdminPage extends Component {
 
@@ -96,7 +104,10 @@ class AdminPage extends Component {
 
     return (
         <div className={classes.root}>
-          <AppBar position="absolute" className={classNames(classes.appBar, classes.appBarShift)}>
+          <AppBar
+              position="absolute"
+              className={classNames(classes.appBar, classes.appBarShift)}
+          >
             <Toolbar className={classes.toolbar}>
               <Typography
                   component="h1"
@@ -105,7 +116,7 @@ class AdminPage extends Component {
                   noWrap
                   className={classes.title}
               >
-                E-commerce Admin Panel
+                Admin Panel
               </Typography>
               <IconButton onClick={AdminPage.logoutUser} color="inherit" alt="Log out">
                 <PowerSetting/>
@@ -118,12 +129,16 @@ class AdminPage extends Component {
                 paper: classNames(classes.drawerPaper)
               }}
           >
+            <div className={classes.toolbarText}>
+              Hello!
+            </div>
+            <Divider/>
             <SidebarMenu/>
             <Divider/>
           </Drawer>
           <main className={classes.content}>
             <div className={classes.appBarSpacer}/>
-            {/*<AdminRoutes/>*/}
+            <AdminRoutes/>
           </main>
         </div>
     );
