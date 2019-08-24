@@ -12,7 +12,7 @@ import java.util.Objects;
 @Component
 public class ObjectUtils {
 
-  private String[] getNullPropertyNames (Object source) {
+  private String[] getNullPropertyNames(Object source) {
     BeanWrapper src = new BeanWrapperImpl(source);
     return Arrays
         .stream(src.getPropertyDescriptors())
