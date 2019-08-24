@@ -3,8 +3,12 @@ package com.kosinskyi.ecom.registry.service;
 import com.kosinskyi.ecom.registry.entity.User;
 import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.exception.NoDataFoundException;
+import com.kosinskyi.ecom.registry.exception.NotYetImplementedException;
 import com.kosinskyi.ecom.registry.repository.UserRepository;
+import com.kosinskyi.ecom.registry.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,10 +24,12 @@ import java.util.UUID;
 public class UserService implements UserDetailsService, CrudService<User> {
 
   private UserRepository userRepository;
+  private ObjectUtils objectUtils;
 
   @Autowired
-  public UserService(UserRepository userRepository) {
+  public UserService(UserRepository userRepository, ObjectUtils objectUtils) {
     this.userRepository = userRepository;
+    this.objectUtils = objectUtils;
   }
 
   @Override
@@ -34,13 +40,6 @@ public class UserService implements UserDetailsService, CrudService<User> {
         .orElseThrow(() -> new UsernameNotFoundException(String.format("No user with email %s found", email)));
   }
 
-  @Transactional
-  public UserDetails loadUserById(Long id) {
-    return userRepository
-        .findById(id)
-        .orElseThrow(() -> new UsernameNotFoundException(String.format("No user with id %d found", id)));
-  }
-
   public User getCurrentUser(Principal principal) {
     return userRepository
         .findByEmail(principal.getName())
@@ -48,36 +47,38 @@ public class UserService implements UserDetailsService, CrudService<User> {
   }
 
   @Override
-  public User getById(Long id) {
+  public User findById(Long userId) {
     return userRepository
-        .findById(id)
-        .orElseThrow(() -> new NoDataFoundException(String.format("No user with id %d found", id)));
+        .findById(userId)
+        .orElseThrow(() -> new NoDataFoundException(String.format("No user with id %d found", userId)));
   }
 
   @Override
-  public List<User> getAll() {
-    return userRepository.findAll();
+  public List<User> findAll() {
+    throw new NotYetImplementedException();
+  }
+
+  @Override
+  public Page<User> findAll(Pageable pageable) {
+    throw new NotYetImplementedException();
   }
 
   @Override
   public User create(User user) {
-    if (user.getId() != null) {
-      throw new ActionForbiddenException("User id is forbidden in create request");
-    }
+    user.setId(null);
     return userRepository.save(user);
   }
 
   @Override
-  public User update(Long id, User entity) {
-    entity.setId(id);
-    return userRepository.save(entity);
+  public User update(Long userId, User updatedEntity) {
+    User existingUser = findById(userId);
+    objectUtils.copyNotNullProperties(updatedEntity, existingUser);
+    return userRepository.save(existingUser);
   }
 
   @Override
-  public User delete(Long id) {
-    User user = getById(id);
-    userRepository.delete(user);
-    return user;
+  public User delete(Long userId) {
+    throw new NotYetImplementedException();
   }
 
   public User setRefreshToken(User user, long jwtRefreshTokenExpirationInMs) {

@@ -1,4 +1,4 @@
-package com.kosinskyi.ecom.registry.convert;
+package com.kosinskyi.ecom.registry.mapping;
 
 import com.kosinskyi.ecom.registry.entity.BaseEntity;
 import com.kosinskyi.ecom.registry.service.CrudService;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Component
 @Transactional
 @SuppressWarnings("unchecked")
-public abstract class AbstractConvertFacade<E extends BaseEntity, I, O> {
+public abstract class AbstractMapper<E extends BaseEntity, I, O> {
 
   private ModelMapper modelMapper;
   protected CrudService<E> crudService;
@@ -33,11 +33,11 @@ public abstract class AbstractConvertFacade<E extends BaseEntity, I, O> {
   }
 
   public O getById(Long id) {
-    return mapEntityToResponseDto(crudService.getById(id));
+    return mapEntityToResponseDto(crudService.findById(id));
   }
 
   public List<O> getAll() {
-    List<E> entities = crudService.getAll();
+    List<E> entities = crudService.findAll();
     return mapEntityListToResponseDtoList(entities);
   }
 

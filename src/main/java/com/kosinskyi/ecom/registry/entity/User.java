@@ -64,7 +64,7 @@ public class User extends BaseEntity implements UserDetails {
 
   @Override
   public boolean isAccountNonExpired() {
-    return System.currentTimeMillis() < accountExpireDate.getTime();
+    return accountExpireDate == null || System.currentTimeMillis() < accountExpireDate.getTime();
   }
 
   @Override

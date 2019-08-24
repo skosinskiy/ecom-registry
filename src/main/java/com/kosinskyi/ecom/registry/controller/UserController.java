@@ -1,6 +1,6 @@
 package com.kosinskyi.ecom.registry.controller;
 
-import com.kosinskyi.ecom.registry.convert.UserConvertFacade;
+import com.kosinskyi.ecom.registry.mapping.UserMapper;
 import com.kosinskyi.ecom.registry.dto.response.UserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,9 +13,9 @@ import java.security.Principal;
 @RequestMapping("api/users")
 public class UserController {
 
-  private UserConvertFacade userConvertFacade;
+  private UserMapper userConvertFacade;
 
-  public UserController(UserConvertFacade userConvertFacade) {
+  public UserController(UserMapper userConvertFacade) {
     this.userConvertFacade = userConvertFacade;
   }
 
