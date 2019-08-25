@@ -4,8 +4,14 @@ spring:
       jdbc:h2:mem:ecom-registry;DB_CLOSE_ON_EXIT=FALSE
     username:
       sa
+server:
+  port:
+    10000
+
 app:
   jwtSecret:
-    05a7605ec52b437d9d4d0cb069ace784
-  jwtExpirationInMs:
+    ${random.uuid}
+  jwtRefreshTokenExpirationInMs:
+    1209600000
+  jwtAccessTokenExpirationInMs:
     900000

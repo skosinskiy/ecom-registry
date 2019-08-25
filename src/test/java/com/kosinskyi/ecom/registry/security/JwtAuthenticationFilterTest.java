@@ -1,5 +1,6 @@
 package com.kosinskyi.ecom.registry.security;
 
+import io.jsonwebtoken.Claims;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,79 +15,70 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class JwtAuthenticationFilterTest {
 
-	@MockBean
-	private SecurityService securityService;
+  @Autowired
+  private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-	@Autowired
-	private JwtAuthenticationFilter jwtAuthenticationFilter;
+  @MockBean
+  private SecurityService securityService;
 
-	@Test
-	public void doFilterInternalValidTokenTest() throws ServletException, IOException {
-		String header = "Bearer Token";
-		String token = "Token";
-		HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-		HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-		FilterChain mockFilterChain = mock(FilterChain.class);
+  @Test
+  public void doFilterInternalEmptyHeaderTest() throws ServletException, IOException {
 
-		when(mockRequest.getHeader("Authorization")).thenReturn(header);
-		when(securityService.isTokenValid(token)).thenReturn(true);
+    HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+    HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
+    FilterChain filterChain = mock(FilterChain.class);
 
-		jwtAuthenticationFilter.doFilterInternal(mockRequest, mockResponse, mockFilterChain);
+    when(httpServletRequest.getHeader(SecurityService.AUTHORIZATION_HEADER)).thenReturn(null);
 
-		verify(securityService, times(1)).setAuthenticationFromJwt(token, mockRequest);
-		verify(mockFilterChain, times(1)).doFilter(mockRequest, mockResponse);
-	}
+    jwtAuthenticationFilter.doFilterInternal(httpServletRequest, httpServletResponse, filterChain);
 
-	@Test
-	public void doFilterInternalInvalidTokenTest() throws ServletException, IOException {
-		String header = "Bearer Token";
-		String token = "Token";
-		HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-		HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-		FilterChain mockFilterChain = mock(FilterChain.class);
+    verify(securityService, times(0))
+        .setAuthenticationFromJwt(anyString(), any(HttpServletRequest.class));
+    verify(filterChain, times(1)).doFilter(httpServletRequest, httpServletResponse);
+  }
 
-		when(mockRequest.getHeader("Authorization")).thenReturn(header);
-		when(securityService.isTokenValid(token)).thenReturn(false);
+  @Test
+  public void doFilterInternalWrongAuthTokenTest() throws ServletException, IOException {
 
-		jwtAuthenticationFilter.doFilterInternal(mockRequest, mockResponse, mockFilterChain);
+    HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+    HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
+    FilterChain filterChain = mock(FilterChain.class);
 
-		verify(securityService, times(0)).setAuthenticationFromJwt(token, mockRequest);
-		verify(mockFilterChain, times(1)).doFilter(mockRequest, mockResponse);
-	}
+    when(httpServletRequest.getHeader(SecurityService.AUTHORIZATION_HEADER)).thenReturn("test");
 
-	@Test
-	public void doFilterInternalMissingTokenTest() throws ServletException, IOException {
-		String header = null;
-		HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-		HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-		FilterChain mockFilterChain = mock(FilterChain.class);
+    jwtAuthenticationFilter.doFilterInternal(httpServletRequest, httpServletResponse, filterChain);
 
-		when(mockRequest.getHeader("Authorization")).thenReturn(header);
+    verify(securityService, times(0))
+        .setAuthenticationFromJwt(anyString(), any(HttpServletRequest.class));
+    verify(filterChain, times(1)).doFilter(httpServletRequest, httpServletResponse);
+  }
 
-		jwtAuthenticationFilter.doFilterInternal(mockRequest, mockResponse, mockFilterChain);
+  @Test
+  public void doFilterInternalTest() throws ServletException, IOException {
+    String jwt = "jwt";
+    String authHeader = SecurityService.TOKEN_TYPE + jwt;
+    HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+    HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
+    FilterChain filterChain = mock(FilterChain.class);
 
-		verify(securityService, times(0)).setAuthenticationFromJwt(anyString(), eq(mockRequest));
-		verify(mockFilterChain, times(1)).doFilter(mockRequest, mockResponse);
-	}
+    when(httpServletRequest.getHeader(SecurityService.AUTHORIZATION_HEADER)).thenReturn(authHeader);
 
-	@Test
-	public void doFilterInternalWrongTokenTest() throws ServletException, IOException {
-		String header = "Invalid Token";
-		HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-		HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-		FilterChain mockFilterChain = mock(FilterChain.class);
+    jwtAuthenticationFilter.doFilterInternal(httpServletRequest, httpServletResponse, filterChain);
 
-		when(mockRequest.getHeader("Authorization")).thenReturn(header);
+    verify(securityService, times(1))
+        .setAuthenticationFromJwt(jwt, httpServletRequest);
+    verify(filterChain, times(1)).doFilter(httpServletRequest, httpServletResponse);
+  }
 
-		jwtAuthenticationFilter.doFilterInternal(mockRequest, mockResponse, mockFilterChain);
-
-		verify(securityService, times(0)).setAuthenticationFromJwt(anyString(), eq(mockRequest));
-		verify(mockFilterChain, times(1)).doFilter(mockRequest, mockResponse);
-	}
 }

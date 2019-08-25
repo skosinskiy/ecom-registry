@@ -13,10 +13,14 @@ node_js:
 cache:
   directories:
     - $HOME/.m2
+    - frontend/node_modules/
+before_script:
+  - npm install --prefix frontend/
 
 script:
   - mvn clean package
   - sonar-scanner
+  - npm run build --prefix frontend/
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 

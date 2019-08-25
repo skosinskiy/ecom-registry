@@ -31,7 +31,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
       AuthenticationException exc) throws IOException {
     log.error("Responding with unauthorized error. Message - {}", exc.getMessage());
     ErrorResponse unauthorizedErrorResponse = new ErrorResponse(exc, httpServletRequest, HttpStatus.UNAUTHORIZED);
+    httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
     httpServletResponse.getWriter().write(objectMapper.writeValueAsString(unauthorizedErrorResponse));
-    httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.name());
   }
 }

@@ -1,44 +1,52 @@
 package com.kosinskyi.ecom.registry.security;
 
 import com.kosinskyi.ecom.registry.dto.request.LoginRequest;
+import com.kosinskyi.ecom.registry.dto.request.RefreshRequest;
 import com.kosinskyi.ecom.registry.dto.response.LoginResponse;
 import com.kosinskyi.ecom.registry.entity.Permission;
 import com.kosinskyi.ecom.registry.entity.User;
+import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.service.UserService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class SecurityServiceTest {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Autowired
   private SecurityService securityService;
@@ -49,144 +57,205 @@ public class SecurityServiceTest {
   @MockBean
   private UserService userService;
 
-  @Value("${app.jwtExpirationInMs}")
-  private int jwtExpirationInMs;
+  @MockBean
+  private JwtParser jwtParser;
 
-  @Value("${app.jwtSecret}")
-  private String jwtSecret;
+  @Value("${app.jwtAccessTokenExpirationInMs}")
+  private long jwtAccessTokenExpirationInMs;
 
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
+  @Value("${app.jwtRefreshTokenExpirationInMs}")
+  private Long jwtRefreshTokenExpirationInMs;
 
   @Test
   public void setAuthenticationAndGenerateJwtTest() {
-    Long id = 1L;
-    String email = "stanislav.kosinski@gmail.com";
-    String password = "admin";
-
-    User user = new User();
-    user.setId(id);
-
+    String email = "email";
+    String password = "password";
     LoginRequest loginRequest = new LoginRequest();
     loginRequest.setEmail(email);
     loginRequest.setPassword(password);
+    Long userId = 1L;
+    User user = new User();
+    user.setId(userId);
+    user.setEmail(email);
+
+    String jwtRefreshToken = "jwtRefreshToken";
+    List<Permission> permissions = new ArrayList<>();
+    permissions.add(Permission.MANAGE_ACCOUNTS);
+    permissions.add(Permission.MANAGE_REGISTRY);
+    User userWithRefreshToken = new User();
+    userWithRefreshToken.setId(userId);
+    userWithRefreshToken.setEmail(email);
+    userWithRefreshToken.setJwtRefreshToken(jwtRefreshToken);
+    userWithRefreshToken.setJwtRefreshTokenExpireDate(new Date(jwtRefreshTokenExpirationInMs));
+    userWithRefreshToken.setAccountExpireDate(new Date(System.currentTimeMillis() + 1000000));
+    userWithRefreshToken.setPermissions(permissions);
 
     Authentication authentication = mock(Authentication.class);
-    SecurityContext securityContext = mock(SecurityContext.class);
 
-    SecurityContextHolder.setContext(securityContext);
-
-    when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
+    when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password)))
+        .thenReturn(authentication);
     when(authentication.getPrincipal()).thenReturn(user);
+    when(userService.setRefreshToken(user, jwtRefreshTokenExpirationInMs)).thenReturn(userWithRefreshToken);
 
     LoginResponse loginResponse = securityService.setAuthenticationAndGenerateJwt(loginRequest);
 
-    ArgumentCaptor captor = ArgumentCaptor.forClass(UsernamePasswordAuthenticationToken.class);
-    verify(securityContext, times(1)).setAuthentication(authentication);
-    verify(authenticationManager, times(1))
-        .authenticate((UsernamePasswordAuthenticationToken)captor.capture());
-    UsernamePasswordAuthenticationToken usernameToken = (UsernamePasswordAuthenticationToken) captor.getValue();
-
-    assertEquals(email, usernameToken.getPrincipal());
-    assertEquals(password, usernameToken.getCredentials());
-    assertEquals(SecurityService.TOKEN_TYPE, loginResponse.getTokenType());
-    assertEquals(id, securityService.getUserIdFromJwt(loginResponse.getJwt()));
-  }
-
-  @Test
-  public void generateTokenTest() {
-    long id = 1L;
-    User user = new User();
-    user.setId(id);
-
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn(user);
-
-    String jwt = securityService.generateToken(authentication);
-
-    Claims claims = Jwts.parser()
-        .setSigningKey(jwtSecret)
-        .parseClaimsJws(jwt)
+    Claims claims = Jwts
+        .parser()
+        .setSigningKey(securityService.getJwtSecret())
+        .parseClaimsJws(loginResponse.getJwtAccessToken())
         .getBody();
-
-    assertEquals(id, Long.parseLong(claims.getSubject()));
-    assertEquals(jwtExpirationInMs, claims.getExpiration().getTime() - claims.getIssuedAt().getTime() );
-
+    assertEquals(authentication, SecurityContextHolder.getContext().getAuthentication());
+    assertEquals(jwtRefreshToken, loginResponse.getJwtRefreshToken());
+    assertEquals(jwtRefreshTokenExpirationInMs, loginResponse.getJwtRefreshTokenExpireDate());
+    assertEquals(SecurityService.TOKEN_TYPE, loginResponse.getTokenType());
+    assertEquals(String.valueOf(userId), claims.getSubject());
+    assertEquals(email, claims.get(SecurityService.EMAIL_CLAIM));
+    assertTrue(Boolean.parseBoolean(claims.get(SecurityService.IS_ACCOUNT_NON_EXPIRED_CLAIM).toString()));
+    assertEquals(permissions, ((List<String>) claims.get(SecurityService.PERMISSIONS_CLAIM))
+        .stream()
+        .map(Permission::valueOf)
+        .collect(Collectors.toList()));
+    assertEquals(jwtAccessTokenExpirationInMs,claims.getExpiration().getTime() - claims.getIssuedAt().getTime());
   }
 
   @Test
-  public void isTokenValidEmptyTokenTest() {
-    String jwt = "";
-    assertFalse(securityService.isTokenValid(jwt));
+  public void setAuthenticationFromJwtTest() {
+    String jwt = "jwt";
+    String email = "email";
+    boolean isAccountNotExpired = true;
+    List<String> permissions = new ArrayList<>();
+    permissions.add(Permission.MANAGE_ACCOUNTS.toString());
+    permissions.add(Permission.MANAGE_REGISTRY.toString());
+    HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+    Jws<Claims> claimsJws = mock(Jws.class);
+    Claims claims = mock(Claims.class);
+
+    when(jwtParser.setSigningKey(anyString())).thenReturn(jwtParser);
+    when(jwtParser.parseClaimsJws(jwt)).thenReturn(claimsJws);
+    when(claimsJws.getBody()).thenReturn(claims);
+    when(claims.get(SecurityService.EMAIL_CLAIM)).thenReturn(email);
+    when(claims.get(SecurityService.IS_ACCOUNT_NON_EXPIRED_CLAIM)).thenReturn(isAccountNotExpired);
+    when(claims.get(SecurityService.PERMISSIONS_CLAIM)).thenReturn(permissions);
+
+    securityService.setAuthenticationFromJwt(jwt, httpServletRequest);
+
+    UserDetails user =
+        (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    assertEquals(email, user.getUsername());
+    assertEquals(isAccountNotExpired, user.isAccountNonExpired());
+    assertEquals(permissions.stream().map(Permission::valueOf).collect(Collectors.toSet()), user.getAuthorities());
   }
 
   @Test
-  public void isTokenValidInvalidTokenTest() {
-    String jwt = "Invalid.token.test";
-    exception.expect(MalformedJwtException.class);
-    exception.expectMessage("Unable to read JSON value");
+  public void setAuthenticationFromJwtAccountExpiredTest() {
+    String jwt = "jwt";
+    String email = "email";
+    boolean isAccountNotExpired = false;
+    List<String> permissions = new ArrayList<>();
+    permissions.add(Permission.MANAGE_ACCOUNTS.toString());
+    permissions.add(Permission.MANAGE_REGISTRY.toString());
+    HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+    Jws<Claims> claimsJws = mock(Jws.class);
+    Claims claims = mock(Claims.class);
 
-    securityService.isTokenValid(jwt);
+    when(jwtParser.setSigningKey(anyString())).thenReturn(jwtParser);
+    when(jwtParser.parseClaimsJws(jwt)).thenReturn(claimsJws);
+    when(claimsJws.getBody()).thenReturn(claims);
+    when(claims.get(SecurityService.EMAIL_CLAIM)).thenReturn(email);
+    when(claims.get(SecurityService.IS_ACCOUNT_NON_EXPIRED_CLAIM)).thenReturn(isAccountNotExpired);
+    when(claims.get(SecurityService.PERMISSIONS_CLAIM)).thenReturn(permissions);
+
+    securityService.setAuthenticationFromJwt(jwt, httpServletRequest);
+
+    UserDetails user =
+        (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    assertEquals(email, user.getUsername());
+    assertEquals(isAccountNotExpired, user.isAccountNonExpired());
+    assertEquals(permissions.stream().map(Permission::valueOf).collect(Collectors.toSet()), user.getAuthorities());
   }
 
   @Test
-  public void isTokenValidSuccessTest() {
-    long id = 1L;
+  public void refreshTokenTest() {
+    String jwtRefreshToken = "jwtRefreshToken";
+    RefreshRequest refreshRequest = new RefreshRequest();
+    refreshRequest.setJwtRefreshToken(jwtRefreshToken);
+
     User user = new User();
-    user.setId(id);
+    user.setAccountExpireDate(new Date(System.currentTimeMillis() + 1000000));
+    user.setJwtRefreshTokenExpireDate(new Date(System.currentTimeMillis() + 1000000));
 
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn(user);
-
-    String jwt = securityService.generateToken(authentication);
-
-    assertTrue(securityService.isTokenValid(jwt));
-  }
-
-  @Test
-  public void setAuthenticationFromJwt() {
-    Long id = 1L;
-
+    Long userId = 1L;
+    String email = "email";
     List<Permission> permissions = new ArrayList<>();
+    permissions.add(Permission.MANAGE_ACCOUNTS);
     permissions.add(Permission.MANAGE_REGISTRY);
+    User userWithRefreshToken = new User();
+    userWithRefreshToken.setId(userId);
+    userWithRefreshToken.setEmail(email);
+    userWithRefreshToken.setJwtRefreshToken(jwtRefreshToken);
+    userWithRefreshToken.setJwtRefreshTokenExpireDate(new Date(jwtRefreshTokenExpirationInMs));
+    userWithRefreshToken.setAccountExpireDate(new Date(System.currentTimeMillis() + 1000000));
+    userWithRefreshToken.setPermissions(permissions);
 
-    User user = new User();
-    user.setId(id);
-    user.setPermissions(permissions);
+    when(userService.findUserByRefreshToken(jwtRefreshToken)).thenReturn(user);
+    when(userService.setRefreshToken(user, jwtRefreshTokenExpirationInMs)).thenReturn(userWithRefreshToken);
 
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    Authentication authentication = mock(Authentication.class);
-    SecurityContext securityContext = mock(SecurityContext.class);
+    LoginResponse loginResponse = securityService.refreshToken(refreshRequest);
 
-    SecurityContextHolder.setContext(securityContext);
-
-    when(authentication.getPrincipal()).thenReturn(user);
-    when(userService.loadUserById(id)).thenReturn(user);
-
-    String jwt = securityService.generateToken(authentication);
-
-    securityService.setAuthenticationFromJwt(jwt, request);
-
-    ArgumentCaptor captor = ArgumentCaptor.forClass(Authentication.class);
-    verify(securityContext, times(1)).setAuthentication((Authentication) captor.capture());
-    UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken) captor.getValue();
-
-    assertEquals(user, authenticationToken.getPrincipal());
-    assertEquals(permissions, authenticationToken.getAuthorities());
+    Claims claims = Jwts
+        .parser()
+        .setSigningKey(securityService.getJwtSecret())
+        .parseClaimsJws(loginResponse.getJwtAccessToken())
+        .getBody();
+    assertEquals(jwtRefreshToken, loginResponse.getJwtRefreshToken());
+    assertEquals(jwtRefreshTokenExpirationInMs, loginResponse.getJwtRefreshTokenExpireDate());
+    assertEquals(SecurityService.TOKEN_TYPE, loginResponse.getTokenType());
+    assertEquals(String.valueOf(userId), claims.getSubject());
+    assertEquals(email, claims.get(SecurityService.EMAIL_CLAIM));
+    assertTrue(Boolean.parseBoolean(claims.get(SecurityService.IS_ACCOUNT_NON_EXPIRED_CLAIM).toString()));
+    assertEquals(permissions, ((List<String>) claims.get(SecurityService.PERMISSIONS_CLAIM))
+        .stream()
+        .map(Permission::valueOf)
+        .collect(Collectors.toList()));
+    assertEquals(jwtAccessTokenExpirationInMs,claims.getExpiration().getTime() - claims.getIssuedAt().getTime());
   }
 
   @Test
-  public void getUserIdFromJwt() {
-    Long id = 1L;
+  public void refreshTokenExpiredAccountExceptionTest() {
+    String jwtRefreshToken = "jwtRefreshToken";
+    RefreshRequest refreshRequest = new RefreshRequest();
+    refreshRequest.setJwtRefreshToken(jwtRefreshToken);
 
     User user = new User();
-    user.setId(id);
+    user.setAccountExpireDate(new Date(System.currentTimeMillis()));
+    user.setJwtRefreshTokenExpireDate(new Date(System.currentTimeMillis() + 1000000));
 
-    Authentication authentication = mock(Authentication.class);
-    when(authentication.getPrincipal()).thenReturn(user);
+    when(userService.findUserByRefreshToken(jwtRefreshToken)).thenReturn(user);
 
-    String jwt = securityService.generateToken(authentication);
+    expectedException.expect(AccountExpiredException.class);
+    expectedException.expectMessage("User account is expired");
 
-    assertEquals(id, securityService.getUserIdFromJwt(jwt));
+    securityService.refreshToken(refreshRequest);
+  }
+
+  @Test
+  public void refreshTokenExpiredExceptionTest() {
+    String jwtRefreshToken = "jwtRefreshToken";
+    RefreshRequest refreshRequest = new RefreshRequest();
+    refreshRequest.setJwtRefreshToken(jwtRefreshToken);
+
+    User user = new User();
+    user.setAccountExpireDate(new Date(System.currentTimeMillis() + 1000000));
+    user.setJwtRefreshTokenExpireDate(new Date(System.currentTimeMillis()));
+    user.setJwtRefreshToken(jwtRefreshToken);
+
+    when(userService.findUserByRefreshToken(jwtRefreshToken)).thenReturn(user);
+
+    expectedException.expect(ActionForbiddenException.class);
+    expectedException.expectMessage(String.format("Refresh token %s is expired", jwtRefreshToken));
+
+    securityService.refreshToken(refreshRequest);
   }
 }

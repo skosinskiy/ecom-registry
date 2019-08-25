@@ -1,5 +1,6 @@
 package com.kosinskyi.ecom.registry.security;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,23 +25,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   }
 
   @Override
-  protected void doFilterInternal(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      FilterChain filterChain) throws ServletException, IOException {
-    String jwt = getJwtFromRequest(request);
-    if (securityService.isTokenValid(jwt)) {
-      securityService.setAuthenticationFromJwt(jwt, request);
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
+    String bearerToken = request.getHeader(SecurityService.AUTHORIZATION_HEADER);
+    if (headerHasJwtToken(bearerToken)) {
+      securityService.setAuthenticationFromJwt(getJwtFromRequest(bearerToken), request);
     }
     filterChain.doFilter(request, response);
   }
 
-  private String getJwtFromRequest(HttpServletRequest request) {
-    String bearerToken = request.getHeader("Authorization");
-    if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(SecurityService.TOKEN_TYPE)) {
-      return bearerToken.substring(7);
-    }
-    return null;
+  private boolean headerHasJwtToken(String bearerToken) {
+    return StringUtils.hasText(bearerToken) && bearerToken.startsWith(SecurityService.TOKEN_TYPE);
+  }
+
+  private String getJwtFromRequest(String bearerToken) {
+    return bearerToken.substring(SecurityService.TOKEN_TYPE.length());
   }
 
 }

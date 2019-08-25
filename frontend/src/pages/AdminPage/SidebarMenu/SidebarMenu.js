@@ -1,0 +1,46 @@
+import React, {Component} from 'react'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+import ListItemText from '@material-ui/core/ListItemText'
+import {Grant} from '../../../constants/permissions'
+import {connect} from 'react-redux'
+import PropTypes from 'prop-types'
+import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined'
+import {hasGrant} from '../../../utils/hasGrant'
+import NavLink from '../../../components/NavLink/NavLink'
+
+class SidebarMenu extends Component {
+  render () {
+    const {user} = this.props
+
+    return (
+      <div>
+
+        {
+          hasGrant(user, Grant.MANAGE_REGISTRY) &&
+                    <NavLink to={'/file-manager'}>
+                      <ListItem button alignItems={'center'}>
+                        <ListItemIcon>
+                          <DescriptionOutlinedIcon/>
+                        </ListItemIcon>
+                        <ListItemText primary={'File Manager'}/>
+                      </ListItem>
+                    </NavLink>
+        }
+
+      </div>
+    )
+  }
+}
+
+SidebarMenu.propTypes = {
+  user: PropTypes.object.isRequired
+}
+
+const mapStateToProps = state => {
+  return {
+    user: state.users.currentUser
+  }
+}
+
+export default connect(mapStateToProps)(SidebarMenu)

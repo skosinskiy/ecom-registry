@@ -8,7 +8,9 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,9 +20,9 @@ import java.io.PrintWriter;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -33,62 +35,80 @@ public class GenericExceptionHandlerTest {
   private ObjectMapper objectMapper;
 
   @Test
-  public void handleSecurityExceptionTest() throws IOException {
-    String errorMessage = "Bad credentials";
-    String path = "/";
-    BadCredentialsException badCredentialsException = new BadCredentialsException(errorMessage);
-    HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-    HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-    PrintWriter mockWriter = mock(PrintWriter.class);
+  public void handleAuthenticationExceptionTest() throws IOException {
+    String exceptionMessage = "Bad credentials";
+    String servletPath = "servletPath";
+    HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+    HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
+    PrintWriter writer = mock(PrintWriter.class);
+    AuthenticationException exception = new BadCredentialsException(exceptionMessage);
 
-    when(mockRequest.getServletPath()).thenReturn(path);
-    when(mockResponse.getWriter()).thenReturn(mockWriter);
+    when(httpServletRequest.getServletPath()).thenReturn(servletPath);
+    when(httpServletResponse.getWriter()).thenReturn(writer);
 
-    genericExceptionHandler.handleException(badCredentialsException, mockRequest, mockResponse);
+    genericExceptionHandler.handleException(exception, httpServletRequest, httpServletResponse);
 
-    ArgumentCaptor captor = ArgumentCaptor.forClass(String.class);
-    verify(mockWriter, times(1))
-        .write((String) captor.capture());
-    ErrorResponse captureErrorResponse =
-        objectMapper.readValue((String) captor.getValue(), ErrorResponse.class);
+    ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+    verify(writer, times(1)).write(captor.capture());
+    ErrorResponse capturedErrorResponse = objectMapper.readValue(captor.getValue(), ErrorResponse.class);
 
-    assertEquals(errorMessage, captureErrorResponse.getMessage());
-    assertEquals(HttpStatus.UNAUTHORIZED.name(), captureErrorResponse.getError());
-    assertEquals(HttpStatus.UNAUTHORIZED.value(), captureErrorResponse.getStatus());
-    assertEquals(path, captureErrorResponse.getPath());
-    assertNotNull(captureErrorResponse.getTimeStamp());
-
-    verify(mockResponse, times(1))
-        .sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.name());
+    verify(httpServletResponse, times(1)).setStatus(HttpStatus.UNAUTHORIZED.value());
+    assertNotNull(capturedErrorResponse.getTimeStamp());
+    assertEquals(exceptionMessage, capturedErrorResponse.getMessage());
+    assertEquals(HttpStatus.UNAUTHORIZED.name(), capturedErrorResponse.getError());
+    assertEquals(HttpStatus.UNAUTHORIZED.value(), capturedErrorResponse.getStatus());
+    assertEquals(servletPath, capturedErrorResponse.getPath());
   }
 
   @Test
-  public void handleException() throws IOException {
-    String errorMessage = "Runtime exception";
-    String path = "/";
-    RuntimeException badCredentialsException = new RuntimeException(errorMessage);
-    HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-    HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-    PrintWriter mockWriter = mock(PrintWriter.class);
+  public void handleAccessDeniedExceptionTest() throws IOException {
+    String exceptionMessage = "exceptionMessage";
+    String servletPath = "servletPath";
+    HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+    HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
+    PrintWriter writer = mock(PrintWriter.class);
+    AccessDeniedException exception = new AccessDeniedException(exceptionMessage);
 
-    when(mockRequest.getServletPath()).thenReturn(path);
-    when(mockResponse.getWriter()).thenReturn(mockWriter);
+    when(httpServletRequest.getServletPath()).thenReturn(servletPath);
+    when(httpServletResponse.getWriter()).thenReturn(writer);
 
-    genericExceptionHandler.handleException(badCredentialsException, mockRequest, mockResponse);
+    genericExceptionHandler.handleException(exception, httpServletRequest, httpServletResponse);
 
-    ArgumentCaptor captor = ArgumentCaptor.forClass(String.class);
-    verify(mockWriter, times(1))
-        .write((String) captor.capture());
-    ErrorResponse captureErrorResponse =
-        objectMapper.readValue((String) captor.getValue(), ErrorResponse.class);
+    ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+    verify(writer, times(1)).write(captor.capture());
+    ErrorResponse capturedErrorResponse = objectMapper.readValue(captor.getValue(), ErrorResponse.class);
 
-    assertEquals(errorMessage, captureErrorResponse.getMessage());
-    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.name(), captureErrorResponse.getError());
-    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), captureErrorResponse.getStatus());
-    assertEquals(path, captureErrorResponse.getPath());
-    assertNotNull(captureErrorResponse.getTimeStamp());
+    verify(httpServletResponse, times(1)).setStatus(HttpStatus.FORBIDDEN.value());
+    assertNotNull(capturedErrorResponse.getTimeStamp());
+    assertEquals(exceptionMessage, capturedErrorResponse.getMessage());
+    assertEquals(HttpStatus.FORBIDDEN.name(), capturedErrorResponse.getError());
+    assertEquals(HttpStatus.FORBIDDEN.value(), capturedErrorResponse.getStatus());
+    assertEquals(servletPath, capturedErrorResponse.getPath());
+  }
 
-    verify(mockResponse, times(1))
-        .sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.name());
+  @Test
+  public void handleRuntimeExceptionTest() throws IOException {
+    String exceptionMessage = "exceptionMessage";
+    String servletPath = "servletPath";
+    HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+    HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
+    PrintWriter writer = mock(PrintWriter.class);
+    RuntimeException exception = new RuntimeException(exceptionMessage);
+
+    when(httpServletRequest.getServletPath()).thenReturn(servletPath);
+    when(httpServletResponse.getWriter()).thenReturn(writer);
+
+    genericExceptionHandler.handleException(exception, httpServletRequest, httpServletResponse);
+
+    ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+    verify(writer, times(1)).write(captor.capture());
+    ErrorResponse capturedErrorResponse = objectMapper.readValue(captor.getValue(), ErrorResponse.class);
+
+    verify(httpServletResponse, times(1)).setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    assertNotNull(capturedErrorResponse.getTimeStamp());
+    assertEquals(exceptionMessage, capturedErrorResponse.getMessage());
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.name(), capturedErrorResponse.getError());
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), capturedErrorResponse.getStatus());
+    assertEquals(servletPath, capturedErrorResponse.getPath());
   }
 }

@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.management.relation.Role;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -34,8 +35,17 @@ public class User extends BaseEntity implements UserDetails {
   @Column(name = "password")
   private String password;
 
-  @Column(name = "password_expire_date")
-  private Date passwordExpireDate;
+  @Column(name = "account_expire_date")
+  private Date accountExpireDate;
+
+  @Column(name = "jwt_refresh_token")
+  private String jwtRefreshToken;
+
+  @Column(name = "jwt_refresh_token_expire_date")
+  private Date jwtRefreshTokenExpireDate;
+
+  @Column(name = "role_id")
+  private Role role;
 
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "user_permissions", joinColumns = @JoinColumn(name = "user_id"))
@@ -54,7 +64,7 @@ public class User extends BaseEntity implements UserDetails {
 
   @Override
   public boolean isAccountNonExpired() {
-    return System.currentTimeMillis() < passwordExpireDate.getTime();
+    return accountExpireDate == null || System.currentTimeMillis() < accountExpireDate.getTime();
   }
 
   @Override
