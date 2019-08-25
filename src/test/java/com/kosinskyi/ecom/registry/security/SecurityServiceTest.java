@@ -167,7 +167,7 @@ public class SecurityServiceTest {
     userWithRefreshToken.setEmail(email);
     userWithRefreshToken.setJwtRefreshToken(jwtRefreshToken);
     userWithRefreshToken.setJwtRefreshTokenExpireDate(new Date(jwtRefreshTokenExpirationInMs));
-    userWithRefreshToken.setAccountExpireDate(new Date(System.currentTimeMillis() + 1000000));
+    userWithRefreshToken.setAccountExpireDate(new Date(System.currentTimeMillis()));
     userWithRefreshToken.setPermissions(permissions);
 
     when(userService.findUserByRefreshToken(jwtRefreshToken)).thenReturn(user);
@@ -185,7 +185,7 @@ public class SecurityServiceTest {
     assertEquals(SecurityService.TOKEN_TYPE, loginResponse.getTokenType());
     assertEquals(String.valueOf(userId), claims.getSubject());
     assertEquals(email, claims.get(SecurityService.EMAIL_CLAIM));
-    assertTrue(Boolean.parseBoolean(claims.get(SecurityService.IS_ACCOUNT_NON_EXPIRED_CLAIM).toString()));
+    assertFalse(Boolean.parseBoolean(claims.get(SecurityService.IS_ACCOUNT_NON_EXPIRED_CLAIM).toString()));
     assertEquals(permissions, ((List<String>) claims.get(SecurityService.PERMISSIONS_CLAIM))
         .stream()
         .map(Permission::valueOf)
