@@ -11,9 +11,8 @@ import java.security.Principal;
 @Component
 public class UserMapper extends AbstractMapper<User, UserRequest, UserResponse> {
 
-  private UserService userService = (UserService) crudService;
-
   public UserResponse getCurrentUser(Principal principal) {
+    UserService userService = (UserService) crudService;
     return mapEntityToResponseDto(userService.getCurrentUser(principal));
   }
 }

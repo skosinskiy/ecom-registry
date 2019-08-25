@@ -8,6 +8,7 @@ import com.kosinskyi.ecom.registry.entity.User;
 import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.service.UserService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,7 @@ public class SecurityService {
   static final String IS_ACCOUNT_NON_EXPIRED_CLAIM = "isAccountNonExpired";
   private AuthenticationManager authenticationManager;
   private UserService userService;
+  private JwtParser jwtParser;
 
   @Value("${app.jwtSecret}")
   private String jwtSecret;
@@ -54,9 +56,13 @@ public class SecurityService {
   }
 
   @Autowired
-  public SecurityService(@Lazy AuthenticationManager authenticationManager, UserService userService) {
+  public SecurityService(
+      @Lazy AuthenticationManager authenticationManager,
+      UserService userService,
+      JwtParser jwtParser) {
     this.authenticationManager = authenticationManager;
     this.userService = userService;
+    this.jwtParser = jwtParser;
   }
 
   public LoginResponse setAuthenticationAndGenerateJwt(LoginRequest loginRequest) {
@@ -97,7 +103,7 @@ public class SecurityService {
   }
 
   private Claims getJwtClaims(String jwt) {
-    return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).getBody();
+    return jwtParser.setSigningKey(jwtSecret).parseClaimsJws(jwt).getBody();
   }
 
   public void setAuthenticationFromJwt(String jwt, HttpServletRequest request) {

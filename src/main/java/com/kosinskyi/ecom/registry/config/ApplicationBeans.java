@@ -1,7 +1,8 @@
 package com.kosinskyi.ecom.registry.config;
 
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,6 +30,11 @@ public class ApplicationBeans {
     SessionLocaleResolver slr = new SessionLocaleResolver();
     slr.setDefaultLocale(Locale.US);
     return slr;
+  }
+
+  @Bean
+  public JwtParser jwtParser() {
+    return Jwts.parser();
   }
 
 }
