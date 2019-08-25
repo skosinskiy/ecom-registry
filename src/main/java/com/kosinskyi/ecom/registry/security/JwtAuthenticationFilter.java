@@ -25,24 +25,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   }
 
   @Override
-  protected void doFilterInternal(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      FilterChain filterChain) throws ServletException, IOException {
-    String jwt = getJwtFromRequest(request);
-    if (StringUtils.hasText(jwt)) {
-      Claims jwtClaims = securityService.getJwtClaims(jwt);
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
+    String bearerToken = request.getHeader(SecurityService.AUTHORIZATION_HEADER);
+    if (headerHasJwtToken(bearerToken)) {
+      Claims jwtClaims = securityService.getJwtClaims(getJwtFromRequest(bearerToken));
       securityService.setAuthenticationFromClaims(jwtClaims, request);
     }
     filterChain.doFilter(request, response);
   }
 
-  private String getJwtFromRequest(HttpServletRequest request) {
-    String bearerToken = request.getHeader(SecurityService.AUTHORIZATION_HEADER);
-    if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(SecurityService.TOKEN_TYPE)) {
+  private boolean headerHasJwtToken(String bearerToken) {
+    return StringUtils.hasText(bearerToken) && bearerToken.startsWith(SecurityService.TOKEN_TYPE);
+  }
+
+  private String getJwtFromRequest(String bearerToken) {
       return bearerToken.substring(SecurityService.TOKEN_TYPE.length());
-    }
-    return null;
   }
 
 }
