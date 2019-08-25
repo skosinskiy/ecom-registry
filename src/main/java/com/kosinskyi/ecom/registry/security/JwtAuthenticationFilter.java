@@ -29,8 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
     String bearerToken = request.getHeader(SecurityService.AUTHORIZATION_HEADER);
     if (headerHasJwtToken(bearerToken)) {
-      Claims jwtClaims = securityService.getJwtClaims(getJwtFromRequest(bearerToken));
-      securityService.setAuthenticationFromClaims(jwtClaims, request);
+      securityService.setAuthenticationFromJwt(getJwtFromRequest(bearerToken), request);
     }
     filterChain.doFilter(request, response);
   }
@@ -40,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   }
 
   private String getJwtFromRequest(String bearerToken) {
-      return bearerToken.substring(SecurityService.TOKEN_TYPE.length());
+    return bearerToken.substring(SecurityService.TOKEN_TYPE.length());
   }
 
 }

@@ -92,11 +92,12 @@ public class SecurityService {
         .compact();
   }
 
-  public Claims getJwtClaims(String jwt) {
+  private Claims getJwtClaims(String jwt) {
     return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).getBody();
   }
 
-  public void setAuthenticationFromClaims(Claims claims, HttpServletRequest request) {
+  public void setAuthenticationFromJwt(String jwt, HttpServletRequest request) {
+    Claims claims = getJwtClaims(jwt);
     UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
         .username(String.valueOf(claims.get(EMAIL_CLAIM)))
         .password("")
