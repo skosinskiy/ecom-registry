@@ -119,10 +119,39 @@ public class SecurityServiceTest {
   }
 
   @Test
-  public void setAuthenticationFromJwt() {
+  public void setAuthenticationFromJwtTest() {
     String jwt = "jwt";
     String email = "email";
     boolean isAccountNotExpired = true;
+    List<String> permissions = new ArrayList<>();
+    permissions.add(Permission.MANAGE_ACCOUNTS.toString());
+    permissions.add(Permission.MANAGE_REGISTRY.toString());
+    HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+    Jws<Claims> claimsJws = mock(Jws.class);
+    Claims claims = mock(Claims.class);
+
+    when(jwtParser.setSigningKey(anyString())).thenReturn(jwtParser);
+    when(jwtParser.parseClaimsJws(jwt)).thenReturn(claimsJws);
+    when(claimsJws.getBody()).thenReturn(claims);
+    when(claims.get(SecurityService.EMAIL_CLAIM)).thenReturn(email);
+    when(claims.get(SecurityService.IS_ACCOUNT_NON_EXPIRED_CLAIM)).thenReturn(isAccountNotExpired);
+    when(claims.get(SecurityService.PERMISSIONS_CLAIM)).thenReturn(permissions);
+
+    securityService.setAuthenticationFromJwt(jwt, httpServletRequest);
+
+    UserDetails user =
+        (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    assertEquals(email, user.getUsername());
+    assertEquals(isAccountNotExpired, user.isAccountNonExpired());
+    assertEquals(permissions.stream().map(Permission::valueOf).collect(Collectors.toSet()), user.getAuthorities());
+  }
+
+  @Test
+  public void setAuthenticationFromJwtAccountExpiredTest() {
+    String jwt = "jwt";
+    String email = "email";
+    boolean isAccountNotExpired = false;
     List<String> permissions = new ArrayList<>();
     permissions.add(Permission.MANAGE_ACCOUNTS.toString());
     permissions.add(Permission.MANAGE_REGISTRY.toString());
@@ -167,7 +196,7 @@ public class SecurityServiceTest {
     userWithRefreshToken.setEmail(email);
     userWithRefreshToken.setJwtRefreshToken(jwtRefreshToken);
     userWithRefreshToken.setJwtRefreshTokenExpireDate(new Date(jwtRefreshTokenExpirationInMs));
-    userWithRefreshToken.setAccountExpireDate(new Date(System.currentTimeMillis()));
+    userWithRefreshToken.setAccountExpireDate(new Date(System.currentTimeMillis() + 1000000));
     userWithRefreshToken.setPermissions(permissions);
 
     when(userService.findUserByRefreshToken(jwtRefreshToken)).thenReturn(user);
@@ -185,7 +214,7 @@ public class SecurityServiceTest {
     assertEquals(SecurityService.TOKEN_TYPE, loginResponse.getTokenType());
     assertEquals(String.valueOf(userId), claims.getSubject());
     assertEquals(email, claims.get(SecurityService.EMAIL_CLAIM));
-    assertFalse(Boolean.parseBoolean(claims.get(SecurityService.IS_ACCOUNT_NON_EXPIRED_CLAIM).toString()));
+    assertTrue(Boolean.parseBoolean(claims.get(SecurityService.IS_ACCOUNT_NON_EXPIRED_CLAIM).toString()));
     assertEquals(permissions, ((List<String>) claims.get(SecurityService.PERMISSIONS_CLAIM))
         .stream()
         .map(Permission::valueOf)
