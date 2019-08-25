@@ -7,37 +7,36 @@ import {hasGrant} from '../../utils/hasGrant'
 import FileManager from '../../pages/AdminPage/FileManager/FileManager'
 
 class AdminRouter extends Component {
-    render () {
-        const {user} = this.props
+  render () {
+    const {user} = this.props
 
-        return (
-            <Switch>
-                <AuthorizedRoute authorized={hasGrant(user, Grant.MANAGE_REGISTRY)} path="/file-manager" component={FileManager} />
-            </Switch>
-        )
-    }
+    return (
+      <Switch>
+        <AuthorizedRoute authorized={hasGrant(user, Grant.MANAGE_REGISTRY)} path="/file-manager" component={FileManager} />
+      </Switch>
+    )
+  }
 }
 
 AdminRouter.propTypes = {
-    user: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired
 }
 
-
 export const AuthorizedRoute = ({component: Component, authorized, ...rest}) => (
-    <Route {...rest} render={(props) => authorized
-        ? <Route component={Component} {...props} />
-        : <Redirect to='/login' />} />
+  <Route {...rest} render={(props) => authorized
+    ? <Route component={Component} {...props} />
+    : <Redirect to='/login' />} />
 )
 
 AuthorizedRoute.propTypes = {
-    component: PropTypes.func.isRequired,
-    authorized: PropTypes.bool.isRequired,
+  component: PropTypes.func.isRequired,
+  authorized: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = ({users}) => {
-    return {
-        user: users.currentUser
-    }
+  return {
+    user: users.currentUser
+  }
 }
 
 export default withRouter(connect(mapStateToProps)(AdminRouter))

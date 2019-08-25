@@ -5,22 +5,22 @@ import CircularProgress from '@material-ui/core/CircularProgress'
 import './Preloader.scss'
 
 const styles = theme => ({
-    progress: {
-        margin: theme.spacing(2)
-    }
+  progress: {
+    margin: theme.spacing(2)
+  }
 })
 
 function Preloader (props) {
-    const {classes} = props
-    return (
-        <div className='preloader'>
-            <CircularProgress className={classes.progress}/>
-        </div>
-    )
+  const {classes} = props
+  return (
+    <div className='preloader'>
+      <CircularProgress className={classes.progress}/>
+    </div>
+  )
 }
 
 Preloader.propTypes = {
-    classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired
 }
 
 export default withStyles(styles)(Preloader)

@@ -1,18 +1,18 @@
-import React, {Component} from 'react';
-import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import {withStyles} from "@material-ui/core";
-import {withRouter} from "react-router-dom";
+import React, {Component} from 'react'
+import Drawer from '@material-ui/core/Drawer'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
+import Divider from '@material-ui/core/Divider'
+import IconButton from '@material-ui/core/IconButton'
+import {withStyles} from '@material-ui/core'
+import {withRouter} from 'react-router-dom'
 import classNames from 'classnames'
 import PowerSetting from '@material-ui/icons/PowerSettingsNew'
 import SidebarMenu from './SidebarMenu/SidebarMenu'
 import AdminRoutes from '../../components/AdminRoutes/AdminRoutes'
 
-const drawerWidth = 240;
+const drawerWidth = 240
 
 const styles = theme => ({
   root: {
@@ -92,56 +92,54 @@ const styles = theme => ({
 })
 
 class AdminPage extends Component {
-
-  static logoutUser() {
+  static logoutUser () {
     window.localStorage.clear()
     window.location.reload()
   }
 
-  render() {
-
+  render () {
     const {classes} = this.props
 
     return (
-        <div className={classes.root}>
-          <AppBar
-              position="absolute"
-              className={classNames(classes.appBar, classes.appBarShift)}
-          >
-            <Toolbar className={classes.toolbar}>
-              <Typography
-                  component="h1"
-                  variant="h6"
-                  color="inherit"
-                  noWrap
-                  className={classes.title}
-              >
+      <div className={classes.root}>
+        <AppBar
+          position="absolute"
+          className={classNames(classes.appBar, classes.appBarShift)}
+        >
+          <Toolbar className={classes.toolbar}>
+            <Typography
+              component="h1"
+              variant="h6"
+              color="inherit"
+              noWrap
+              className={classes.title}
+            >
                 Admin Panel
-              </Typography>
-              <IconButton onClick={AdminPage.logoutUser} color="inherit" alt="Log out">
-                <PowerSetting/>
-              </IconButton>
-            </Toolbar>
-          </AppBar>
-          <Drawer
-              variant="permanent"
-              classes={{
-                paper: classNames(classes.drawerPaper)
-              }}
-          >
-            <div className={classes.toolbarText}>
+            </Typography>
+            <IconButton onClick={AdminPage.logoutUser} color="inherit" alt="Log out">
+              <PowerSetting/>
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          variant="permanent"
+          classes={{
+            paper: classNames(classes.drawerPaper)
+          }}
+        >
+          <div className={classes.toolbarText}>
               Hello!
-            </div>
-            <Divider/>
-            <SidebarMenu/>
-            <Divider/>
-          </Drawer>
-          <main className={classes.content}>
-            <div className={classes.appBarSpacer}/>
-            <AdminRoutes/>
-          </main>
-        </div>
-    );
+          </div>
+          <Divider/>
+          <SidebarMenu/>
+          <Divider/>
+        </Drawer>
+        <main className={classes.content}>
+          <div className={classes.appBarSpacer}/>
+          <AdminRoutes/>
+        </main>
+      </div>
+    )
   }
 }
 

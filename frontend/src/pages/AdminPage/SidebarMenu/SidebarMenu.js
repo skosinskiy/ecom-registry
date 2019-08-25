@@ -10,40 +10,37 @@ import {hasGrant} from '../../../utils/hasGrant'
 import NavLink from '../../../components/NavLink/NavLink'
 
 class SidebarMenu extends Component {
+  render () {
+    const {user} = this.props
 
+    return (
+      <div>
 
-    render() {
-
-        const {user} = this.props
-
-        return (
-            <div>
-
-                {
-                    hasGrant(user, Grant.MANAGE_REGISTRY) &&
+        {
+          hasGrant(user, Grant.MANAGE_REGISTRY) &&
                     <NavLink to={'/file-manager'}>
-                        <ListItem button alignItems={'center'}>
-                            <ListItemIcon>
-                                <DescriptionOutlinedIcon/>
-                            </ListItemIcon>
-                            <ListItemText primary={'File Manager'}/>
-                        </ListItem>
+                      <ListItem button alignItems={'center'}>
+                        <ListItemIcon>
+                          <DescriptionOutlinedIcon/>
+                        </ListItemIcon>
+                        <ListItemText primary={'File Manager'}/>
+                      </ListItem>
                     </NavLink>
-                }
+        }
 
-            </div>
-        )
-    }
+      </div>
+    )
+  }
 }
 
 SidebarMenu.propTypes = {
-    user: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired
 }
 
 const mapStateToProps = state => {
-    return {
-        user: state.users.currentUser
-    }
+  return {
+    user: state.users.currentUser
+  }
 }
 
 export default connect(mapStateToProps)(SidebarMenu)

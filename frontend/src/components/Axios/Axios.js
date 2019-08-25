@@ -1,7 +1,7 @@
 import {toastr} from 'react-redux-toastr'
 import axios from 'axios'
 import 'react-redux-toastr/lib/css/react-redux-toastr.min.css'
-import {getJwtToken} from "../../service/jwtService";
+import {getJwtToken} from '../../service/jwtService'
 
 const METHOD_GET = 'get'
 const METHOD_POST = 'post'
@@ -11,23 +11,23 @@ const METHOD_DELETE = 'delete'
 const REQUEST_TIMEOUT = 60000
 
 export class FetchData {
-  get(url, requestParams) {
+  get (url, requestParams) {
     return this.makeRequest(url, METHOD_GET, null, requestParams)
   }
 
-  post(url, body, requestParams) {
+  post (url, body, requestParams) {
     return this.makeRequest(url, METHOD_POST, body, requestParams)
   }
 
-  put(url, body, requestParams) {
+  put (url, body, requestParams) {
     return this.makeRequest(url, METHOD_PUT, body, requestParams)
   }
 
-  delete(url, requestParams) {
+  delete (url, requestParams) {
     return this.makeRequest(url, METHOD_DELETE, null, requestParams)
   }
 
-  async makeRequest(url, method, body, reqParams) {
+  async makeRequest (url, method, body, reqParams) {
     const requestParams = {
       method: method || METHOD_GET,
       data: body,
@@ -53,21 +53,21 @@ export class FetchData {
     return this.sendRequest(url, requestParams)
   }
 
-  sendRequest(url, requestParams) {
+  sendRequest (url, requestParams) {
     return new Promise((resolve, reject) => {
       axios(url, requestParams)
-      .then(result => resolve(result.data))
-      .catch(reason => {
-        if (reason.response.status === 401) {
-          window.localStorage.clear()
-        }
-        this.requestFailed(reason)
-        reject(reason)
-      })
+        .then(result => resolve(result.data))
+        .catch(reason => {
+          if (reason.response.status === 401) {
+            window.localStorage.clear()
+          }
+          this.requestFailed(reason)
+          reject(reason)
+        })
     })
   }
 
-  requestFailed(reason) {
+  requestFailed (reason) {
     if (reason.message) {
       toastr.error(reason.message, reason.response && reason.response.data && reason.response.data.message)
     } else {

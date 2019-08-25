@@ -2,18 +2,11 @@ import React, {Component} from 'react'
 import Table from '@material-ui/core/Table'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
-import {TableCell} from "@material-ui/core";
-import Paper from "@material-ui/core/Paper";
-import mapStateToProps from "react-redux/es/connect/mapStateToProps";
+import {TableCell} from '@material-ui/core'
+import Paper from '@material-ui/core/Paper'
 
 class FileManager extends Component {
-
-  componentDidMount() {
-
-  }
-
-  render() {
-
+  render () {
     return (
       <Paper>
         <Table>
@@ -29,21 +22,7 @@ class FileManager extends Component {
         </Table>
       </Paper>
     )
-
   }
-
 }
-
-// const mapStateToProps = state => {
-//   return {
-//     folderList: state.folderList
-//   }
-// }
-//
-// const mapDispatchToProps = dispatch => {
-//   return {
-//     getFolders: () => dispatch()
-//   }
-// }
 
 export default FileManager
