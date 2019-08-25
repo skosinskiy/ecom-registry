@@ -34,9 +34,9 @@ public class SecurityService {
 
   static final String AUTHORIZATION_HEADER = "Authorization";
   static final String TOKEN_TYPE = "Bearer ";
-  private static final String EMAIL_CLAIM = "email";
-  private static final String PERMISSIONS_CLAIM = "permissions";
-  private static final String IS_ACCOUNT_NON_EXPIRED_CLAIM = "isAccountNonExpired";
+  static final String EMAIL_CLAIM = "email";
+  static final String PERMISSIONS_CLAIM = "permissions";
+  static final String IS_ACCOUNT_NON_EXPIRED_CLAIM = "isAccountNonExpired";
   private AuthenticationManager authenticationManager;
   private UserService userService;
 
@@ -48,6 +48,10 @@ public class SecurityService {
 
   @Value("${app.jwtRefreshTokenExpirationInMs}")
   private Long jwtRefreshTokenExpirationInMs;
+
+  String getJwtSecret() {
+    return jwtSecret;
+  }
 
   @Autowired
   public SecurityService(@Lazy AuthenticationManager authenticationManager, UserService userService) {
