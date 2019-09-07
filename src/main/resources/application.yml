@@ -15,3 +15,9 @@ app:
     1209600000
   jwtAccessTokenExpirationInMs:
     900000
+
+aws:
+  s3:
+    credentials:
+      path:
+        src/main/resources/aws/s3/credentials

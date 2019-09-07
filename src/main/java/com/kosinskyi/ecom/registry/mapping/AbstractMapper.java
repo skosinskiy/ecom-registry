@@ -28,6 +28,13 @@ public abstract class AbstractMapper<E extends BaseEntity, I, O> {
     this.crudService = crudService;
   }
 
+  protected E mapRequestDtoToEntity(I requestDto) {
+    return requestDto != null
+        ? modelMapper.map(requestDto, (Class<E>) ((ParameterizedType) getClass()
+        .getGenericSuperclass()).getActualTypeArguments()[0])
+        : null;
+  }
+
   protected O mapEntityToResponseDto(E entity) {
     return entity != null
         ? modelMapper.map(entity, (Class<O>) ((ParameterizedType) getClass()

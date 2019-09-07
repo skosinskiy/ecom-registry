@@ -20,8 +20,8 @@ public class UserController {
   }
 
   @GetMapping("current")
-  public ResponseEntity<UserResponse> getCurrentUser(Principal principal) {
-    return ResponseEntity.ok(userConvertFacade.getCurrentUser(principal));
+  public ResponseEntity<UserResponse> getCurrentUser() {
+    return ResponseEntity.ok(userConvertFacade.getCurrentUser());
   }
 
 }

@@ -84,7 +84,7 @@ public class UserServiceTest {
     when(principal.getName()).thenReturn(email);
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
-    User result = userService.getCurrentUser(principal);
+    User result = userService.getCurrentUser();
 
     assertEquals(user, result);
   }

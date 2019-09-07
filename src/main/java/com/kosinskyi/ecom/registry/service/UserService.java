@@ -9,6 +9,7 @@ import com.kosinskyi.ecom.registry.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,10 +41,11 @@ public class UserService implements UserDetailsService, CrudService<User> {
         .orElseThrow(() -> new UsernameNotFoundException(String.format("No user with email %s found", email)));
   }
 
-  public User getCurrentUser(Principal principal) {
+  public User getCurrentUser() {
+    String principalName = SecurityContextHolder.getContext().getAuthentication().getName();
     return userRepository
-        .findByEmail(principal.getName())
-        .orElseThrow(() -> new NoDataFoundException(String.format("No user with id %s found", principal.getName())));
+        .findByEmail(principalName)
+        .orElseThrow(() -> new NoDataFoundException(String.format("No user with id %s found", principalName)));
   }
 
   @Override

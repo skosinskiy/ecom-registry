@@ -6,6 +6,9 @@ registry.iml
 /target
 *.class
 
+#AWS credential path
+src/main/resources/aws/s3/*
+
 # Log file
 /logs
 *.log
