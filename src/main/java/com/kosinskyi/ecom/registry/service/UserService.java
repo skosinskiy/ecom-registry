@@ -46,6 +46,12 @@ public class UserService implements UserDetailsService, CrudService<User> {
         .orElseThrow(() -> new NoDataFoundException(String.format("No user with id %s found", principal.getName())));
   }
 
+  public User findByEmail(String email) {
+    return userRepository
+        .findByEmail(email)
+        .orElseThrow(() -> new UsernameNotFoundException(String.format("No user with email %s found", email)));
+  }
+
   @Override
   public User findById(Long userId) {
     return userRepository
