@@ -30,7 +30,7 @@ public class AuthController {
   }
 
   @PostMapping("refresh")
-  public ResponseEntity<LoginResponse> getCurrentUser(@Valid @RequestBody RefreshRequest refreshRequest) {
+  public ResponseEntity<LoginResponse> refreshJwtAccessToken(@Valid @RequestBody RefreshRequest refreshRequest) {
     return ResponseEntity.ok(securityService.refreshToken(refreshRequest));
   }
 
