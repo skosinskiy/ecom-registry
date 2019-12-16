@@ -248,7 +248,7 @@ public class SecurityServiceTest {
 
     User user = new User();
     user.setAccountExpireDate(new Date(System.currentTimeMillis() + 1000000));
-    user.setJwtRefreshTokenExpireDate(new Date(System.currentTimeMillis()));
+    user.setJwtRefreshTokenExpireDate(new Date(System.currentTimeMillis() - 1000000));
     user.setJwtRefreshToken(jwtRefreshToken);
 
     when(userService.findUserByRefreshToken(jwtRefreshToken)).thenReturn(user);
