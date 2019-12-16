@@ -13,15 +13,15 @@ import java.security.Principal;
 @RequestMapping("api/users")
 public class UserController {
 
-  private UserMapper userConvertFacade;
+  private UserMapper userMapper;
 
-  public UserController(UserMapper userConvertFacade) {
-    this.userConvertFacade = userConvertFacade;
+  public UserController(UserMapper userMapper) {
+    this.userMapper = userMapper;
   }
 
   @GetMapping("current")
   public ResponseEntity<UserResponse> getCurrentUser(Principal principal) {
-    return ResponseEntity.ok(userConvertFacade.getCurrentUser(principal));
+    return ResponseEntity.ok(userMapper.getCurrentUser(principal));
   }
 
 }
