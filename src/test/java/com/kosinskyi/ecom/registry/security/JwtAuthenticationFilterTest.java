@@ -1,6 +1,6 @@
 package com.kosinskyi.ecom.registry.security;
 
-import io.jsonwebtoken.Claims;
+import com.kosinskyi.ecom.registry.filter.JwtAuthenticationFilter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
