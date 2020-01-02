@@ -77,14 +77,12 @@ public class UserServiceTest {
   @Test
   public void getCurrentUserTest() {
     String email = "email";
-    Principal principal = mock(Principal.class);
     User user = new User();
     user.setEmail(email);
 
-    when(principal.getName()).thenReturn(email);
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
-    User result = userService.getCurrentUser(principal);
+    User result = userService.getCurrentUser();
 
     assertEquals(user, result);
   }
