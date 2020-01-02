@@ -2,7 +2,7 @@ package com.kosinskyi.ecom.registry.logging.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kosinskyi.ecom.registry.exception.ApplicationException;
+import com.kosinskyi.ecom.registry.error.exception.ApplicationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

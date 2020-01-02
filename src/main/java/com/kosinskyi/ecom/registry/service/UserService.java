@@ -1,9 +1,10 @@
 package com.kosinskyi.ecom.registry.service;
 
 import com.kosinskyi.ecom.registry.entity.User;
-import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
-import com.kosinskyi.ecom.registry.exception.NoDataFoundException;
-import com.kosinskyi.ecom.registry.exception.NotYetImplementedException;
+import com.kosinskyi.ecom.registry.error.exception.ActionForbiddenException;
+import com.kosinskyi.ecom.registry.error.exception.NoDataFoundException;
+import com.kosinskyi.ecom.registry.error.exception.NotYetImplementedException;
+import com.kosinskyi.ecom.registry.logging.Logging;
 import com.kosinskyi.ecom.registry.repository.UserRepository;
 import com.kosinskyi.ecom.registry.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Logging
 public class UserService implements UserDetailsService, CrudService<User> {
 
   private UserRepository userRepository;

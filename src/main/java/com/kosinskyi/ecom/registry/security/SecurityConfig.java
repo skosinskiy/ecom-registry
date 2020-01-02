@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -20,17 +19,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private UserService userService;
-  private JwtAuthenticationFilter jwtAuthenticationFilter;
-  private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
   @Autowired
-  public SecurityConfig(
-      UserService userService,
-      JwtAuthenticationFilter jwtAuthenticationFilter,
-      JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
+  public SecurityConfig(UserService userService) {
     this.userService = userService;
-    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
   }
 
   @Bean(BeanIds.AUTHENTICATION_MANAGER)
@@ -48,19 +40,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
           .csrf()
           .disable()
-          .exceptionHandling()
-          .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-        .and()
           .sessionManagement()
-          .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
-          .authorizeRequests()
-          .antMatchers("/**/static/**", "/h2-console/**", "/api/auth/**")
-          .permitAll()
-        .anyRequest()
-          .authenticated();
-
-    http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+          .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
   }
 
   @Override

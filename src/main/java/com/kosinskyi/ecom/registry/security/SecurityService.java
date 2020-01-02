@@ -5,9 +5,11 @@ import com.kosinskyi.ecom.registry.dto.request.RefreshRequest;
 import com.kosinskyi.ecom.registry.dto.response.LoginResponse;
 import com.kosinskyi.ecom.registry.entity.Permission;
 import com.kosinskyi.ecom.registry.entity.User;
-import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
+import com.kosinskyi.ecom.registry.error.exception.ActionForbiddenException;
+import com.kosinskyi.ecom.registry.error.exception.AuthenticationException;
 import com.kosinskyi.ecom.registry.service.UserService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -33,11 +35,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SecurityService {
 
-  static final String AUTHORIZATION_HEADER = "Authorization";
-  static final String TOKEN_TYPE = "Bearer ";
-  static final String EMAIL_CLAIM = "email";
-  static final String PERMISSIONS_CLAIM = "permissions";
-  static final String IS_ACCOUNT_NON_EXPIRED_CLAIM = "isAccountNonExpired";
+  public static final String AUTHORIZATION_HEADER = "Authorization";
+  public static final String TOKEN_TYPE = "Bearer ";
+  public static final String EMAIL_CLAIM = "email";
+  public static final String PERMISSIONS_CLAIM = "permissions";
+  public static final String IS_ACCOUNT_NON_EXPIRED_CLAIM = "isAccountNonExpired";
   private AuthenticationManager authenticationManager;
   private UserService userService;
   private JwtParser jwtParser;
@@ -103,7 +105,11 @@ public class SecurityService {
   }
 
   private Claims getJwtClaims(String jwt) {
-    return jwtParser.setSigningKey(jwtSecret).parseClaimsJws(jwt).getBody();
+    try {
+      return jwtParser.setSigningKey(jwtSecret).parseClaimsJws(jwt).getBody();
+    } catch (JwtException | IllegalArgumentException exc) {
+      throw new AuthenticationException(exc.getMessage());
+    }
   }
 
   public void setAuthenticationFromJwt(String jwt, HttpServletRequest request) {
