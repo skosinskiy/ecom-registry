@@ -1,6 +1,6 @@
-package com.kosinskyi.ecom.registry.dto.response;
+package com.kosinskyi.ecom.registry.dto.response.user;
 
-import com.kosinskyi.ecom.registry.entity.Permission;
+import com.kosinskyi.ecom.registry.entity.user.Permission;
 import lombok.Data;
 
 import java.util.Date;

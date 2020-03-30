@@ -1,4 +1,4 @@
-package com.kosinskyi.ecom.registry.dto.response;
+package com.kosinskyi.ecom.registry.dto.response.auth;
 
 import lombok.Builder;
 import lombok.Data;

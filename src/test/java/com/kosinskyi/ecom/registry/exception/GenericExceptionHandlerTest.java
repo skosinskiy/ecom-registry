@@ -1,7 +1,7 @@
 package com.kosinskyi.ecom.registry.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kosinskyi.ecom.registry.dto.response.ErrorResponse;
+import com.kosinskyi.ecom.registry.dto.response.error.ErrorResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;

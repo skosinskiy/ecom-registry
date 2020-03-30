@@ -1,12 +1,11 @@
-package com.kosinskyi.ecom.registry.dto.response;
+package com.kosinskyi.ecom.registry.dto.response.file;
 
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 public class FileItemResponse {
 
   private String fileKey;
+  private Long size;
 
 }

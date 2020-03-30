@@ -2,11 +2,11 @@ package com.kosinskyi.ecom.registry.security;
 
 import com.kosinskyi.ecom.registry.dto.request.LoginRequest;
 import com.kosinskyi.ecom.registry.dto.request.RefreshRequest;
-import com.kosinskyi.ecom.registry.dto.response.LoginResponse;
-import com.kosinskyi.ecom.registry.entity.Permission;
-import com.kosinskyi.ecom.registry.entity.User;
+import com.kosinskyi.ecom.registry.dto.response.auth.LoginResponse;
+import com.kosinskyi.ecom.registry.entity.user.Permission;
+import com.kosinskyi.ecom.registry.entity.user.User;
 import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
-import com.kosinskyi.ecom.registry.service.UserService;
+import com.kosinskyi.ecom.registry.service.user.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
@@ -29,8 +29,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,10 +1,12 @@
 package com.kosinskyi.ecom.registry.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kosinskyi.ecom.registry.dto.response.ErrorResponse;
+import com.kosinskyi.ecom.registry.dto.response.error.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -32,6 +34,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     log.error("Responding with unauthorized error. Message - {}", exc.getMessage());
     ErrorResponse unauthorizedErrorResponse = new ErrorResponse(exc, httpServletRequest, HttpStatus.UNAUTHORIZED);
     httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+    httpServletResponse.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
     httpServletResponse.getWriter().write(objectMapper.writeValueAsString(unauthorizedErrorResponse));
   }
 }

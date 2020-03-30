@@ -1,6 +1,6 @@
 package com.kosinskyi.ecom.registry.service;
 
-import com.kosinskyi.ecom.registry.entity.BaseEntity;
+import com.kosinskyi.ecom.registry.entity.base.BaseEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

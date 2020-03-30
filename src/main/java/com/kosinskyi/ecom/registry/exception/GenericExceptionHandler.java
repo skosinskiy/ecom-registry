@@ -1,10 +1,12 @@
 package com.kosinskyi.ecom.registry.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kosinskyi.ecom.registry.dto.response.ErrorResponse;
+import com.kosinskyi.ecom.registry.dto.response.error.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -32,7 +34,8 @@ public class GenericExceptionHandler {
     HttpStatus httpStatus = getHttpStatusForException(exc);
     ErrorResponse internalErrorResponse = new ErrorResponse(exc, request, httpStatus);
     response.setStatus(httpStatus.value());
-    response.getWriter().write(objectMapper.writeValueAsString(internalErrorResponse));
+    response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+    response.getWriter().write(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(internalErrorResponse));
   }
 
   private HttpStatus getHttpStatusForException(Exception exc) {

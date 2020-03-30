@@ -1,4 +1,4 @@
-package com.kosinskyi.ecom.registry.dto.response;
+package com.kosinskyi.ecom.registry.dto.response.error;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

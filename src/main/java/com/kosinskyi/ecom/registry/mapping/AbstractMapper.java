@@ -1,6 +1,6 @@
 package com.kosinskyi.ecom.registry.mapping;
 
-import com.kosinskyi.ecom.registry.entity.BaseEntity;
+import com.kosinskyi.ecom.registry.entity.base.BaseEntity;
 import com.kosinskyi.ecom.registry.service.CrudService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +12,10 @@ import java.lang.reflect.ParameterizedType;
 @Component
 @Transactional
 @SuppressWarnings("unchecked")
-public abstract class AbstractMapper<E extends BaseEntity, I, O> {
+public abstract class AbstractMapper<E extends BaseEntity, S extends CrudService<E>> {
 
   private ModelMapper modelMapper;
-  CrudService<E> crudService;
+  S crudService;
 
   @Autowired
   public void setModelMapper(ModelMapper modelMapper) {
@@ -24,21 +24,20 @@ public abstract class AbstractMapper<E extends BaseEntity, I, O> {
 
   @Autowired
   @SuppressWarnings("ALL")
-  public void setCrudService(CrudService<E> crudService) {
+  public void setCrudService(S crudService) {
     this.crudService = crudService;
   }
 
-  protected E mapRequestDtoToEntity(I requestDto) {
+  protected <I> E mapRequestDtoToEntity(I requestDto) {
     return requestDto != null
         ? modelMapper.map(requestDto, (Class<E>) ((ParameterizedType) getClass()
         .getGenericSuperclass()).getActualTypeArguments()[0])
         : null;
   }
 
-  protected O mapEntityToResponseDto(E entity) {
+  protected <O> O mapEntityToResponseDto(E entity, Class<O> responseClass) {
     return entity != null
-        ? modelMapper.map(entity, (Class<O>) ((ParameterizedType) getClass()
-        .getGenericSuperclass()).getActualTypeArguments()[2])
+        ? modelMapper.map(entity, responseClass)
         : null;
   }
 }

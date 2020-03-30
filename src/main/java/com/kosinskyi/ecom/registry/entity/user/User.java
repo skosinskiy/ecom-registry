@@ -1,5 +1,6 @@
-package com.kosinskyi.ecom.registry.entity;
+package com.kosinskyi.ecom.registry.entity.user;
 
+import com.kosinskyi.ecom.registry.entity.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;

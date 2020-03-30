@@ -1,10 +1,11 @@
-package com.kosinskyi.ecom.registry.service;
+package com.kosinskyi.ecom.registry.service.user;
 
-import com.kosinskyi.ecom.registry.entity.User;
+import com.kosinskyi.ecom.registry.entity.user.User;
 import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.exception.NoDataFoundException;
 import com.kosinskyi.ecom.registry.exception.NotYetImplementedException;
 import com.kosinskyi.ecom.registry.repository.UserRepository;
+import com.kosinskyi.ecom.registry.service.CrudService;
 import com.kosinskyi.ecom.registry.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,7 +17,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.security.Principal;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;

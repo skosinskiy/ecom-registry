@@ -2,7 +2,7 @@ package com.kosinskyi.ecom.registry.controller;
 
 import com.kosinskyi.ecom.registry.dto.request.LoginRequest;
 import com.kosinskyi.ecom.registry.dto.request.RefreshRequest;
-import com.kosinskyi.ecom.registry.dto.response.LoginResponse;
+import com.kosinskyi.ecom.registry.dto.response.auth.LoginResponse;
 import com.kosinskyi.ecom.registry.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

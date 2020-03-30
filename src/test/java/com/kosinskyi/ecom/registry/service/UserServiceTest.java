@@ -1,10 +1,11 @@
 package com.kosinskyi.ecom.registry.service;
 
-import com.kosinskyi.ecom.registry.entity.User;
+import com.kosinskyi.ecom.registry.entity.user.User;
 import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.exception.NoDataFoundException;
 import com.kosinskyi.ecom.registry.exception.NotYetImplementedException;
 import com.kosinskyi.ecom.registry.repository.UserRepository;
+import com.kosinskyi.ecom.registry.service.user.UserService;
 import com.kosinskyi.ecom.registry.utils.ObjectUtils;
 import org.junit.Rule;
 import org.junit.Test;
