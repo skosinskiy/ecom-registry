@@ -1,4 +1,4 @@
-package com.kosinskyi.ecom.registry.exception;
+package com.kosinskyi.ecom.registry.error.exception;
 
 public class NoDataFoundException extends ApplicationException {
 
