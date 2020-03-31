@@ -17,11 +17,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.security.Principal;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -78,11 +79,13 @@ public class UserServiceTest {
   @Test
   public void getCurrentUserTest() {
     String email = "email";
-    Principal principal = mock(Principal.class);
+    Authentication authentication = mock(Authentication.class);
     User user = new User();
     user.setEmail(email);
 
-    when(principal.getName()).thenReturn(email);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+    when(authentication.getName()).thenReturn(email);
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
     User result = userService.getCurrentUser();
