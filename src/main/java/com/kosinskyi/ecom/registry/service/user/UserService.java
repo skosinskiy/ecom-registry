@@ -1,86 +1,55 @@
 package com.kosinskyi.ecom.registry.service.user;
 
 import com.kosinskyi.ecom.registry.entity.user.User;
+import com.kosinskyi.ecom.registry.entity.user.User_;
+import com.kosinskyi.ecom.registry.entity.user.specification.UserSpecification;
 import com.kosinskyi.ecom.registry.error.exception.ActionForbiddenException;
-import com.kosinskyi.ecom.registry.error.exception.NoDataFoundException;
-import com.kosinskyi.ecom.registry.error.exception.NotYetImplementedException;
-import com.kosinskyi.ecom.registry.repository.UserRepository;
-import com.kosinskyi.ecom.registry.service.CrudService;
-import com.kosinskyi.ecom.registry.utils.ObjectUtils;
+import com.kosinskyi.ecom.registry.repository.base.JpaSpecificationExecutorRepository;
+import com.kosinskyi.ecom.registry.repository.user.UserRepository;
+import com.kosinskyi.ecom.registry.service.crud.CreateService;
+import com.kosinskyi.ecom.registry.service.crud.ReadService;
+import com.kosinskyi.ecom.registry.service.crud.UpdateService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Service
-public class UserService implements UserDetailsService, CrudService<User> {
+public class UserService implements UserDetailsService, ReadService<User>, CreateService<User>, UpdateService<User> {
 
-  private UserRepository userRepository;
-  private ObjectUtils objectUtils;
+  private UserRepository repository;
+  private UserSpecification specification;
 
   @Autowired
-  public UserService(UserRepository userRepository, ObjectUtils objectUtils) {
-    this.userRepository = userRepository;
-    this.objectUtils = objectUtils;
+  public UserService(UserRepository repository, UserSpecification specification) {
+    this.repository = repository;
+    this.specification = specification;
+  }
+
+  @Override
+  public JpaSpecificationExecutorRepository<User, Long> repositorySupplier() {
+    return repository;
+  }
+
+  @Override
+  public Class<User> entityClassSupplier() {
+    return User.class;
   }
 
   @Override
   @Transactional
   public UserDetails loadUserByUsername(String email) {
-    return userRepository
-        .findByEmail(email)
-        .orElseThrow(() -> new UsernameNotFoundException(String.format("No user with email %s found", email)));
+    return findByEmail(email);
   }
 
   public User getCurrentUser() {
-    String principalName = SecurityContextHolder.getContext().getAuthentication().getName();
-    return userRepository
-        .findByEmail(principalName)
-        .orElseThrow(() -> new NoDataFoundException(String.format("No user with id %s found", principalName)));
-  }
-
-  @Override
-  public User findById(Long userId) {
-    return userRepository
-        .findById(userId)
-        .orElseThrow(() -> new NoDataFoundException(String.format("No user with id %d found", userId)));
-  }
-
-  @Override
-  public List<User> findAll() {
-    throw new NotYetImplementedException();
-  }
-
-  @Override
-  public Page<User> findAll(Pageable pageable) {
-    throw new NotYetImplementedException();
-  }
-
-  @Override
-  public User create(User user) {
-    user.setId(null);
-    return userRepository.save(user);
-  }
-
-  @Override
-  public User update(Long userId, User updatedEntity) {
-    User existingUser = findById(userId);
-    objectUtils.copyNotNullProperties(updatedEntity, existingUser);
-    return userRepository.save(existingUser);
-  }
-
-  @Override
-  public User delete(Long userId) {
-    throw new NotYetImplementedException();
+    String email = SecurityContextHolder.getContext().getAuthentication().getName();
+    return findByEmail(email);
   }
 
   public User setRefreshToken(User user, long jwtRefreshTokenExpirationInMs) {
@@ -89,7 +58,7 @@ public class UserService implements UserDetailsService, CrudService<User> {
     }
     user.setJwtRefreshToken(generateRefreshToken());
     user.setJwtRefreshTokenExpireDate(getJwtRefreshTokenExpireTimeInMs(jwtRefreshTokenExpirationInMs));
-    return userRepository.save(user);
+    return repository.save(user);
   }
 
   private String generateRefreshToken() {
@@ -100,10 +69,11 @@ public class UserService implements UserDetailsService, CrudService<User> {
     return new Date(System.currentTimeMillis() + jwtRefreshTokenExpirationInMs);
   }
 
-  public User findUserByRefreshToken(String jwtRefreshToken) {
-    return userRepository
-        .findByJwtRefreshToken(jwtRefreshToken)
-        .orElseThrow(() ->
-            new NoDataFoundException(String.format("No user found with refresh token %s", jwtRefreshToken)));
+  public User findByRefreshToken(String jwtRefreshToken) {
+    return findOne(specification.entityFieldEquals(User_.jwtRefreshToken, jwtRefreshToken));
+  }
+
+  public User findByEmail(String email) {
+    return findOne(specification.entityFieldEquals(User_.email, email));
   }
 }

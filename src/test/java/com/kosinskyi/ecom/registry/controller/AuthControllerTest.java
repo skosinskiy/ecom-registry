@@ -59,7 +59,7 @@ public class AuthControllerTest {
     assertNotNull(loginResponse.getJwtAccessToken());
     assertEquals(expectedTokenType, loginResponse.getTokenType());
     assertNotNull(loginResponse.getJwtRefreshToken());
-    assertEquals(expectedEmail, userService.findUserByRefreshToken(loginResponse.getJwtRefreshToken()).getEmail());
+    assertEquals(expectedEmail, userService.findByRefreshToken(loginResponse.getJwtRefreshToken()).getEmail());
     assertTrue(loginResponse.getJwtRefreshTokenExpireDate() - beforeRequestTime > jwtRefreshTokenExpirationInMs);
   }
 

@@ -26,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
+@Transactional
 public class SecurityServiceTest {
 
   @Rule
@@ -197,7 +199,7 @@ public class SecurityServiceTest {
     userWithRefreshToken.setAccountExpireDate(new Date(System.currentTimeMillis() + 1000000));
     userWithRefreshToken.setPermissions(permissions);
 
-    when(userService.findUserByRefreshToken(jwtRefreshToken)).thenReturn(user);
+    when(userService.findByRefreshToken(jwtRefreshToken)).thenReturn(user);
     when(userService.setRefreshToken(user, jwtRefreshTokenExpirationInMs)).thenReturn(userWithRefreshToken);
 
     LoginResponse loginResponse = securityService.refreshToken(refreshRequest);
@@ -230,7 +232,7 @@ public class SecurityServiceTest {
     user.setAccountExpireDate(new Date(System.currentTimeMillis()));
     user.setJwtRefreshTokenExpireDate(new Date(System.currentTimeMillis() + 1000000));
 
-    when(userService.findUserByRefreshToken(jwtRefreshToken)).thenReturn(user);
+    when(userService.findByRefreshToken(jwtRefreshToken)).thenReturn(user);
 
     expectedException.expect(AccountExpiredException.class);
     expectedException.expectMessage("User account is expired");
@@ -250,7 +252,7 @@ public class SecurityServiceTest {
     user.setJwtRefreshTokenExpireDate(new Date(System.currentTimeMillis()));
     user.setJwtRefreshToken(jwtRefreshToken);
 
-    when(userService.findUserByRefreshToken(jwtRefreshToken)).thenReturn(user);
+    when(userService.findByRefreshToken(jwtRefreshToken)).thenReturn(user);
 
     expectedException.expect(ActionForbiddenException.class);
     expectedException.expectMessage(String.format("Refresh token %s is expired", jwtRefreshToken));
