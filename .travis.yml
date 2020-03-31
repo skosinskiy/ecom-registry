@@ -18,14 +18,7 @@ before_script:
   - npm install --prefix frontend/
 
 script:
-  - mvn clean package
-  - sonar-scanner
+  - mvn clean package sonar:sonar
   - npm run build --prefix frontend/
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-
-addons:
-  sonarcloud:
-    organization: "skosinskiy-github"
-    token:
-      secure: "G1PvPw6rOIb128Bc1b0jx/4JSqhu1ZoDkRQkAGg8nL3Ir1jtHU6Jk7DHvP1LSIY+jWtXZU4HHaiBEXXhIiJlYsmMDz02XNn0Ad6Eh4/oUT3zFX91a7qJKvzWwcakuZBSpjMu7PX6xQJpY57XvivS2Co8MHbo9l5mgwEGl4YSiSlCNmekS9r+bcS2drgFwYCN4z5d05/7N+nPcQLdSRREhQ/Wab88V5ijkicfyzv30l74xzMHHx0qTm7R5USk0YISA4R3U/RT3UIJCJx/zw7RuO+S6hB/H3nizI3Cugg7QvHoU1hztbVtJwWvYNHVVtKp9UQiYH0nKXWP+Ip+BCpEHePf0/pLa3Sn1I/qqJ8nGtnz02aU3gUi5dX2E43Fsn9a3/NA2B9Bu/BsDeNiXckwivgo+zpfqdG5LJaNkxrbQ9b2V6QY4OCZQVOoRb0zfpqwVnOhbPQ5ZyXFsNQWoaIFBZUl5/QWSrF4gYn1jFo8Tp5W0CQjTSP4wuQ/J89BmOAMyS19F40wLaJb3eeDqbgyIZWVzBtdIEWUjcyeBf6pfXdLnjuwCI27KQQkm2VRKFiEkQBDL8GT/ZrdomW3Qriq35lI0zKdWWzh6DG4PoMIfhJpw09dcw29t3F53QLi50PBcm9+2vt2Oxhht2DB5T1h8az16qxNWgfUp02Hy9CCq3k="
