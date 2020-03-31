@@ -129,7 +129,7 @@ public class SecurityService {
   }
 
   public LoginResponse refreshToken(RefreshRequest refreshRequest) {
-    User user = userService.findUserByRefreshToken(refreshRequest.getJwtRefreshToken());
+    User user = userService.findByRefreshToken(refreshRequest.getJwtRefreshToken());
     checkIsUserExpired(user);
     checkIsJwtRefreshTokenExpired(user);
     User userWithRefreshToken = userService.setRefreshToken(user, jwtRefreshTokenExpirationInMs);

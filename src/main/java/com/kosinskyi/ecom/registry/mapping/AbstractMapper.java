@@ -1,7 +1,6 @@
 package com.kosinskyi.ecom.registry.mapping;
 
 import com.kosinskyi.ecom.registry.entity.base.BaseEntity;
-import com.kosinskyi.ecom.registry.service.CrudService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,10 +11,10 @@ import java.lang.reflect.ParameterizedType;
 @Component
 @Transactional
 @SuppressWarnings("unchecked")
-public abstract class AbstractMapper<E extends BaseEntity, S extends CrudService<E>> {
+public abstract class AbstractMapper<E extends BaseEntity, S> {
 
   private ModelMapper modelMapper;
-  S crudService;
+  S service;
 
   @Autowired
   public void setModelMapper(ModelMapper modelMapper) {
@@ -24,8 +23,8 @@ public abstract class AbstractMapper<E extends BaseEntity, S extends CrudService
 
   @Autowired
   @SuppressWarnings("ALL")
-  public void setCrudService(S crudService) {
-    this.crudService = crudService;
+  public void setService(S service) {
+    this.service = service;
   }
 
   protected <I> E mapRequestDtoToEntity(I requestDto) {

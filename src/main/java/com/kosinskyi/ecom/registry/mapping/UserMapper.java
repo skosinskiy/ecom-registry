@@ -9,6 +9,6 @@ import org.springframework.stereotype.Component;
 public class UserMapper extends AbstractMapper<User, UserService> {
 
   public UserResponse getCurrentUser() {
-    return mapEntityToResponseDto(crudService.getCurrentUser(), UserResponse.class);
+    return mapEntityToResponseDto(service.getCurrentUser(), UserResponse.class);
   }
 }

@@ -3,7 +3,6 @@ package com.kosinskyi.ecom.registry.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kosinskyi.ecom.registry.dto.response.user.UserResponse;
 import com.kosinskyi.ecom.registry.entity.user.User;
-import com.kosinskyi.ecom.registry.repository.UserRepository;
 import com.kosinskyi.ecom.registry.service.user.UserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,8 +15,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -38,13 +35,10 @@ public class UserControllerTest {
   @Autowired
   private UserService userService;
 
-  @Autowired
-  private UserRepository userRepository;
-
   @Test
   public void getCurrentUserTest() throws Exception {
     String expectedEmail = "stanislav.kosinski@gmail.com";
-    User expectedUser = userRepository.findByEmail(expectedEmail).orElseThrow(NoSuchElementException::new);
+    User expectedUser = userService.findByEmail(expectedEmail);
 
     MockHttpServletResponse response = mockMvc.perform(get("/api/users/current")).andReturn().getResponse();
 

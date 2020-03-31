@@ -4,7 +4,7 @@ import com.kosinskyi.ecom.registry.entity.user.User;
 import com.kosinskyi.ecom.registry.error.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.error.exception.NoDataFoundException;
 import com.kosinskyi.ecom.registry.error.exception.NotYetImplementedException;
-import com.kosinskyi.ecom.registry.repository.UserRepository;
+import com.kosinskyi.ecom.registry.repository.user.UserRepository;
 import com.kosinskyi.ecom.registry.service.user.UserService;
 import com.kosinskyi.ecom.registry.utils.ObjectUtils;
 import org.junit.Rule;
@@ -57,7 +57,7 @@ public class UserServiceTest {
     User user = new User();
     user.setEmail(email);
 
-    when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+    when(userService.findByEmail(email)).thenReturn(Optional.of(user));
 
     UserDetails result = userService.loadUserByUsername(email);
 
@@ -232,7 +232,7 @@ public class UserServiceTest {
 
     when(userRepository.findByJwtRefreshToken(jwtRefreshToken)).thenReturn(Optional.of(user));
 
-    User result = userService.findUserByRefreshToken(jwtRefreshToken);
+    User result = userService.findByRefreshToken(jwtRefreshToken);
 
     assertEquals(user, result);
   }
@@ -246,6 +246,6 @@ public class UserServiceTest {
     expectedException.expect(NoDataFoundException.class);
     expectedException.expectMessage(String.format("No user found with refresh token %s", jwtRefreshToken));
 
-    userService.findUserByRefreshToken(jwtRefreshToken);
+    userService.findByRefreshToken(jwtRefreshToken);
   }
 }
