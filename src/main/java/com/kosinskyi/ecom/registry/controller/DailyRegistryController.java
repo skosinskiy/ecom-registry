@@ -1,7 +1,7 @@
 package com.kosinskyi.ecom.registry.controller;
 
 import com.kosinskyi.ecom.registry.dto.response.registry.DailyRegistryResponse;
-import com.kosinskyi.ecom.registry.mapping.DailyRegistryMapper;
+import com.kosinskyi.ecom.registry.mapping.registry.DailyRegistryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +32,7 @@ public class DailyRegistryController {
 
   @GetMapping
   public ResponseEntity<Page<DailyRegistryResponse>> findAll(Pageable pageable) {
-    return ResponseEntity.ok(mapper.findAll(pageable));
+    return ResponseEntity.ok(mapper.findAll(pageable, DailyRegistryResponse.class));
   }
 
   @GetMapping(value = "{registryId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -49,7 +49,7 @@ public class DailyRegistryController {
 
   @DeleteMapping("{registryId}")
   public ResponseEntity<DailyRegistryResponse> delete(@PathVariable Long registryId) {
-    return ResponseEntity.ok(mapper.delete(registryId));
+    return ResponseEntity.ok(mapper.delete(registryId, DailyRegistryResponse.class));
   }
 
 }
