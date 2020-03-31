@@ -16,10 +16,10 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <sonar.projectKey>ecom-registry</sonar.projectKey>
+        <sonar.projectKey>ecom-registry-helper</sonar.projectKey>
         <sonar.organization>skosinskiy-github</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.login>0f2fdb49772b2327bfbba87ed7f80d5885c9ecd0</sonar.login>
+        <sonar.login>0a4cd4df40fb84aae2d332510c0350bc0501a3fd</sonar.login>
     </properties>
 
     <dependencies>
