@@ -1,11 +1,8 @@
 package com.kosinskyi.ecom.registry.service.file;
 
-import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
+import com.kosinskyi.ecom.registry.error.exception.ActionForbiddenException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

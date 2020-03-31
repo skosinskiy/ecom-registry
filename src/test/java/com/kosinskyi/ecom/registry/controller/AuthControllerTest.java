@@ -2,8 +2,8 @@ package com.kosinskyi.ecom.registry.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kosinskyi.ecom.registry.dto.request.LoginRequest;
-import com.kosinskyi.ecom.registry.dto.response.LoginResponse;
-import com.kosinskyi.ecom.registry.service.UserService;
+import com.kosinskyi.ecom.registry.dto.response.auth.LoginResponse;
+import com.kosinskyi.ecom.registry.service.user.UserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest

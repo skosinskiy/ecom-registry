@@ -1,7 +1,7 @@
 package com.kosinskyi.ecom.registry.service.file;
 
 import com.amazonaws.util.IOUtils;
-import com.kosinskyi.ecom.registry.exception.ApplicationException;
+import com.kosinskyi.ecom.registry.error.exception.ApplicationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

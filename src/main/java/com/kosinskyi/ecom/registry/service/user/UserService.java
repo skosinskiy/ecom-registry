@@ -1,9 +1,9 @@
 package com.kosinskyi.ecom.registry.service.user;
 
 import com.kosinskyi.ecom.registry.entity.user.User;
-import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
-import com.kosinskyi.ecom.registry.exception.NoDataFoundException;
-import com.kosinskyi.ecom.registry.exception.NotYetImplementedException;
+import com.kosinskyi.ecom.registry.error.exception.ActionForbiddenException;
+import com.kosinskyi.ecom.registry.error.exception.NoDataFoundException;
+import com.kosinskyi.ecom.registry.error.exception.NotYetImplementedException;
 import com.kosinskyi.ecom.registry.repository.UserRepository;
 import com.kosinskyi.ecom.registry.service.CrudService;
 import com.kosinskyi.ecom.registry.utils.ObjectUtils;

@@ -1,14 +1,13 @@
 package com.kosinskyi.ecom.registry.service.file;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.kosinskyi.ecom.registry.exception.ApplicationException;
-import com.kosinskyi.ecom.registry.exception.NotYetImplementedException;
+import com.kosinskyi.ecom.registry.error.exception.ApplicationException;
+import com.kosinskyi.ecom.registry.error.exception.NotYetImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 @Service
 public class AmazonS3RegistryFileService implements RegistryFileService {

@@ -2,9 +2,9 @@ package com.kosinskyi.ecom.registry.service.registry;
 
 import com.kosinskyi.ecom.registry.entity.file.FileItem;
 import com.kosinskyi.ecom.registry.entity.registry.DailyRegistry;
-import com.kosinskyi.ecom.registry.exception.ApplicationException;
-import com.kosinskyi.ecom.registry.exception.NoDataFoundException;
-import com.kosinskyi.ecom.registry.exception.NotYetImplementedException;
+import com.kosinskyi.ecom.registry.error.exception.ApplicationException;
+import com.kosinskyi.ecom.registry.error.exception.NoDataFoundException;
+import com.kosinskyi.ecom.registry.error.exception.NotYetImplementedException;
 import com.kosinskyi.ecom.registry.repository.DailyRegistryRepository;
 import com.kosinskyi.ecom.registry.service.CrudService;
 import com.kosinskyi.ecom.registry.service.file.RegistryFileService;
@@ -37,6 +37,11 @@ public class DailyRegistryService implements CrudService<DailyRegistry> {
     this.jpaRepository = jpaRepository;
     this.registryFileService = registryFileService;
     this.userService = userService;
+  }
+
+  @Override
+  public DailyRegistry create(DailyRegistry entity) {
+    throw new NotYetImplementedException();
   }
 
   @Transactional
@@ -74,11 +79,6 @@ public class DailyRegistryService implements CrudService<DailyRegistry> {
   @Override
   public Page<DailyRegistry> findAll(Pageable pageable) {
     return jpaRepository.findAll(pageable);
-  }
-
-  @Override
-  public DailyRegistry create(DailyRegistry entity) {
-    throw new NotYetImplementedException();
   }
 
   @Override

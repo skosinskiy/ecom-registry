@@ -2,6 +2,7 @@ package com.kosinskyi.ecom.registry.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kosinskyi.ecom.registry.dto.response.error.ErrorResponse;
+import com.kosinskyi.ecom.registry.error.GenericExceptionHandler;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -18,7 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -46,7 +48,7 @@ public class GenericExceptionHandlerTest {
     when(httpServletRequest.getServletPath()).thenReturn(servletPath);
     when(httpServletResponse.getWriter()).thenReturn(writer);
 
-    genericExceptionHandler.handleException(exception, httpServletRequest, httpServletResponse);
+    genericExceptionHandler.handleException(exception, httpServletRequest);
 
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(writer, times(1)).write(captor.capture());
@@ -72,7 +74,7 @@ public class GenericExceptionHandlerTest {
     when(httpServletRequest.getServletPath()).thenReturn(servletPath);
     when(httpServletResponse.getWriter()).thenReturn(writer);
 
-    genericExceptionHandler.handleException(exception, httpServletRequest, httpServletResponse);
+    genericExceptionHandler.handleException(exception, httpServletRequest);
 
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(writer, times(1)).write(captor.capture());
@@ -91,20 +93,17 @@ public class GenericExceptionHandlerTest {
     String exceptionMessage = "exceptionMessage";
     String servletPath = "servletPath";
     HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
-    HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
     PrintWriter writer = mock(PrintWriter.class);
     RuntimeException exception = new RuntimeException(exceptionMessage);
 
     when(httpServletRequest.getServletPath()).thenReturn(servletPath);
-    when(httpServletResponse.getWriter()).thenReturn(writer);
 
-    genericExceptionHandler.handleException(exception, httpServletRequest, httpServletResponse);
+    genericExceptionHandler.handleException(exception, httpServletRequest);
 
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(writer, times(1)).write(captor.capture());
     ErrorResponse capturedErrorResponse = objectMapper.readValue(captor.getValue(), ErrorResponse.class);
 
-    verify(httpServletResponse, times(1)).setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
     assertNotNull(capturedErrorResponse.getTimeStamp());
     assertEquals(exceptionMessage, capturedErrorResponse.getMessage());
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.name(), capturedErrorResponse.getError());

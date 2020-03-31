@@ -40,8 +40,8 @@ export const DailyRegistry = props => {
   const registryItems = dailyRegistryList === null ? null : dailyRegistryList.map(registry => {
     const {user, fileItem, createdDate} = registry
     const fileKey = fileItem.fileKey
-    const registryDate = registry.registryDate;
-    const extension = fileKey.substring(fileKey.lastIndexOf('.') + 1);
+    const registryDate = registry.registryDate
+    const extension = fileKey.substring(fileKey.lastIndexOf('.') + 1)
     return (
       <TableRow key={registry.id}>
         <TableCell>{registryDate}</TableCell>
