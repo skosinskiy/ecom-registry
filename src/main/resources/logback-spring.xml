@@ -5,27 +5,21 @@
 
     <appender name="CONSOLE"
               class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.kosinskyi.ecom.registry.logging.MaskingPatternLayout">
-                <maskPattern>password</maskPattern>
-                <Pattern>
-                    %cyan(%d{ISO8601}) %highlight(%-5.5level) %green(${PID}) --- %white(%X{requestId}) [%magenta(%-25.25t)] %yellow(%-40.40logger{40}): %msg%n%throwable
-                </Pattern>
-            </layout>
-        </encoder>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %cyan(%d{ISO8601}) %highlight(%-5.5level) %green(${PID}) --- [%magenta(%-25.25t)] %yellow(%-40.40logger{40}): %msg%n%throwable
+            </Pattern>
+        </layout>
     </appender>
 
     <appender name="FILE"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_DIR}/tms-core.log</file>
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.kosinskyi.ecom.registry.logging.MaskingPatternLayout">
-                <maskPattern>password</maskPattern>
-                <Pattern>
-                    %d{ISO8601} %-5.5level ${PID} --- %X{requestId} [%-25.25t] %-40.40logger{40}: %msg%n%throwable
-                </Pattern>
-            </layout>
-        </encoder>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{ISO8601} %-5.5level ${PID} --- [%-25.25t] %-40.40logger{40}: %msg%n%throwable
+            </Pattern>
+        </layout>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_DIR}/archived/%d{yyyy/MM/dd, aux}//tms-core-%d{yyyy-MM-dd-HH}.log</fileNamePattern>
         </rollingPolicy>
@@ -38,14 +32,11 @@
             <onMismatch>DENY</onMismatch>
         </filter>
         <file>${LOG_DIR}/tms-core-errors.log</file>
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.kosinskyi.ecom.registry.logging.MaskingPatternLayout">
-                <maskPattern>password</maskPattern>
-                <Pattern>
-                    %d{ISO8601} %-5.5level ${PID} --- %X{requestId} [%-25.25t] %-40.40logger{40}: %msg%n%throwable
-                </Pattern>
-            </layout>
-        </encoder>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{ISO8601} %-5.5level ${PID} --- [%-25.25t] %-40.40logger{40}: %msg%n%throwable
+            </Pattern>
+        </layout>
         <rollingPolicy
                 class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <fileNamePattern>${LOG_DIR}/archived/tms-core-errors.%i.log</fileNamePattern>
@@ -62,14 +53,11 @@
             </evaluator>
             <onMismatch>DENY</onMismatch>
         </filter>
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.kosinskyi.ecom.registry.logging.MaskingPatternLayout">
-                <maskPattern>password</maskPattern>
-                <Pattern>
-                    %d{ISO8601} %-5.5level ${PID} --- %X{requestId} [%-25.25t] %-40.40logger{40}: %msg%n%throwable
-                </Pattern>
-            </layout>
-        </encoder>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{ISO8601} %-5.5level ${PID} --- [%-25.25t] %-40.40logger{40}: %msg%n%throwable
+            </Pattern>
+        </layout>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_DIR}/archived/%d{yyyy/MM/dd, aux}//tms-core-http-%d{yyyy-MM-dd}.log</fileNamePattern>
         </rollingPolicy>

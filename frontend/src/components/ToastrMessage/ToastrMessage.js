@@ -3,10 +3,10 @@ import ReduxToastr from 'react-redux-toastr'
 
 const ToastrMessage = props => (
   <ReduxToastr
-    timeOut={6000}
-    newestOnTop={false}
+    timeOut={5000}
+    newestOnTop={true}
     preventDuplicates
-    position="top-left"
+    position="top-right"
     transitionIn="fadeIn"
     transitionOut="fadeOut"
     progressBar

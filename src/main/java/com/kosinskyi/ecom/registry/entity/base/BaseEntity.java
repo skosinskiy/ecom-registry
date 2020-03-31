@@ -1,4 +1,4 @@
-package com.kosinskyi.ecom.registry.entity;
+package com.kosinskyi.ecom.registry.entity.base;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

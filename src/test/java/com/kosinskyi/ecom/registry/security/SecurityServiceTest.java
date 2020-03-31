@@ -2,11 +2,11 @@ package com.kosinskyi.ecom.registry.security;
 
 import com.kosinskyi.ecom.registry.dto.request.LoginRequest;
 import com.kosinskyi.ecom.registry.dto.request.RefreshRequest;
-import com.kosinskyi.ecom.registry.dto.response.LoginResponse;
-import com.kosinskyi.ecom.registry.entity.Permission;
-import com.kosinskyi.ecom.registry.entity.User;
+import com.kosinskyi.ecom.registry.dto.response.auth.LoginResponse;
+import com.kosinskyi.ecom.registry.entity.user.Permission;
+import com.kosinskyi.ecom.registry.entity.user.User;
 import com.kosinskyi.ecom.registry.error.exception.ActionForbiddenException;
-import com.kosinskyi.ecom.registry.service.UserService;
+import com.kosinskyi.ecom.registry.service.user.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
@@ -33,8 +33,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -245,8 +245,9 @@ public class SecurityServiceTest {
     refreshRequest.setJwtRefreshToken(jwtRefreshToken);
 
     User user = new User();
-    user.setAccountExpireDate(new Date(System.currentTimeMillis() + 1000000));
-    user.setJwtRefreshTokenExpireDate(new Date(System.currentTimeMillis() - 1000000));
+    user.setId(100L);
+    user.setAccountExpireDate(new Date(System.currentTimeMillis() + System.currentTimeMillis()));
+    user.setJwtRefreshTokenExpireDate(new Date(System.currentTimeMillis()));
     user.setJwtRefreshToken(jwtRefreshToken);
 
     when(userService.findUserByRefreshToken(jwtRefreshToken)).thenReturn(user);

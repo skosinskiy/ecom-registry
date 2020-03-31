@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import api from '../components/Axios/Axios'
 
-export const getJwtToken = (requestParams, requestTimeout) => {
+export const getJwtToken = (requestTimeout) => {
   const {jwtAccessToken, jwtRefreshToken, jwtRefreshTokenExpireTime} = getLocalStorageTokens()
   if (!jwtAccessToken) {
     return null

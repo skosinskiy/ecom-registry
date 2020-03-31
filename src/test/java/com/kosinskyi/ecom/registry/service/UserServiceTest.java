@@ -1,9 +1,11 @@
 package com.kosinskyi.ecom.registry.service;
 
-import com.kosinskyi.ecom.registry.entity.User;
+import com.kosinskyi.ecom.registry.entity.user.User;
 import com.kosinskyi.ecom.registry.error.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.error.exception.NoDataFoundException;
+import com.kosinskyi.ecom.registry.error.exception.NotYetImplementedException;
 import com.kosinskyi.ecom.registry.repository.UserRepository;
+import com.kosinskyi.ecom.registry.service.user.UserService;
 import com.kosinskyi.ecom.registry.utils.ObjectUtils;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,14 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -69,8 +70,8 @@ public class UserServiceTest {
 
     when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
-    expectedException.expect(NoDataFoundException.class);
-    expectedException.expectMessage(String.format("No User found by param %s", email));
+    expectedException.expect(UsernameNotFoundException.class);
+    expectedException.expectMessage(String.format("No user with email %s found", email));
 
     userService.loadUserByUsername(email);
   }
@@ -78,14 +79,14 @@ public class UserServiceTest {
   @Test
   public void getCurrentUserTest() {
     String email = "email";
+    Authentication authentication = mock(Authentication.class);
     User user = new User();
     user.setEmail(email);
 
-    Authentication authentication = mock(Authentication.class);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
 
     when(authentication.getName()).thenReturn(email);
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
-    SecurityContextHolder.getContext().setAuthentication(authentication);
 
     User result = userService.getCurrentUser();
 
@@ -112,30 +113,22 @@ public class UserServiceTest {
     when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
     expectedException.expect(NoDataFoundException.class);
-    expectedException.expectMessage(String.format("No User found by id %d", userId));
+    expectedException.expectMessage(String.format("No user with id %d found", userId));
 
     userService.findById(userId);
   }
 
   @Test
   public void findAllTest() {
-    List mockList = mock(List.class);
-    when(userRepository.findAll()).thenReturn(mockList);
-
-    List<User> result = userService.findAll();
-
-    assertEquals(mockList, result);
+    expectedException.expect(NotYetImplementedException.class);
+    userService.findAll();
   }
 
   @Test
   public void findAllPageableTest() {
     Pageable pageable = mock(Pageable.class);
-    Page mockPage = mock(Page.class);
-    when(userRepository.findAll(pageable)).thenReturn(mockPage);
-
-    Page<User> result = userService.findAll(pageable);
-
-    assertEquals(mockPage, result);
+    expectedException.expect(NotYetImplementedException.class);
+    userService.findAll(pageable);
   }
 
   @Test
@@ -194,14 +187,8 @@ public class UserServiceTest {
   @Test
   public void deleteTest() {
     Long userId = 1L;
-
-    User user = mock(User.class);
-    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-    User result = userService.delete(userId);
-
-    assertEquals(user, result);
-    verify(userRepository, times(1)).delete(user);
+    expectedException.expect(NotYetImplementedException.class);
+    userService.delete(userId);
   }
 
   @Test
@@ -257,7 +244,7 @@ public class UserServiceTest {
     when(userRepository.findByJwtRefreshToken(jwtRefreshToken)).thenReturn(Optional.empty());
 
     expectedException.expect(NoDataFoundException.class);
-    expectedException.expectMessage(String.format("No User found by param %s", jwtRefreshToken));
+    expectedException.expectMessage(String.format("No user found with refresh token %s", jwtRefreshToken));
 
     userService.findUserByRefreshToken(jwtRefreshToken);
   }

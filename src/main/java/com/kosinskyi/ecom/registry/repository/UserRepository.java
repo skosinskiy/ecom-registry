@@ -1,6 +1,6 @@
 package com.kosinskyi.ecom.registry.repository;
 
-import com.kosinskyi.ecom.registry.entity.User;
+import com.kosinskyi.ecom.registry.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

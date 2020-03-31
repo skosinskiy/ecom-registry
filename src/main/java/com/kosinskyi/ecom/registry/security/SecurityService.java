@@ -2,14 +2,12 @@ package com.kosinskyi.ecom.registry.security;
 
 import com.kosinskyi.ecom.registry.dto.request.LoginRequest;
 import com.kosinskyi.ecom.registry.dto.request.RefreshRequest;
-import com.kosinskyi.ecom.registry.dto.response.LoginResponse;
-import com.kosinskyi.ecom.registry.entity.Permission;
-import com.kosinskyi.ecom.registry.entity.User;
+import com.kosinskyi.ecom.registry.dto.response.auth.LoginResponse;
+import com.kosinskyi.ecom.registry.entity.user.Permission;
+import com.kosinskyi.ecom.registry.entity.user.User;
 import com.kosinskyi.ecom.registry.error.exception.ActionForbiddenException;
-import com.kosinskyi.ecom.registry.error.exception.AuthenticationException;
-import com.kosinskyi.ecom.registry.service.UserService;
+import com.kosinskyi.ecom.registry.service.user.UserService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -105,11 +103,7 @@ public class SecurityService {
   }
 
   private Claims getJwtClaims(String jwt) {
-    try {
-      return jwtParser.setSigningKey(jwtSecret).parseClaimsJws(jwt).getBody();
-    } catch (JwtException | IllegalArgumentException exc) {
-      throw new AuthenticationException(exc.getMessage());
-    }
+    return jwtParser.setSigningKey(jwtSecret).parseClaimsJws(jwt).getBody();
   }
 
   public void setAuthenticationFromJwt(String jwt, HttpServletRequest request) {

@@ -1,6 +1,6 @@
 package com.kosinskyi.ecom.registry.security;
 
-import com.kosinskyi.ecom.registry.service.UserService;
+import com.kosinskyi.ecom.registry.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

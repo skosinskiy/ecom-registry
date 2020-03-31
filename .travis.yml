@@ -18,8 +18,7 @@ before_script:
   - npm install --prefix frontend/
 
 script:
-  - mvn clean package
-  - sonar-scanner
+  - mvn clean package sonar:sonar
   - npm run build --prefix frontend/
 after_success:
   - bash <(curl -s https://codecov.io/bash)
@@ -27,5 +26,4 @@ after_success:
 addons:
   sonarcloud:
     organization: "skosinskiy-github"
-    token:
-      secure: ${SONAR_TOKEN}
+    token: "${SONAR_TOKEN}"

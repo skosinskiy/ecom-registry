@@ -18,12 +18,12 @@ class SidebarMenu extends Component {
 
         {
           hasGrant(user, Grant.MANAGE_REGISTRY) &&
-                    <NavLink to={'/file-manager'}>
+                    <NavLink to={'/daily-registry'}>
                       <ListItem button alignItems={'center'}>
                         <ListItemIcon>
                           <DescriptionOutlinedIcon/>
                         </ListItemIcon>
-                        <ListItemText primary={'File Manager'}/>
+                        <ListItemText primary={'Daily registry'}/>
                       </ListItem>
                     </NavLink>
         }

@@ -2,12 +2,10 @@ package com.kosinskyi.ecom.registry.controller;
 
 import com.kosinskyi.ecom.registry.dto.request.LoginRequest;
 import com.kosinskyi.ecom.registry.dto.request.RefreshRequest;
-import com.kosinskyi.ecom.registry.dto.response.LoginResponse;
-import com.kosinskyi.ecom.registry.logging.Logging;
+import com.kosinskyi.ecom.registry.dto.response.auth.LoginResponse;
 import com.kosinskyi.ecom.registry.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +15,6 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
-@Logging
 public class AuthController {
 
   private SecurityService securityService;
@@ -33,7 +30,7 @@ public class AuthController {
   }
 
   @PostMapping("refresh")
-  public ResponseEntity<LoginResponse> refreshJwtAccessToken(@Valid @RequestBody RefreshRequest refreshRequest) {
+  public ResponseEntity<LoginResponse> getCurrentUser(@Valid @RequestBody RefreshRequest refreshRequest) {
     return ResponseEntity.ok(securityService.refreshToken(refreshRequest));
   }
 

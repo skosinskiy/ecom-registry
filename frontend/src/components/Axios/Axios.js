@@ -11,6 +11,10 @@ const METHOD_DELETE = 'delete'
 const REQUEST_TIMEOUT = 60000
 
 export class FetchData {
+  getBlob (url, requestParams) {
+    return this.makeRequest(url, METHOD_GET, null, requestParams, 'blob')
+  }
+
   get (url, requestParams) {
     return this.makeRequest(url, METHOD_GET, null, requestParams)
   }
@@ -27,13 +31,14 @@ export class FetchData {
     return this.makeRequest(url, METHOD_DELETE, null, requestParams)
   }
 
-  async makeRequest (url, method, body, reqParams) {
+  async makeRequest (url, method, body, reqParams, responseType) {
     const requestParams = {
       method: method || METHOD_GET,
       data: body,
       params: {
         ...(reqParams || {})
-      }
+      },
+      responseType: responseType
     }
 
     requestParams.timeout = REQUEST_TIMEOUT
@@ -44,12 +49,13 @@ export class FetchData {
       }
     }
 
-    const jwtAccessToken = await getJwtToken(requestParams, REQUEST_TIMEOUT, url)
+    const jwtAccessToken = await getJwtToken(REQUEST_TIMEOUT)
     if (jwtAccessToken) {
       requestParams.headers = {
         'Authorization': `Bearer ${jwtAccessToken}`
       }
     }
+    console.log(requestParams)
     return this.sendRequest(url, requestParams)
   }
 

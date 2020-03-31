@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kosinskyi.ecom.registry.error.exception.ApplicationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpOutputMessage;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -88,8 +90,19 @@ public class HttpLoggingService {
     return map;
   }
 
+  private Map<String, String> buildHeadersMap(HttpOutputMessage outputMessage) {
+    Map<String, String> map = new HashMap<>();
+    HttpHeaders headers = outputMessage.getHeaders();
+    headers.keySet().forEach(header -> map.put(header, headers.getFirst(header)));
+    return map;
+  }
+
   public void logResponse(HttpServletResponse httpServletResponse, Object body) {
     logResponse(body, buildHeadersMap(httpServletResponse));
+  }
+
+  public void logResponse(HttpOutputMessage outputMessage, Object body) {
+    logResponse(body, buildHeadersMap(outputMessage));
   }
 
   private void logResponse(Object body, Map<String, String> headersMap) {

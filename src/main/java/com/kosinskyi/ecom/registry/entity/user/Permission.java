@@ -1,4 +1,4 @@
-package com.kosinskyi.ecom.registry.entity;
+package com.kosinskyi.ecom.registry.entity.user;
 
 import org.springframework.security.core.GrantedAuthority;
 
