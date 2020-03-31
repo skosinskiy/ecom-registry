@@ -2,9 +2,10 @@ package com.kosinskyi.ecom.registry.service.registry;
 
 import com.kosinskyi.ecom.registry.entity.file.FileItem;
 import com.kosinskyi.ecom.registry.entity.registry.DailyRegistry;
+import com.kosinskyi.ecom.registry.exception.ApplicationException;
+import com.kosinskyi.ecom.registry.exception.NoDataFoundException;
 import com.kosinskyi.ecom.registry.exception.NotYetImplementedException;
 import com.kosinskyi.ecom.registry.repository.DailyRegistryRepository;
-import com.kosinskyi.ecom.registry.service.BaseCrudService;
 import com.kosinskyi.ecom.registry.service.CrudService;
 import com.kosinskyi.ecom.registry.service.file.RegistryFileService;
 import com.kosinskyi.ecom.registry.service.user.UserService;
@@ -22,9 +23,9 @@ import java.util.List;
 @Service
 public class DailyRegistryService implements CrudService<DailyRegistry> {
 
+  private DailyRegistryRepository jpaRepository;
   private RegistryFileService registryFileService;
   private UserService userService;
-  private BaseCrudService<DailyRegistry> baseCrudService;
 
   @Autowired
   public DailyRegistryService(
@@ -33,18 +34,22 @@ public class DailyRegistryService implements CrudService<DailyRegistry> {
       RegistryFileService registryFileService,
       UserService userService
   ) {
+    this.jpaRepository = jpaRepository;
     this.registryFileService = registryFileService;
     this.userService = userService;
-    this.baseCrudService = new BaseCrudService<>(jpaRepository);
   }
 
   @Transactional
   public DailyRegistry create(LocalDate date, MultipartFile multipartFile) {
+    jpaRepository.findByRegistryDate(date).ifPresent(dailyRegistry -> {
+      throw new ApplicationException("Registry with such date already exists");
+    });
     DailyRegistry dailyRegistry = new DailyRegistry();
     dailyRegistry.setRegistryDate(date);
     dailyRegistry.setFileItem(createFileItem(multipartFile));
     dailyRegistry.setUser(userService.getCurrentUser());
-    return baseCrudService.create(dailyRegistry);
+    dailyRegistry.setId(null);
+    return jpaRepository.save(dailyRegistry);
   }
 
   private FileItem createFileItem(MultipartFile multipartFile) {
@@ -58,17 +63,17 @@ public class DailyRegistryService implements CrudService<DailyRegistry> {
 
   @Override
   public DailyRegistry findById(Long id) {
-    return baseCrudService.findById(id);
+    return jpaRepository.findById(id).orElseThrow(() -> new NoDataFoundException("No data found"));
   }
 
   @Override
   public List<DailyRegistry> findAll() {
-    return baseCrudService.findAll();
+    return jpaRepository.findAll();
   }
 
   @Override
   public Page<DailyRegistry> findAll(Pageable pageable) {
-    return baseCrudService.findAll(pageable);
+    return jpaRepository.findAll(pageable);
   }
 
   @Override
@@ -83,6 +88,13 @@ public class DailyRegistryService implements CrudService<DailyRegistry> {
 
   @Override
   public DailyRegistry delete(Long id) {
-    return baseCrudService.delete(id);
+    DailyRegistry dailyRegistry = findById(id);
+    jpaRepository.delete(dailyRegistry);
+    return dailyRegistry;
+  }
+
+  public byte[] getBinary(Long id) {
+    DailyRegistry dailyRegistry = findById(id);
+    return registryFileService.getBinaryFile(dailyRegistry.getFileItem().getFileKey());
   }
 }

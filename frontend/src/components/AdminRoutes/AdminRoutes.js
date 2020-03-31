@@ -4,15 +4,14 @@ import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 import {Grant} from '../../constants/permissions'
 import {hasGrant} from '../../utils/hasGrant'
-import FileManager from '../../pages/AdminPage/FileManager/FileManager'
+import {DailyRegistry} from '../../pages/AdminPage/DailyRegistry/DailyRegistry'
 
 class AdminRouter extends Component {
   render () {
     const {user} = this.props
-
     return (
       <Switch>
-        <AuthorizedRoute authorized={hasGrant(user, Grant.MANAGE_REGISTRY)} path="/file-manager" component={FileManager} />
+        <AuthorizedRoute authorized={hasGrant(user, Grant.MANAGE_REGISTRY)} path="/daily-registry" component={DailyRegistry} />
       </Switch>
     )
   }

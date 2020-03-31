@@ -23,7 +23,7 @@ import java.time.LocalDate;
 @ToString(callSuper = true)
 public class DailyRegistry extends BaseEntity {
 
-  @Column(name = "registry_date")
+  @Column(name = "registry_date", unique = true)
   private LocalDate registryDate;
 
   @OneToOne(cascade = CascadeType.ALL)

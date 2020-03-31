@@ -6,5 +6,6 @@ import lombok.Data;
 public class BaseEntityResponse {
 
   private Long id;
+  private Long createdDate;
 
 }

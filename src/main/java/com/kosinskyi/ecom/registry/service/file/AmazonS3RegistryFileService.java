@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 @Service
 public class AmazonS3RegistryFileService implements RegistryFileService {
@@ -19,6 +20,11 @@ public class AmazonS3RegistryFileService implements RegistryFileService {
   @Autowired
   public AmazonS3RegistryFileService(AmazonS3Client s3Client) {
     this.s3Client = s3Client;
+  }
+
+  @Override
+  public byte[] getBinaryFile(String fileKey) {
+    throw new NotYetImplementedException();
   }
 
   @Override

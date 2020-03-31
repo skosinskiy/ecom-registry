@@ -4,6 +4,7 @@ import com.kosinskyi.ecom.registry.exception.ActionForbiddenException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +32,8 @@ public interface RegistryFileService {
   default String generateFileKey(MultipartFile multipartFile) {
     return UUID.randomUUID().toString() + ALLOWED_MIME_TYPES.get(multipartFile.getContentType());
   }
+
+  byte[] getBinaryFile(String fileKey);
 
   String uploadFile(MultipartFile multipartFile);
 
