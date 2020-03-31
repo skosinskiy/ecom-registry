@@ -1,4 +1,4 @@
-package com.kosinskyi.ecom.registry.aspect;
+package com.kosinskyi.ecom.registry.logging;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -17,9 +17,9 @@ public class LoggingAspect {
 
   private static final String VOID_RETURN_TYPE = "void";
 
-  @Around("com.kosinskyi.ecom.registry.aspect.PointcutExpressionsHolder.controllerLayer() || "
-      + "com.kosinskyi.ecom.registry.aspect.PointcutExpressionsHolder.repositoryLayer() ||"
-      + "com.kosinskyi.ecom.registry.aspect.PointcutExpressionsHolder.serviceLayer()")
+  @Around("com.kosinskyi.ecom.registry.logging.PointcutExpressionsHolder.controllerLayer() || "
+      + "com.kosinskyi.ecom.registry.logging.PointcutExpressionsHolder.repositoryLayer() ||"
+      + "com.kosinskyi.ecom.registry.logging.PointcutExpressionsHolder.serviceLayer()")
   public Object logAroundMethodExecution(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
     MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();
     String methodName = signature.toShortString();

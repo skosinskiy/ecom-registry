@@ -1,4 +1,4 @@
-package com.kosinskyi.ecom.registry.aspect;
+package com.kosinskyi.ecom.registry.logging;
 
 import org.aspectj.lang.annotation.Pointcut;
 
