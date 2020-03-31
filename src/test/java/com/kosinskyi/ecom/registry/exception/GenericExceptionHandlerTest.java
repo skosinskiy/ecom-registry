@@ -18,9 +18,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -48,7 +50,7 @@ public class GenericExceptionHandlerTest {
     when(httpServletRequest.getServletPath()).thenReturn(servletPath);
     when(httpServletResponse.getWriter()).thenReturn(writer);
 
-    genericExceptionHandler.handleException(exception, httpServletRequest);
+    genericExceptionHandler.handleAuthException(exception, httpServletRequest, httpServletResponse);
 
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(writer, times(1)).write(captor.capture());
@@ -63,51 +65,40 @@ public class GenericExceptionHandlerTest {
   }
 
   @Test
-  public void handleAccessDeniedExceptionTest() throws IOException {
-    String exceptionMessage = "exceptionMessage";
+  public void handleAccessDeniedExceptionTest() {
+    String exceptionMessage = "Full authentication is required";
     String servletPath = "servletPath";
     HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
-    HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
-    PrintWriter writer = mock(PrintWriter.class);
     AccessDeniedException exception = new AccessDeniedException(exceptionMessage);
 
     when(httpServletRequest.getServletPath()).thenReturn(servletPath);
-    when(httpServletResponse.getWriter()).thenReturn(writer);
 
-    genericExceptionHandler.handleException(exception, httpServletRequest);
+    ErrorResponse errorResponse = genericExceptionHandler.handleException(exception, httpServletRequest).getBody();
 
-    ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-    verify(writer, times(1)).write(captor.capture());
-    ErrorResponse capturedErrorResponse = objectMapper.readValue(captor.getValue(), ErrorResponse.class);
-
-    verify(httpServletResponse, times(1)).setStatus(HttpStatus.FORBIDDEN.value());
-    assertNotNull(capturedErrorResponse.getTimeStamp());
-    assertEquals(exceptionMessage, capturedErrorResponse.getMessage());
-    assertEquals(HttpStatus.FORBIDDEN.name(), capturedErrorResponse.getError());
-    assertEquals(HttpStatus.FORBIDDEN.value(), capturedErrorResponse.getStatus());
-    assertEquals(servletPath, capturedErrorResponse.getPath());
+    assertTrue(Objects.nonNull(errorResponse));
+    assertNotNull(errorResponse.getTimeStamp());
+    assertEquals(exceptionMessage, errorResponse.getMessage());
+    assertEquals(HttpStatus.UNAUTHORIZED.name(), errorResponse.getError());
+    assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatus());
+    assertEquals(servletPath, errorResponse.getPath());
   }
 
   @Test
-  public void handleRuntimeExceptionTest() throws IOException {
+  public void handleRuntimeExceptionTest() {
     String exceptionMessage = "exceptionMessage";
     String servletPath = "servletPath";
     HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
-    PrintWriter writer = mock(PrintWriter.class);
     RuntimeException exception = new RuntimeException(exceptionMessage);
 
     when(httpServletRequest.getServletPath()).thenReturn(servletPath);
 
-    genericExceptionHandler.handleException(exception, httpServletRequest);
+    ErrorResponse errorResponse = genericExceptionHandler.handleException(exception, httpServletRequest).getBody();
 
-    ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-    verify(writer, times(1)).write(captor.capture());
-    ErrorResponse capturedErrorResponse = objectMapper.readValue(captor.getValue(), ErrorResponse.class);
-
-    assertNotNull(capturedErrorResponse.getTimeStamp());
-    assertEquals(exceptionMessage, capturedErrorResponse.getMessage());
-    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.name(), capturedErrorResponse.getError());
-    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), capturedErrorResponse.getStatus());
-    assertEquals(servletPath, capturedErrorResponse.getPath());
+    assertTrue(Objects.nonNull(errorResponse));
+    assertNotNull(errorResponse.getTimeStamp());
+    assertEquals(exceptionMessage, errorResponse.getMessage());
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.name(), errorResponse.getError());
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
+    assertEquals(servletPath, errorResponse.getPath());
   }
 }
