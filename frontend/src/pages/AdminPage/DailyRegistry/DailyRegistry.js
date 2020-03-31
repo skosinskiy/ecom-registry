@@ -52,10 +52,10 @@ export const DailyRegistry = props => {
         <TableCell>
           <IconButton size="medium" onClick={() =>
             saveFile(`/api/registry/daily/${registry.id}`, `${registryDate}.${extension}`)}>
-            <ArrowDownwardIcon fontSize="medium" />
+            <ArrowDownwardIcon />
           </IconButton>
           <IconButton size="medium" onClick={() => dispatch(deleteDailyRegistry(registry.id))}>
-            <DeleteIcon fontSize="inherit" />
+            <DeleteIcon />
           </IconButton>
         </TableCell>
       </TableRow>
