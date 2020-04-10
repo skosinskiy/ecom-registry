@@ -5,6 +5,7 @@ import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistryParseCrite
 import com.kosinskyi.ecom.registry.error.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.error.exception.ApplicationException;
 import com.kosinskyi.ecom.registry.service.file.RegistryFileService;
+import com.kosinskyi.ecom.registry.service.registry.daily.DailyRegistryService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -21,7 +22,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy.CREATE_NULL_AS_BLANK;
@@ -42,21 +44,24 @@ public class DailyRegistryParseService {
 
   private RegistryFileService registryFileService;
   private DailyRegistryParseCriteriaService parseCriteriaService;
+  private DailyRegistryService dailyRegistryService;
 
   @Autowired
   public DailyRegistryParseService(
       @Qualifier("localRegistryFileService") RegistryFileService registryFileService,
-      DailyRegistryParseCriteriaService parseCriteriaService) {
+      DailyRegistryParseCriteriaService parseCriteriaService,
+      DailyRegistryService dailyRegistryService) {
     this.registryFileService = registryFileService;
     this.parseCriteriaService = parseCriteriaService;
+    this.dailyRegistryService = dailyRegistryService;
   }
 
   @Async
-  public void parse(DailyRegistry dailyRegistry) {
+  public void parse(Long dailyRegistryId) {
+    DailyRegistry dailyRegistry = dailyRegistryService.findById(dailyRegistryId);
     LocalDate registryDate = dailyRegistry.getRegistryDate();
-    Long dailyRegistryId = dailyRegistry.getId();
     log.info("Received request for parsing daily registry {}, date: {}", dailyRegistryId, registryDate);
-    Sheet originalSheet = getWorkbook(dailyRegistry.getFileItem().getFileKey()).getSheetAt(0);
+    Sheet originalSheet = getWorkbook(dailyRegistry.getRegistryItem().getFileKey()).getSheetAt(0);
     Map<Long, Workbook> map = new HashMap<>();
     List<DailyRegistryParseCriteria> parseCriteriaList = parseCriteriaService.findAll();
     log.info("Starting parsing daily registry {}, date: {}", dailyRegistryId, registryDate);
@@ -68,8 +73,17 @@ public class DailyRegistryParseService {
         copyRow(originalRow, sheet.createRow(sheet.getLastRowNum() + 1), createdWorkbook);
       });
     }
+    //TODO split by different services
     log.info("Processing finished for daily registry {}, date: {}", dailyRegistryId, registryDate);
-    map.forEach((k, v) -> saveWorkbook(v, getFileName(findCriteriaById(parseCriteriaList, k).getName(), registryDate)));
+    String zipFileKey = registryFileService.saveZip(map
+        .entrySet()
+        .stream()
+        .collect(
+            Collectors.toMap(
+                entry -> getFileName(findCriteriaById(parseCriteriaList, entry.getKey()).getName(), registryDate),
+                entry -> getBytesFromWorkbook(entry.getValue())
+            )));
+    dailyRegistryService.setParsedRegistryItem(dailyRegistry, zipFileKey);
   }
 
   private Workbook getOrPutWorkbook(Map<Long, Workbook> map, Long criteriaId, Sheet originalSheet) {
@@ -88,7 +102,7 @@ public class DailyRegistryParseService {
     return createdWorkbook;
   }
 
-  private DailyRegistryParseCriteria findCriteriaById(List<DailyRegistryParseCriteria> parseCriteriaList , Long id) {
+  private DailyRegistryParseCriteria findCriteriaById(List<DailyRegistryParseCriteria> parseCriteriaList, Long id) {
     return parseCriteriaList
         .stream()
         .filter(c -> c.getId().equals(id))
@@ -126,12 +140,12 @@ public class DailyRegistryParseService {
     }
   }
 
-  private void saveWorkbook(Workbook workbook, String name) {
+  private byte[] getBytesFromWorkbook(Workbook workbook) {
     try {
-      FileOutputStream outputStream = new FileOutputStream(name);
-      workbook.write(outputStream);
-      outputStream.close();
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      workbook.write(baos);
       workbook.close();
+      return baos.toByteArray();
     } catch (IOException exc) {
       log.error(exc.getMessage());
       throw new ApplicationException(exc.getMessage(), exc);

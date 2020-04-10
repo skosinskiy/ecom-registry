@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Service
 public class AmazonS3RegistryFileService implements RegistryFileService {
@@ -39,6 +40,11 @@ public class AmazonS3RegistryFileService implements RegistryFileService {
 
   @Override
   public void removeFile(String fileKey) {
+    throw new NotYetImplementedException();
+  }
+
+  @Override
+  public String saveZip(Map<String, byte[]> fileNameBytesMap) {
     throw new NotYetImplementedException();
   }
 }

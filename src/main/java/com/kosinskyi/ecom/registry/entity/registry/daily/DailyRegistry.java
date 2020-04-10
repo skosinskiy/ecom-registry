@@ -27,8 +27,12 @@ public class DailyRegistry extends BaseEntity {
   private LocalDate registryDate;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "file_item_id")
-  private FileItem fileItem;
+  @JoinColumn(name = "registry_item_id", nullable = false)
+  private FileItem registryItem;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "parsed_registry_item_id")
+  private FileItem parsedRegistryItem;
 
   @ManyToOne
   @JoinColumn(name = "user_id")

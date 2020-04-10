@@ -22,7 +22,7 @@ public class FileItem extends BaseEntity {
   @Column(name = "file_key", nullable = false)
   private String fileKey;
 
-  @Column(name = "size", nullable = false)
+  @Column(name = "size")
   private Long size;
 
 }

@@ -61,7 +61,7 @@ public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteS
     });
     DailyRegistry dailyRegistry = new DailyRegistry();
     dailyRegistry.setRegistryDate(date);
-    dailyRegistry.setFileItem(createFileItem(multipartFile));
+    dailyRegistry.setRegistryItem(createFileItem(multipartFile));
     dailyRegistry.setUser(userService.getCurrentUser());
     dailyRegistry.setId(null);
     return jpaRepository.save(dailyRegistry);
@@ -85,6 +85,13 @@ public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteS
 
   public byte[] getBinary(Long id) {
     DailyRegistry dailyRegistry = findById(id);
-    return registryFileService.getBinaryFile(dailyRegistry.getFileItem().getFileKey());
+    return registryFileService.getBinaryFile(dailyRegistry.getRegistryItem().getFileKey());
+  }
+
+  public void setParsedRegistryItem(DailyRegistry dailyRegistry, String fileKey) {
+    FileItem fileItem = new FileItem();
+    fileItem.setFileKey(fileKey);
+    dailyRegistry.setParsedRegistryItem(fileItem);
+    jpaRepository.save(dailyRegistry);
   }
 }
