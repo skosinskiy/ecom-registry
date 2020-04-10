@@ -2,7 +2,6 @@ package com.kosinskyi.ecom.registry.controller;
 
 import com.kosinskyi.ecom.registry.dto.response.registry.DailyRegistryResponse;
 import com.kosinskyi.ecom.registry.mapping.registry.DailyRegistryMapper;
-import com.kosinskyi.ecom.registry.service.registry.daily.DailyRegistryService;
 import com.kosinskyi.ecom.registry.service.registry.daily.parsing.DailyRegistryParseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -55,14 +54,11 @@ public class DailyRegistryController {
   }
 
   @Autowired
-  private DailyRegistryService dailyRegistryService;
-
-  @Autowired
   private DailyRegistryParseService dailyRegistryParseService;
 
   @GetMapping("parse/{dailyRegistryId}")
   public ResponseEntity<String> test(@PathVariable Long dailyRegistryId) {
-    dailyRegistryParseService.parse(dailyRegistryService.findById(dailyRegistryId));
+    dailyRegistryParseService.parse(dailyRegistryId);
     return ResponseEntity.ok("OK");
   }
 
