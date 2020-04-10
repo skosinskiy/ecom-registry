@@ -42,13 +42,13 @@ public class SecurityService {
   private UserService userService;
   private JwtParser jwtParser;
 
-  @Value("${app.jwtSecret}")
+  @Value("${jwt.secret}")
   private String jwtSecret;
 
-  @Value("${app.jwtAccessTokenExpirationInMs}")
+  @Value("${jwt.access-token-exp-ms}")
   private Long jwtAccessTokenExpirationInMs;
 
-  @Value("${app.jwtRefreshTokenExpirationInMs}")
+  @Value("${jwt.refresh-token-exp-ms}")
   private Long jwtRefreshTokenExpirationInMs;
 
   String getJwtSecret() {

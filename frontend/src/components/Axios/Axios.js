@@ -55,7 +55,6 @@ export class FetchData {
         'Authorization': `Bearer ${jwtAccessToken}`
       }
     }
-    console.log(requestParams)
     return this.sendRequest(url, requestParams)
   }
 

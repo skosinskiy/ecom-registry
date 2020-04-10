@@ -56,13 +56,9 @@ public class UserService implements UserDetailsService, ReadService<User>, Creat
     if (user.getId() == null) {
       throw new ActionForbiddenException("User id must not be null when set refresh token");
     }
-    user.setJwtRefreshToken(generateRefreshToken());
+    user.setJwtRefreshToken(UUID.randomUUID().toString());
     user.setJwtRefreshTokenExpireDate(getJwtRefreshTokenExpireTimeInMs(jwtRefreshTokenExpirationInMs));
     return repository.save(user);
-  }
-
-  private String generateRefreshToken() {
-    return UUID.randomUUID().toString();
   }
 
   private Date getJwtRefreshTokenExpireTimeInMs(long jwtRefreshTokenExpirationInMs) {
