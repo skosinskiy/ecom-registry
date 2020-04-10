@@ -60,10 +60,10 @@ public class SecurityServiceTest {
   @MockBean
   private JwtParser jwtParser;
 
-  @Value("${app.jwtAccessTokenExpirationInMs}")
+  @Value("${jwt.access-token-exp-ms}")
   private long jwtAccessTokenExpirationInMs;
 
-  @Value("${app.jwtRefreshTokenExpirationInMs}")
+  @Value("${jwt.refresh-token-exp-ms}")
   private Long jwtRefreshTokenExpirationInMs;
 
   @Test

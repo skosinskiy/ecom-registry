@@ -37,7 +37,7 @@ public class AuthControllerTest {
   @Autowired
   private UserService userService;
 
-  @Value("${app.jwtRefreshTokenExpirationInMs}")
+  @Value("${jwt.refresh-token-exp-ms}")
   private Long jwtRefreshTokenExpirationInMs;
 
   @Test
