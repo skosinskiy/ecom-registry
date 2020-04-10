@@ -2,6 +2,7 @@ package com.kosinskyi.ecom.registry.entity.registry.daily;
 
 import com.kosinskyi.ecom.registry.entity.base.BaseEntity;
 import com.kosinskyi.ecom.registry.entity.file.FileItem;
+import com.kosinskyi.ecom.registry.entity.registry.daily.constants.DailyRegistryStatus;
 import com.kosinskyi.ecom.registry.entity.user.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,6 +11,8 @@ import lombok.ToString;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -25,6 +28,10 @@ public class DailyRegistry extends BaseEntity {
 
   @Column(name = "registry_date", unique = true)
   private LocalDate registryDate;
+
+  @Column(name = "status", nullable = false)
+  @Enumerated(EnumType.STRING)
+  private DailyRegistryStatus status;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "registry_item_id", nullable = false)

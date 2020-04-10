@@ -3,6 +3,7 @@ package com.kosinskyi.ecom.registry.service.registry.daily;
 import com.kosinskyi.ecom.registry.entity.file.FileItem;
 import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistry;
 import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistry_;
+import com.kosinskyi.ecom.registry.entity.registry.daily.constants.DailyRegistryStatus;
 import com.kosinskyi.ecom.registry.entity.registry.daily.specification.DailyRegistrySpecification;
 import com.kosinskyi.ecom.registry.error.exception.ApplicationException;
 import com.kosinskyi.ecom.registry.repository.base.JpaSpecificationExecutorRepository;
@@ -10,6 +11,7 @@ import com.kosinskyi.ecom.registry.repository.registry.daily.DailyRegistryReposi
 import com.kosinskyi.ecom.registry.service.crud.DeleteService;
 import com.kosinskyi.ecom.registry.service.crud.ReadService;
 import com.kosinskyi.ecom.registry.service.file.RegistryFileService;
+import com.kosinskyi.ecom.registry.service.registry.daily.parsing.DailyRegistryParseService;
 import com.kosinskyi.ecom.registry.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,9 +25,10 @@ import java.util.Optional;
 public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteService<DailyRegistry> {
 
   private DailyRegistryRepository jpaRepository;
-  private RegistryFileService registryFileService;
-  private UserService userService;
   private DailyRegistrySpecification specification;
+  private RegistryFileService registryFileService;
+  private DailyRegistryParseService parseService;
+  private UserService userService;
 
   @Autowired
   public DailyRegistryService(
@@ -33,11 +36,13 @@ public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteS
       DailyRegistrySpecification specification,
       @Qualifier("localRegistryFileService")
       RegistryFileService registryFileService,
+      DailyRegistryParseService parseService,
       UserService userService
   ) {
     this.jpaRepository = jpaRepository;
     this.specification = specification;
     this.registryFileService = registryFileService;
+    this.parseService = parseService;
     this.userService = userService;
   }
 
@@ -60,6 +65,7 @@ public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteS
       throw new ApplicationException("Registry with such date already exists");
     });
     DailyRegistry dailyRegistry = new DailyRegistry();
+    dailyRegistry.setStatus(DailyRegistryStatus.CREATED);
     dailyRegistry.setRegistryDate(date);
     dailyRegistry.setRegistryItem(createFileItem(multipartFile));
     dailyRegistry.setUser(userService.getCurrentUser());
@@ -76,6 +82,13 @@ public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteS
     return fileItem;
   }
 
+  public FileItem createFileItem(String fileKey) {
+    FileItem fileItem = new FileItem();
+    fileItem.setId(null);
+    fileItem.setFileKey(fileKey);
+    return fileItem;
+  }
+
   @Override
   public DailyRegistry delete(Long id) {
     DailyRegistry dailyRegistry = findById(id);
@@ -88,10 +101,16 @@ public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteS
     return registryFileService.getBinaryFile(dailyRegistry.getRegistryItem().getFileKey());
   }
 
-  public void setParsedRegistryItem(DailyRegistry dailyRegistry, String fileKey) {
-    FileItem fileItem = new FileItem();
-    fileItem.setFileKey(fileKey);
-    dailyRegistry.setParsedRegistryItem(fileItem);
+  public DailyRegistry parse(Long id) {
+    DailyRegistry dailyRegistry = findById(id);
+    dailyRegistry.setStatus(DailyRegistryStatus.PARSING);
+    parseService.parse(dailyRegistry).whenCompleteAsync((key, throwable) -> setParsedRegistryItem(dailyRegistry, key));
+    return jpaRepository.save(dailyRegistry);
+  }
+
+  private void setParsedRegistryItem(DailyRegistry dailyRegistry, String fileKey) {
+    dailyRegistry.setParsedRegistryItem(createFileItem(fileKey));
+    dailyRegistry.setStatus(DailyRegistryStatus.PARSED);
     jpaRepository.save(dailyRegistry);
   }
 }

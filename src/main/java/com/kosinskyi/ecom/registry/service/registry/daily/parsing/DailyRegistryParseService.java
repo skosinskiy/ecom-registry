@@ -5,7 +5,6 @@ import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistryParseCrite
 import com.kosinskyi.ecom.registry.error.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.error.exception.ApplicationException;
 import com.kosinskyi.ecom.registry.service.file.RegistryFileService;
-import com.kosinskyi.ecom.registry.service.registry.daily.DailyRegistryService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -31,6 +30,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -44,46 +44,48 @@ public class DailyRegistryParseService {
 
   private RegistryFileService registryFileService;
   private DailyRegistryParseCriteriaService parseCriteriaService;
-  private DailyRegistryService dailyRegistryService;
 
   @Autowired
   public DailyRegistryParseService(
       @Qualifier("localRegistryFileService") RegistryFileService registryFileService,
-      DailyRegistryParseCriteriaService parseCriteriaService,
-      DailyRegistryService dailyRegistryService) {
+      DailyRegistryParseCriteriaService parseCriteriaService) {
     this.registryFileService = registryFileService;
     this.parseCriteriaService = parseCriteriaService;
-    this.dailyRegistryService = dailyRegistryService;
   }
 
   @Async
-  public void parse(Long dailyRegistryId) {
-    DailyRegistry dailyRegistry = dailyRegistryService.findById(dailyRegistryId);
+  public CompletableFuture<String> parse(DailyRegistry dailyRegistry) {
+    Long dailyRegistryId = dailyRegistry.getId();
     LocalDate registryDate = dailyRegistry.getRegistryDate();
     log.info("Received request for parsing daily registry {}, date: {}", dailyRegistryId, registryDate);
     Sheet originalSheet = getWorkbook(dailyRegistry.getRegistryItem().getFileKey()).getSheetAt(0);
-    Map<Long, Workbook> map = new HashMap<>();
+    Map<Long, Workbook> cacheMap = new HashMap<>();
     List<DailyRegistryParseCriteria> parseCriteriaList = parseCriteriaService.findAll();
     log.info("Starting parsing daily registry {}, date: {}", dailyRegistryId, registryDate);
-    for (int i = 1; i <= originalSheet.getLastRowNum(); i++) {
-      Row originalRow = originalSheet.getRow(i);
-      findCriteriaByRow(parseCriteriaList, originalSheet, originalRow).ifPresent(criteria -> {
-        Workbook createdWorkbook = getOrPutWorkbook(map, criteria.getId(), originalSheet);
-        Sheet sheet = createdWorkbook.getSheetAt(0);
-        copyRow(originalRow, sheet.createRow(sheet.getLastRowNum() + 1), createdWorkbook);
-      });
-    }
-    //TODO split by different services
+    processOriginalSheet(originalSheet, parseCriteriaList, cacheMap);
     log.info("Processing finished for daily registry {}, date: {}", dailyRegistryId, registryDate);
-    String zipFileKey = registryFileService.saveZip(map
+    return CompletableFuture.completedFuture(registryFileService.saveZip(cacheMap
         .entrySet()
         .stream()
         .collect(
             Collectors.toMap(
                 entry -> getFileName(findCriteriaById(parseCriteriaList, entry.getKey()).getName(), registryDate),
                 entry -> getBytesFromWorkbook(entry.getValue())
-            )));
-    dailyRegistryService.setParsedRegistryItem(dailyRegistry, zipFileKey);
+            ))));
+  }
+
+  private void processOriginalSheet(
+      Sheet originalSheet,
+      List<DailyRegistryParseCriteria> parseCriteriaList,
+      Map<Long, Workbook> cacheMap) {
+    for (int i = 1; i <= originalSheet.getLastRowNum(); i++) {
+      Row originalRow = originalSheet.getRow(i);
+      findCriteriaByRow(parseCriteriaList, originalSheet, originalRow).ifPresent(criteria -> {
+        Workbook createdWorkbook = getOrPutWorkbook(cacheMap, criteria.getId(), originalSheet);
+        Sheet sheet = createdWorkbook.getSheetAt(0);
+        copyRow(originalRow, sheet.createRow(sheet.getLastRowNum() + 1), createdWorkbook);
+      });
+    }
   }
 
   private Workbook getOrPutWorkbook(Map<Long, Workbook> map, Long criteriaId, Sheet originalSheet) {
