@@ -1,12 +1,12 @@
 package com.kosinskyi.ecom.registry.mapping.registry;
 
 import com.kosinskyi.ecom.registry.dto.response.registry.DailyRegistryResponse;
-import com.kosinskyi.ecom.registry.entity.registry.DailyRegistry;
+import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistry;
 import com.kosinskyi.ecom.registry.mapping.base.crud.DeleteMapper;
 import com.kosinskyi.ecom.registry.mapping.base.crud.ReadMapper;
 import com.kosinskyi.ecom.registry.service.crud.DeleteService;
 import com.kosinskyi.ecom.registry.service.crud.ReadService;
-import com.kosinskyi.ecom.registry.service.registry.DailyRegistryService;
+import com.kosinskyi.ecom.registry.service.registry.daily.DailyRegistryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

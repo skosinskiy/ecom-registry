@@ -1,6 +1,6 @@
-package com.kosinskyi.ecom.registry.repository.registry;
+package com.kosinskyi.ecom.registry.repository.registry.daily;
 
-import com.kosinskyi.ecom.registry.entity.registry.DailyRegistry;
+import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistry;
 import com.kosinskyi.ecom.registry.repository.base.JpaSpecificationExecutorRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.kosinskyi.ecom.registry.entity.registry;
+package com.kosinskyi.ecom.registry.entity.registry.daily;
 
 import com.kosinskyi.ecom.registry.entity.base.BaseEntity;
 import com.kosinskyi.ecom.registry.entity.file.FileItem;

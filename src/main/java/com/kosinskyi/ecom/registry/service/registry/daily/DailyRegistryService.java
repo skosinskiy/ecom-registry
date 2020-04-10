@@ -1,12 +1,12 @@
-package com.kosinskyi.ecom.registry.service.registry;
+package com.kosinskyi.ecom.registry.service.registry.daily;
 
 import com.kosinskyi.ecom.registry.entity.file.FileItem;
-import com.kosinskyi.ecom.registry.entity.registry.DailyRegistry;
-import com.kosinskyi.ecom.registry.entity.registry.DailyRegistry_;
-import com.kosinskyi.ecom.registry.entity.registry.specification.DailyRegistrySpecification;
+import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistry;
+import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistry_;
+import com.kosinskyi.ecom.registry.entity.registry.daily.specification.DailyRegistrySpecification;
 import com.kosinskyi.ecom.registry.error.exception.ApplicationException;
 import com.kosinskyi.ecom.registry.repository.base.JpaSpecificationExecutorRepository;
-import com.kosinskyi.ecom.registry.repository.registry.DailyRegistryRepository;
+import com.kosinskyi.ecom.registry.repository.registry.daily.DailyRegistryRepository;
 import com.kosinskyi.ecom.registry.service.crud.DeleteService;
 import com.kosinskyi.ecom.registry.service.crud.ReadService;
 import com.kosinskyi.ecom.registry.service.file.RegistryFileService;

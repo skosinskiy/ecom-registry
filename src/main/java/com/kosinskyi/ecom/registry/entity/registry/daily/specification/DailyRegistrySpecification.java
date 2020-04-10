@@ -1,6 +1,6 @@
-package com.kosinskyi.ecom.registry.entity.registry.specification;
+package com.kosinskyi.ecom.registry.entity.registry.daily.specification;
 
-import com.kosinskyi.ecom.registry.entity.registry.DailyRegistry;
+import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistry;
 import com.kosinskyi.ecom.registry.entity.specification.BaseSpecification;
 import org.springframework.stereotype.Component;
 
