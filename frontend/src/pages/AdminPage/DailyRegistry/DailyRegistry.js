@@ -5,7 +5,7 @@ import TableRow from '@material-ui/core/TableRow'
 import {TableCell} from '@material-ui/core'
 import Paper from '@material-ui/core/Paper'
 import {useDispatch, useSelector} from 'react-redux'
-import {deleteDailyRegistry, fetchDailyRegistry} from '../../../store/registry/daily/operations'
+import {deleteDailyRegistry, fetchDailyRegistry, parseDailyRegistry} from '../../../store/registry/daily/operations'
 import Preloader from '../../../components/Preloader/Preloader'
 import {getDateTimeString} from '../../../utils/dateUtils'
 import TableBody from '@material-ui/core/TableBody'
@@ -16,7 +16,29 @@ import Grid from '@material-ui/core/Grid'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
+import ArchiveIcon from '@material-ui/icons/Archive'
 import {saveFile} from '../../../helpers/dailyRegistry'
+import {StatusBlock} from '../../../components/StatusBlock/StatusBlock'
+
+const getStatusColor = status => {
+  switch (status) {
+    case 'CREATED':
+      return {
+        color: '#0F52BA',
+        backgroundColor: 'rgba(87, 160, 211, 0.08)'
+      }
+    case 'PARSING':
+      return {
+        color: '#ff9800',
+        backgroundColor: 'rgba(255, 152, 0, 0.08)'
+      }
+    case 'PARSED':
+      return {
+        color: '#4caf50',
+        backgroundColor: 'rgba(76, 175, 80, 0.08)'
+      }
+  }
+}
 
 export const DailyRegistry = props => {
   const dailyRegistryList = useSelector(state => state.dailyRegistry.registryList)
@@ -38,24 +60,30 @@ export const DailyRegistry = props => {
   }
 
   const registryItems = dailyRegistryList === null ? null : dailyRegistryList.map(registry => {
-    const {user, fileItem, createdDate} = registry
-    const fileKey = fileItem.fileKey
+    const {user, registryItem, createdDate, status} = registry
+    const fileKey = registryItem.fileKey
     const registryDate = registry.registryDate
     const extension = fileKey.substring(fileKey.lastIndexOf('.') + 1)
     return (
       <TableRow key={registry.id}>
         <TableCell>{registryDate}</TableCell>
         <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
-        <TableCell>{`${convertBytesToMegaBytes(fileItem.size)} MB`}</TableCell>
+        <TableCell>{`${convertBytesToMegaBytes(registryItem.size)} MB`}</TableCell>
         <TableCell>{extension}</TableCell>
         <TableCell>{getDateTimeString(createdDate)}</TableCell>
         <TableCell>
+          <StatusBlock text={status} colors={getStatusColor(status)}/>
+        </TableCell>
+        <TableCell>
+          <IconButton size="medium" onClick={() => dispatch(parseDailyRegistry(registry.id))}>
+            <ArchiveIcon/>
+          </IconButton>
           <IconButton size="medium" onClick={() =>
             saveFile(`/api/registry/daily/${registry.id}`, `${registryDate}.${extension}`)}>
-            <ArrowDownwardIcon />
+            <ArrowDownwardIcon/>
           </IconButton>
           <IconButton size="medium" onClick={() => dispatch(deleteDailyRegistry(registry.id))}>
-            <DeleteIcon />
+            <DeleteIcon/>
           </IconButton>
         </TableCell>
       </TableRow>
@@ -80,7 +108,8 @@ export const DailyRegistry = props => {
               <TableCell>Size</TableCell>
               <TableCell>Extension</TableCell>
               <TableCell>Created</TableCell>
-              <TableCell/>
+              <TableCell>Status</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

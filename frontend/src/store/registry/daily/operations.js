@@ -28,6 +28,14 @@ export const deleteDailyRegistry = registryId => dispatch => {
     })
 }
 
+export const parseDailyRegistry = registryId => dispatch => {
+  api.get(`/api/registry/daily/parse/${registryId}`)
+    .then(registry => {
+      dispatch(ACTIONS.dailyRegistryParsed(registry))
+      toastr.success(`Successfully added registry for ${registry.registryDate} to processing`)
+    })
+}
+
 export const uploadDailyRegistry = (date, file) => dispatch => {
   dispatch(ACTIONS.dailyRegistryLoading(true))
   const formData = new FormData()

@@ -10,7 +10,7 @@ const styles = theme => ({
   }
 })
 
-function Preloader (props) {
+const Preloader = props => {
   const {classes} = props
   return (
     <div className='preloader'>

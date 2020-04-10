@@ -27,6 +27,16 @@ const usersReducer = (state = initialState, action) => {
         ...state,
         registryList: state.registryList.concat(action.payload)
       }
+    case TYPES.DAILY_REGISTRY_PARSING:
+      return {
+        ...state,
+        registryList: state.registryList.map(registry => {
+          if (registry.id === action.payload.id) {
+            registry.status = action.payload.status
+          }
+          return registry
+        })
+      }
     default:
       return {...state}
   }

@@ -1,6 +1,6 @@
 package com.kosinskyi.ecom.registry.controller;
 
-import com.kosinskyi.ecom.registry.dto.response.registry.DailyRegistryResponse;
+import com.kosinskyi.ecom.registry.dto.response.registry.daily.DailyRegistryResponse;
 import com.kosinskyi.ecom.registry.mapping.registry.DailyRegistryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

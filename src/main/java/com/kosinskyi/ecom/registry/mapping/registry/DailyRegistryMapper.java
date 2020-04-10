@@ -1,6 +1,6 @@
 package com.kosinskyi.ecom.registry.mapping.registry;
 
-import com.kosinskyi.ecom.registry.dto.response.registry.DailyRegistryResponse;
+import com.kosinskyi.ecom.registry.dto.response.registry.daily.DailyRegistryResponse;
 import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistry;
 import com.kosinskyi.ecom.registry.mapping.base.crud.DeleteMapper;
 import com.kosinskyi.ecom.registry.mapping.base.crud.ReadMapper;

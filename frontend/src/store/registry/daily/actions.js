@@ -15,6 +15,11 @@ export const dailyRegistryDeleted = dailyRegistry => ({
   payload: dailyRegistry
 })
 
+export const dailyRegistryParsed = dailyRegistry => ({
+  type: TYPES.DAILY_REGISTRY_PARSING,
+  payload: dailyRegistry
+})
+
 export const dailyRegistryUploaded = dailyRegistry => ({
   type: TYPES.DAILY_REGISTRY_UPLOADED,
   payload: dailyRegistry
