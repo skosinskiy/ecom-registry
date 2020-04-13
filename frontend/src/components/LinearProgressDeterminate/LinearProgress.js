@@ -3,14 +3,14 @@ import DialogContentText from '@material-ui/core/DialogContentText'
 import LinearProgress from '@material-ui/core/LinearProgress'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   colorPrimary: {
-    backgroundColor: '#cbe8cc'
+    backgroundColor: theme.palette.primary.light
   },
   barColorPrimary: {
-    backgroundColor: '#73c176'
+    backgroundColor: theme.palette.primary.dark
   }
-})
+}))
 
 export const LinearProgressDeterminate = props => {
   const {disabled, progress} = props

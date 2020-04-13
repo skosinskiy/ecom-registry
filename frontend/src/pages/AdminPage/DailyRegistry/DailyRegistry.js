@@ -14,19 +14,39 @@ import Button from '@material-ui/core/Button'
 import {AddNewModal} from './AddNewModal/AddNewModal'
 import Grid from '@material-ui/core/Grid'
 import IconButton from '@material-ui/core/IconButton'
-import DeleteIcon from '@material-ui/icons/Delete'
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
+import DeleteIconRounded from '@material-ui/icons/DeleteRounded'
+import CloudDownloadRoundedIcon from '@material-ui/icons/CloudDownloadRounded'
 import {saveFile} from '../../../helpers/dailyRegistry'
 import {makeStyles} from '@material-ui/core/styles'
 import {ParseButton} from './ParseButton/ParseButton'
 import {DailyRegistryStatus} from './DailyRegistryStatus/DailyRegistryStatus'
+import ExcelIcon from '../../../icons/excel.svg'
 
 const useStyles = makeStyles((theme) => ({
   addNewButton: {
-    marginBottom: '30px'
+    marginBottom: theme.spacing(3)
   },
   actionCell: {
     marginLeft: theme.spacing(2)
+  },
+  icon: {
+    height: '20px',
+    width: '20px',
+    marginRight: theme.spacing(2)
+  },
+  extensionWrapper: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  downloadButton: {
+    '&:hover': {
+      color: theme.palette.info.light
+    }
+  },
+  deleteButton: {
+    '&:hover': {
+      color: theme.palette.error.main
+    }
   }
 }))
 
@@ -60,7 +80,12 @@ export const DailyRegistry = () => {
         <TableCell>{date}</TableCell>
         <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
         <TableCell>{`${convertBytesToMegaBytes(registryItem.size)} MB`}</TableCell>
-        <TableCell>{registryItemExtension}</TableCell>
+        <TableCell>
+          <div className={classes.extensionWrapper}>
+            <img className={classes.icon} src={ExcelIcon} alt={''}/>
+            {registryItemExtension}
+          </div>
+        </TableCell>
         <TableCell>{getDateTimeString(createdDate)}</TableCell>
         <TableCell><DailyRegistryStatus status={status}/></TableCell>
         <TableCell>
@@ -70,17 +95,17 @@ export const DailyRegistry = () => {
             downloadHandler={() => saveFile(`/api/files/binary/${parsedRegistryItem.id}`, `${date}.${parsedRegistryItem.extension}`)}
           />
           <IconButton
-            className={classes.actionCell}
+            className={[classes.actionCell, classes.downloadButton]}
             size="small"
             onClick={() => saveFile(`/api/files/binary/${registryItem.id}`, `${date}.${registryItemExtension}`)}>
-            <ArrowDownwardIcon/>
+            <CloudDownloadRoundedIcon/>
           </IconButton>
           <IconButton
-            className={classes.actionCell}
+            className={[classes.actionCell, classes.deleteButton]}
             disabled={status === 'PARSING'}
             size="small"
             onClick={() => dispatch(deleteDailyRegistry(registry.id))}>
-            <DeleteIcon/>
+            <DeleteIconRounded/>
           </IconButton>
         </TableCell>
       </TableRow>

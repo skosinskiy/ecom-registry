@@ -11,7 +11,8 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     padding: theme.spacing(4),
-    marginBottom: '20px',
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4),
     borderWidth: '2px',
     borderRadius: '2px',
     borderColor: theme.palette.text.disabled,
@@ -44,11 +45,13 @@ export const RegistryDropzone = props => {
       accept={allowedTypes}
       onDrop={fileDropWrapper}>
       {({getRootProps, getInputProps}) => (
-        <div {...getRootProps({className: classes.dropzone})}>
-          <RegistryDropzoneAlert disabled={valid} text={'Only xls/xlsx file format allowed for uploading!'}/>
-          <input{...getInputProps()}/>
-          <RegistryDropzoneMain file={file} valid={valid}/>
-        </div>
+          <>
+            <RegistryDropzoneAlert disabled={valid} text={'Only xls/xlsx file format allowed for uploading!'}/>
+            <div {...getRootProps({className: classes.dropzone})}>
+              <input{...getInputProps()}/>
+              <RegistryDropzoneMain file={file} valid={valid}/>
+            </div>
+          </>
       )}
     </Dropzone>)
 }

@@ -6,7 +6,7 @@ import Divider from '@material-ui/core/Divider'
 import IconButton from '@material-ui/core/IconButton'
 import {withRouter} from 'react-router-dom'
 import classNames from 'classnames'
-import PowerSetting from '@material-ui/icons/PowerSettingsNew'
+import ExitToAppRoundedIcon from '@material-ui/icons/ExitToAppRounded'
 import SidebarMenu from './SidebarMenu/SidebarMenu'
 import AdminRoutes from '../../components/AdminRoutes/AdminRoutes'
 import makeStyles from '@material-ui/core/styles/makeStyles'
@@ -47,7 +47,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const AdminPage = () => {
-
   const classes = useStyles()
 
   const logoutUser = () => {
@@ -63,7 +62,7 @@ const AdminPage = () => {
       >
         <Toolbar className={classes.toolbar}>
           <IconButton onClick={logoutUser} color="inherit" alt="Log out">
-            <PowerSetting/>
+            <ExitToAppRoundedIcon/>
           </IconButton>
         </Toolbar>
       </AppBar>
