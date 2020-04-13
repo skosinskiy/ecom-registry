@@ -6,7 +6,7 @@ const ToastrMessage = props => (
     timeOut={5000}
     newestOnTop={true}
     preventDuplicates
-    position="top-right"
+    position="bottom-left"
     transitionIn="fadeIn"
     transitionOut="fadeOut"
     progressBar

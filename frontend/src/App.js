@@ -6,6 +6,8 @@ import {connect} from 'react-redux'
 import {usersOperations} from './store/users'
 import ToastrMessage from './components/ToastrMessage/ToastrMessage'
 import Preloader from './components/Preloader/Preloader'
+import {ThemeProvider} from '@material-ui/core/styles'
+import {theme} from './theme/theme'
 
 class App extends Component {
   componentDidMount () {
@@ -18,11 +20,11 @@ class App extends Component {
     }
 
     return (
-        <>
-          <CssBaseline/>
-          <AppRoutes/>
-          <ToastrMessage/>
-        </>
+      <ThemeProvider theme={theme}>
+        <CssBaseline/>
+        <AppRoutes/>
+        <ToastrMessage/>
+      </ThemeProvider>
     )
   }
 }

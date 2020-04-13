@@ -7,7 +7,7 @@ import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined'
 import {hasGrant} from '../../../utils/hasGrant'
-import NavLink from '../../../components/NavLink/NavLink'
+import {CustomNavLink} from '../../../components/NavLink/NavLink'
 
 class SidebarMenu extends Component {
   render () {
@@ -18,14 +18,14 @@ class SidebarMenu extends Component {
 
         {
           hasGrant(user, Grant.MANAGE_REGISTRY) &&
-                    <NavLink to={'/daily-registry'}>
+                    <CustomNavLink to={'/daily-registry'}>
                       <ListItem button alignItems={'center'}>
                         <ListItemIcon>
                           <DescriptionOutlinedIcon/>
                         </ListItemIcon>
                         <ListItemText primary={'Daily registry'}/>
                       </ListItem>
-                    </NavLink>
+                    </CustomNavLink>
         }
 
       </div>

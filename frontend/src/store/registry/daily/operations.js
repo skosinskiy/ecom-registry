@@ -36,18 +36,13 @@ export const parseDailyRegistry = registryId => dispatch => {
     })
 }
 
-export const uploadDailyRegistry = (date, file) => dispatch => {
-  dispatch(ACTIONS.dailyRegistryLoading(true))
+export const uploadDailyRegistry = (date, file, uploadHandler) => dispatch => {
   const formData = new FormData()
   formData.append('date', getDateString(date))
   formData.append('file', file)
-  api.post('/api/registry/daily', formData)
+  api.postFile('/api/registry/daily', formData, null, uploadHandler)
     .then(registry => {
       dispatch(ACTIONS.dailyRegistryUploaded(registry))
-      dispatch(ACTIONS.dailyRegistryLoading(false))
       toastr.success(`Successfully uploaded registry for ${getDateString(date)}`)
-    })
-    .catch(() => {
-      dispatch(ACTIONS.dailyRegistryLoading(false))
     })
 }
