@@ -1,5 +1,6 @@
 package com.kosinskyi.ecom.registry.service.crud;
 
+import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraph;
 import com.kosinskyi.ecom.registry.entity.base.BaseEntity;
 import com.kosinskyi.ecom.registry.error.exception.NoDataFoundException;
 import com.kosinskyi.ecom.registry.service.crud.base.RepositorySupplier;
@@ -9,6 +10,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public interface ReadService<E extends BaseEntity> extends RepositorySupplier<E> {
 
@@ -35,6 +38,12 @@ public interface ReadService<E extends BaseEntity> extends RepositorySupplier<E>
 
   default List<E> findAll() {
     return repositorySupplier().findAll();
+  }
+
+  default List<E> findAll(EntityGraph entityGraph) {
+    return StreamSupport
+        .stream(repositorySupplier().findAll(entityGraph).spliterator(), false)
+        .collect(Collectors.toList());
   }
 
   default List<E> findAll(Specification<E> specification) {

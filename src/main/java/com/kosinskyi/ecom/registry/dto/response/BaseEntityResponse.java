@@ -7,5 +7,6 @@ public class BaseEntityResponse {
 
   private Long id;
   private Long createdDate;
+  private Long modifiedDate;
 
 }

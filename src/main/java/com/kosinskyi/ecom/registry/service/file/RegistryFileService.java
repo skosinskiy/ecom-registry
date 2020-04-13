@@ -11,6 +11,7 @@ import java.util.UUID;
 public interface RegistryFileService {
 
   Map<String, String> ALLOWED_MIME_TYPES = Collections.unmodifiableMap(getAllowedMimeTypes());
+  String ZIP_EXTENSION = ".zip";
 
   static Map<String, String> getAllowedMimeTypes() {
     Map<String, String> allowedMimeTypes = new HashMap<>();
@@ -30,10 +31,16 @@ public interface RegistryFileService {
     return UUID.randomUUID().toString() + ALLOWED_MIME_TYPES.get(multipartFile.getContentType());
   }
 
+  default String generateZipFileKey() {
+    return UUID.randomUUID().toString() + ZIP_EXTENSION;
+  }
+
   byte[] getBinaryFile(String fileKey);
 
   String uploadFile(MultipartFile multipartFile);
 
   void removeFile(String fileKey);
+
+  String saveZip(Map<String, byte[]> fileNameBytesMap);
 
 }

@@ -1,6 +1,6 @@
 package com.kosinskyi.ecom.registry.controller;
 
-import com.kosinskyi.ecom.registry.dto.response.registry.DailyRegistryResponse;
+import com.kosinskyi.ecom.registry.dto.response.registry.daily.DailyRegistryResponse;
 import com.kosinskyi.ecom.registry.mapping.registry.DailyRegistryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,6 +40,11 @@ public class DailyRegistryController {
     return mapper.getBinary(registryId);
   }
 
+  @GetMapping(value = "parsed/{registryId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  public byte[] getParsedBinary(@PathVariable Long registryId) {
+    return mapper.getParsedBinary(registryId);
+  }
+
   @PostMapping
   public ResponseEntity<DailyRegistryResponse> create(
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
@@ -50,6 +55,11 @@ public class DailyRegistryController {
   @DeleteMapping("{registryId}")
   public ResponseEntity<DailyRegistryResponse> delete(@PathVariable Long registryId) {
     return ResponseEntity.ok(mapper.delete(registryId, DailyRegistryResponse.class));
+  }
+
+  @GetMapping("parse/{registryId}")
+  public ResponseEntity<DailyRegistryResponse> parse(@PathVariable Long registryId) {
+    return ResponseEntity.ok(mapper.parse(registryId));
   }
 
 }

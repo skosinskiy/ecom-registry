@@ -1,5 +1,6 @@
 package com.kosinskyi.ecom.registry.security;
 
+import com.kosinskyi.ecom.registry.filter.JwtAuthenticationFilter;
 import com.kosinskyi.ecom.registry.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -19,10 +21,17 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private UserService userService;
+  private JwtAuthenticationFilter jwtAuthenticationFilter;
+  private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
   @Autowired
-  public SecurityConfig(UserService userService) {
+  public SecurityConfig(
+      UserService userService,
+      JwtAuthenticationFilter jwtAuthenticationFilter,
+      JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
     this.userService = userService;
+    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
   }
 
   @Bean(BeanIds.AUTHENTICATION_MANAGER)
@@ -40,8 +49,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
           .csrf()
           .disable()
+          .exceptionHandling()
+          .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+        .and()
           .sessionManagement()
-          .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+          .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
+          .authorizeRequests()
+          .antMatchers("/**/static/**", "/h2-console/**", "/api/auth/**")
+          .permitAll()
+          .anyRequest()
+          .authenticated();
+
+    http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
   }
 
   @Override
