@@ -14,14 +14,14 @@
 
     <appender name="FILE"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DIR}/tms-core.log</file>
+        <file>${LOG_DIR}/registry-core.log</file>
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
                 %d{ISO8601} %-5.5level ${PID} --- [%-25.25t] %-40.40logger{40}: %msg%n%throwable
             </Pattern>
         </layout>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_DIR}/archived/%d{yyyy/MM/dd, aux}//tms-core-%d{yyyy-MM-dd-HH}.log</fileNamePattern>
+            <fileNamePattern>${LOG_DIR}/archived/%d{yyyy/MM/dd, aux}//registry-core-%d{yyyy-MM-dd-HH}.log</fileNamePattern>
         </rollingPolicy>
     </appender>
 
@@ -31,7 +31,7 @@
             <level>ERROR</level>
             <onMismatch>DENY</onMismatch>
         </filter>
-        <file>${LOG_DIR}/tms-core-errors.log</file>
+        <file>${LOG_DIR}/registry-core-errors.log</file>
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
                 %d{ISO8601} %-5.5level ${PID} --- [%-25.25t] %-40.40logger{40}: %msg%n%throwable
@@ -39,14 +39,14 @@
         </layout>
         <rollingPolicy
                 class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <fileNamePattern>${LOG_DIR}/archived/tms-core-errors.%i.log</fileNamePattern>
+            <fileNamePattern>${LOG_DIR}/archived/registry-core-errors.%i.log</fileNamePattern>
         </rollingPolicy>
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
             <maxFileSize>20MB</maxFileSize>
         </triggeringPolicy>
     </appender>
     <appender name="HTTP" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DIR}/tms-core-http.log</file>
+        <file>${LOG_DIR}/registry-core-http.log</file>
         <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
             <evaluator>
                 <expression>logger.equals("com.kosinskyi.ecom.registry.logging.http.HttpLoggingService")</expression>
@@ -59,7 +59,7 @@
             </Pattern>
         </layout>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_DIR}/archived/%d{yyyy/MM/dd, aux}//tms-core-http-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${LOG_DIR}/archived/%d{yyyy/MM/dd, aux}//registry-core-http-%d{yyyy-MM-dd}.log</fileNamePattern>
         </rollingPolicy>
     </appender>
 

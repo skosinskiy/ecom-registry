@@ -23,6 +23,10 @@ export class FetchData {
     return this.makeRequest(url, METHOD_POST, body, requestParams)
   }
 
+  postFile (url, body, requestParams, uploadProgressHandler) {
+    return this.makeRequest(url, METHOD_POST, body, requestParams, null, uploadProgressHandler)
+  }
+
   put (url, body, requestParams) {
     return this.makeRequest(url, METHOD_PUT, body, requestParams)
   }
@@ -31,14 +35,19 @@ export class FetchData {
     return this.makeRequest(url, METHOD_DELETE, null, requestParams)
   }
 
-  async makeRequest (url, method, body, reqParams, responseType) {
+  async makeRequest (url, method, body, reqParams, responseType, uploadProgressHandler) {
     const requestParams = {
       method: method || METHOD_GET,
       data: body,
       params: {
         ...(reqParams || {})
       },
-      responseType: responseType
+      responseType: responseType,
+      onUploadProgress: progressEvent => {
+        if (uploadProgressHandler) {
+          uploadProgressHandler(Math.round((progressEvent.loaded * 100) / progressEvent.total))
+        }
+      }
     }
 
     requestParams.timeout = REQUEST_TIMEOUT

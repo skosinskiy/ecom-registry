@@ -1,16 +1,17 @@
 import {NavLink} from 'react-router-dom'
 import React from 'react'
-import withStyles from '@material-ui/core/styles/withStyles'
+import makeStyles from '@material-ui/core/styles/makeStyles'
 
-const styles = theme => ({
+const useStyles = makeStyles({
   link: {
-    color: theme.palette.grey.A700,
+    color: 'inherit',
     textDecoration: 'none'
   }
 })
 
-export const navLink = props => {
-  const {to, children, classes} = props
+export const CustomNavLink = props => {
+  const {to, children} = props
+  const classes = useStyles()
 
   return (
     <NavLink to={to} className={classes.link}>
@@ -18,5 +19,3 @@ export const navLink = props => {
     </NavLink>
   )
 }
-
-export default withStyles(styles)(navLink)

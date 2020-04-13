@@ -5,13 +5,21 @@ import Grid from '@material-ui/core/Grid'
 import Alert from '@material-ui/lab/Alert'
 
 export const DatePicker = props => {
-  const {isFileDropped, date, handleDateChange} = props
+  const {isFileDropped, date, handleDateChange, dateParsed, disabled} = props
+
+  const alert = dateParsed
+    ? <Alert severity="success">Registry date successfully parsed from file name</Alert>
+    : <Alert severity="error">Please check registry date</Alert>
+
+  if (disabled) {
+    return null
+  }
 
   if (isFileDropped) {
     return (
       <Grid container
         direction={'column'}>
-        <Alert severity="warning">Please check registry date</Alert>
+        {alert}
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <KeyboardDatePicker
             disableToolbar
