@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,16 +32,6 @@ public class DailyRegistryController {
   @GetMapping
   public ResponseEntity<Page<DailyRegistryResponse>> findAll(Pageable pageable) {
     return ResponseEntity.ok(mapper.findAll(pageable, DailyRegistryResponse.class));
-  }
-
-  @GetMapping(value = "{registryId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-  public byte[] getBinary(@PathVariable Long registryId) {
-    return mapper.getBinary(registryId);
-  }
-
-  @GetMapping(value = "parsed/{registryId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-  public byte[] getParsedBinary(@PathVariable Long registryId) {
-    return mapper.getParsedBinary(registryId);
   }
 
   @PostMapping

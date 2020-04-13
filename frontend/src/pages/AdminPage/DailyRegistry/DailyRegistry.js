@@ -65,29 +65,33 @@ export const DailyRegistry = props => {
   const parseButton = (status, registry) => {
     if (status === 'CREATED') {
       return (
-        <IconButton>
-          <FolderOpenIcon size="medium" onClick={() => dispatch(parseDailyRegistry(registry.id))}/>
+        <IconButton size="medium" onClick={() => dispatch(parseDailyRegistry(registry.id))}>
+          <FolderOpenIcon/>
         </IconButton>
       )
     }
     if (status === 'PARSED') {
+      const parsedRegistry = registry.parsedRegistryItem
       return (
-        <IconButton>
-          <FolderIcon size="medium" onClick={() =>
-            saveFile(`/api/registry/daily/parsed/${registry.id}`, `${registry.registryDate}.zip`)}/>
+        <IconButton
+          size={'medium'}
+          onClick={() =>
+            saveFile(`/api/files/binary/${parsedRegistry.id}`, `${registry.registryDate}.${parsedRegistry.extension}`)}>
+          <FolderIcon/>
         </IconButton>
       )
     }
-    return (<IconButton disabled>
-      <FolderIcon size="medium"/>
-    </IconButton>)
+    return (
+      <IconButton disabled size="medium">
+        <FolderIcon />
+      </IconButton>
+    )
   }
 
   const registryItems = dailyRegistryList === null ? null : dailyRegistryList.map(registry => {
     const {user, registryItem, createdDate, status} = registry
-    const fileKey = registryItem.fileKey
     const registryDate = registry.registryDate
-    const extension = fileKey.substring(fileKey.lastIndexOf('.') + 1)
+    const extension = registryItem.extension
 
     return (
       <TableRow key={registry.id}>
@@ -102,7 +106,7 @@ export const DailyRegistry = props => {
         <TableCell>
           {parseButton(status, registry)}
           <IconButton size="medium" onClick={() =>
-            saveFile(`/api/registry/daily/${registry.id}`, `${registryDate}.${extension}`)}>
+            saveFile(`/api/files/binary/${registryItem.id}`, `${registryDate}.${extension}`)}>
             <ArrowDownwardIcon/>
           </IconButton>
           <IconButton

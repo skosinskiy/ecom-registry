@@ -4,6 +4,7 @@ import com.amazonaws.auth.PropertiesFileCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.kosinskyi.ecom.registry.entity.file.constants.Extension;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import org.modelmapper.ModelMapper;
@@ -24,13 +25,15 @@ public class ApplicationBeans {
   private String s3CredentialsPath;
 
   @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
+  public ModelMapper modelMapper() {
+    ModelMapper modelMapper = new ModelMapper();
+    modelMapper.createTypeMap(Extension.class, String.class).setConverter(context -> context.getSource().getValue());
+    return modelMapper;
   }
 
   @Bean
-  public ModelMapper modelMapper() {
-    return new ModelMapper();
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
   }
 
   @Bean
