@@ -21,9 +21,9 @@ import java.util.Map;
 @Service
 public class FileItemService implements ReadService<FileItem> {
 
-  private Map<String, Extension> ALLOWED_MIME_TYPES = Collections.unmodifiableMap(getAllowedMimeTypes());
+  private static final Map<String, Extension> ALLOWED_MIME_TYPES = Collections.unmodifiableMap(getAllowedMimeTypes());
 
-  private Map<String, Extension> getAllowedMimeTypes() {
+  private static Map<String, Extension> getAllowedMimeTypes() {
     Map<String, Extension> allowedMimeTypes = new HashMap<>();
     allowedMimeTypes.put("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Extension.XLSX);
     allowedMimeTypes.put("application/vnd.ms-excel", Extension.XLS);

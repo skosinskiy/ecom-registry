@@ -81,7 +81,7 @@ public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteS
   public DailyRegistry parse(Long id) {
     DailyRegistry dailyRegistry = findById(id);
     dailyRegistry.setStatus(DailyRegistryStatus.PARSING);
-    parseService.parse(dailyRegistry).whenCompleteAsync((f, throwable) -> setParsedRegistryItem(dailyRegistry, f));
+    parseService.parse(dailyRegistry).whenCompleteAsync((file, throwable) -> setParsedRegistryItem(dailyRegistry, file));
     return jpaRepository.save(dailyRegistry);
   }
 
