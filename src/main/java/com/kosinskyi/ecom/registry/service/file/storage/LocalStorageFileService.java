@@ -1,6 +1,8 @@
-package com.kosinskyi.ecom.registry.service.file;
+package com.kosinskyi.ecom.registry.service.file.storage;
 
 import com.amazonaws.util.IOUtils;
+import com.kosinskyi.ecom.registry.entity.file.FileItem;
+import com.kosinskyi.ecom.registry.entity.file.constants.Extension;
 import com.kosinskyi.ecom.registry.error.exception.ApplicationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,17 +24,23 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 @Slf4j
-public class LocalRegistryFileService implements RegistryFileService {
+public class LocalStorageFileService implements StorageFileService {
 
   private static final String STORAGE_PATH = "storage";
 
-  private Path getPath(String fileKey) {
-    return Paths.get(STORAGE_PATH, fileKey);
+  private Path getPath(FileItem fileItem) {
+    String fileName = String.format("%s.%s", fileItem.getKey(), fileItem.getExtension().getValue());
+    return Paths.get(STORAGE_PATH, fileName);
+  }
+
+  private Path getPath(String key, Extension extension) {
+    String fileName = String.format("%s.%s", key, extension.getValue());
+    return Paths.get(STORAGE_PATH, fileName);
   }
 
   @Override
-  public byte[] getBinaryFile(String fileKey) {
-    String path = getPath(fileKey).toString();
+  public byte[] getBinaryFile(FileItem fileItem) {
+    String path = getPath(fileItem).toString();
     InputStream in = null;
     try {
       in = new FileInputStream(new File(path));
@@ -50,10 +58,9 @@ public class LocalRegistryFileService implements RegistryFileService {
   }
 
   @Override
-  public String uploadFile(MultipartFile multipartFile) {
-    validateMimeType(multipartFile);
-    String fileKey = generateFileKey(multipartFile);
-    Path path = getPath(fileKey);
+  public String uploadFile(MultipartFile multipartFile, Extension extension) {
+    String fileKey = generateFileKey();
+    Path path = getPath(fileKey, extension);
     try {
       multipartFile.transferTo(path);
       return fileKey;
@@ -64,11 +71,11 @@ public class LocalRegistryFileService implements RegistryFileService {
   }
 
   @Override
-  public void removeFile(String fileKey) {
+  public void removeFile(FileItem fileItem) {
     try {
-      Files.delete(getPath(fileKey));
+      Files.delete(getPath(fileItem));
     } catch (IOException exc) {
-      log.error("Failed to remove file {}: {}", fileKey, exc.getMessage());
+      log.error("Failed to remove file {}: {}", fileItem.getKey(), exc.getMessage());
       throw new ApplicationException(exc.getMessage(), exc);
     }
   }
@@ -76,10 +83,10 @@ public class LocalRegistryFileService implements RegistryFileService {
   @Override
   public String saveZip(Map<String, byte[]> map) {
     try {
-      String zipName = generateZipFileKey();
+      String zipName = generateFileKey();
       ZipOutputStream zos = new ZipOutputStream(
           new BufferedOutputStream(
-              new FileOutputStream(getPath(zipName).toString())));
+              new FileOutputStream(getPath(zipName, Extension.ZIP).toString())));
       map.forEach((key, value) -> addFileToZip(zos, key, value));
       zos.close();
       return zipName;

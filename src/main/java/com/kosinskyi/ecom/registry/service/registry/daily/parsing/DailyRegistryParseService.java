@@ -1,10 +1,12 @@
 package com.kosinskyi.ecom.registry.service.registry.daily.parsing;
 
+import com.kosinskyi.ecom.registry.entity.file.FileItem;
+import com.kosinskyi.ecom.registry.entity.file.constants.Extension;
 import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistry;
 import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistryParseCriteria;
 import com.kosinskyi.ecom.registry.error.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.error.exception.ApplicationException;
-import com.kosinskyi.ecom.registry.service.file.RegistryFileService;
+import com.kosinskyi.ecom.registry.service.file.FileItemService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -16,7 +18,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -40,31 +41,29 @@ import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy.CREATE_NULL_AS_B
 @Slf4j
 public class DailyRegistryParseService {
 
-  private static final String FILE_EXTENSION = "xlsx";
-
-  private RegistryFileService registryFileService;
+  private FileItemService fileItemService;
   private DailyRegistryParseCriteriaService parseCriteriaService;
 
   @Autowired
   public DailyRegistryParseService(
-      @Qualifier("localRegistryFileService") RegistryFileService registryFileService,
+      FileItemService fileItemService,
       DailyRegistryParseCriteriaService parseCriteriaService) {
-    this.registryFileService = registryFileService;
+    this.fileItemService = fileItemService;
     this.parseCriteriaService = parseCriteriaService;
   }
 
   @Async
-  public CompletableFuture<String> parse(DailyRegistry dailyRegistry) {
+  public CompletableFuture<FileItem> parse(DailyRegistry dailyRegistry) {
     Long dailyRegistryId = dailyRegistry.getId();
     LocalDate registryDate = dailyRegistry.getRegistryDate();
     log.info("Received request for parsing daily registry {}, date: {}", dailyRegistryId, registryDate);
-    Sheet originalSheet = getWorkbook(dailyRegistry.getRegistryItem().getFileKey()).getSheetAt(0);
+    Sheet originalSheet = getWorkbook(dailyRegistry.getRegistryItem()).getSheetAt(0);
     Map<Long, Workbook> cacheMap = new HashMap<>();
     List<DailyRegistryParseCriteria> parseCriteriaList = parseCriteriaService.findAll();
     log.info("Starting parsing daily registry {}, date: {}", dailyRegistryId, registryDate);
     processOriginalSheet(originalSheet, parseCriteriaList, cacheMap);
     log.info("Processing finished for daily registry {}, date: {}", dailyRegistryId, registryDate);
-    return CompletableFuture.completedFuture(registryFileService.saveZip(cacheMap
+    return CompletableFuture.completedFuture(fileItemService.saveZip(cacheMap
         .entrySet()
         .stream()
         .collect(
@@ -130,12 +129,12 @@ public class DailyRegistryParseService {
   }
 
   private String getFileName(String name, LocalDate date) {
-    return String.format("%s %s.%s", name, date, FILE_EXTENSION);
+    return String.format("%s %s.%s", name, date, Extension.XLSX.getValue());
   }
 
-  private Workbook getWorkbook(String fileKey) {
+  private Workbook getWorkbook(FileItem fileItem) {
     try {
-      return new XSSFWorkbook(new ByteArrayInputStream(registryFileService.getBinaryFile(fileKey)));
+      return new XSSFWorkbook(new ByteArrayInputStream(fileItemService.getBinary(fileItem)));
     } catch (IOException exc) {
       log.error(exc.getMessage());
       throw new ApplicationException(exc.getMessage(), exc);
