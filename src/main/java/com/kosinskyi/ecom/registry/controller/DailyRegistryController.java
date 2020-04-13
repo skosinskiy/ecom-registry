@@ -40,6 +40,11 @@ public class DailyRegistryController {
     return mapper.getBinary(registryId);
   }
 
+  @GetMapping(value = "parsed/{registryId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  public byte[] getParsedBinary(@PathVariable Long registryId) {
+    return mapper.getParsedBinary(registryId);
+  }
+
   @PostMapping
   public ResponseEntity<DailyRegistryResponse> create(
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,

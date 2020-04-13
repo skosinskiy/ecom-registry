@@ -50,6 +50,10 @@ public class DailyRegistryMapper implements ReadMapper<DailyRegistry>, DeleteMap
     return service.getBinary(id);
   }
 
+  public byte[] getParsedBinary(Long id) {
+    return service.getParsedBinary(id);
+  }
+
   public DailyRegistryResponse parse(Long registryId) {
     return mapEntityToResponseDto(service.parse(registryId), DailyRegistryResponse.class);
   }

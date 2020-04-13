@@ -101,6 +101,12 @@ public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteS
     return registryFileService.getBinaryFile(dailyRegistry.getRegistryItem().getFileKey());
   }
 
+  public byte[] getParsedBinary(Long id) {
+    DailyRegistry dailyRegistry = findById(id);
+    return registryFileService.getBinaryFile(dailyRegistry.getParsedRegistryItem().getFileKey());
+  }
+
+
   public DailyRegistry parse(Long id) {
     DailyRegistry dailyRegistry = findById(id);
     dailyRegistry.setStatus(DailyRegistryStatus.PARSING);

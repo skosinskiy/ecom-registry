@@ -16,9 +16,10 @@ import Grid from '@material-ui/core/Grid'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
-import ArchiveIcon from '@material-ui/icons/Archive'
 import {saveFile} from '../../../helpers/dailyRegistry'
 import {StatusBlock} from '../../../components/StatusBlock/StatusBlock'
+import FolderIcon from '@material-ui/icons/Folder'
+import FolderOpenIcon from '@material-ui/icons/FolderOpen'
 
 const getStatusColor = status => {
   switch (status) {
@@ -37,6 +38,8 @@ const getStatusColor = status => {
         color: '#4caf50',
         backgroundColor: 'rgba(76, 175, 80, 0.08)'
       }
+    default:
+      return null
   }
 }
 
@@ -59,11 +62,33 @@ export const DailyRegistry = props => {
     return <Preloader/>
   }
 
+  const parseButton = (status, registry) => {
+    if (status === 'CREATED') {
+      return (
+        <IconButton>
+          <FolderOpenIcon size="medium" onClick={() => dispatch(parseDailyRegistry(registry.id))}/>
+        </IconButton>
+      )
+    }
+    if (status === 'PARSED') {
+      return (
+        <IconButton>
+          <FolderIcon size="medium" onClick={() =>
+            saveFile(`/api/registry/daily/parsed/${registry.id}`, `${registry.registryDate}.zip`)}/>
+        </IconButton>
+      )
+    }
+    return (<IconButton disabled>
+      <FolderIcon size="medium"/>
+    </IconButton>)
+  }
+
   const registryItems = dailyRegistryList === null ? null : dailyRegistryList.map(registry => {
     const {user, registryItem, createdDate, status} = registry
     const fileKey = registryItem.fileKey
     const registryDate = registry.registryDate
     const extension = fileKey.substring(fileKey.lastIndexOf('.') + 1)
+
     return (
       <TableRow key={registry.id}>
         <TableCell>{registryDate}</TableCell>
@@ -75,14 +100,15 @@ export const DailyRegistry = props => {
           <StatusBlock text={status} colors={getStatusColor(status)}/>
         </TableCell>
         <TableCell>
-          <IconButton size="medium" onClick={() => dispatch(parseDailyRegistry(registry.id))}>
-            <ArchiveIcon/>
-          </IconButton>
+          {parseButton(status, registry)}
           <IconButton size="medium" onClick={() =>
             saveFile(`/api/registry/daily/${registry.id}`, `${registryDate}.${extension}`)}>
             <ArrowDownwardIcon/>
           </IconButton>
-          <IconButton size="medium" onClick={() => dispatch(deleteDailyRegistry(registry.id))}>
+          <IconButton
+            disabled={status === 'PARSING'}
+            size="medium"
+            onClick={() => dispatch(deleteDailyRegistry(registry.id))}>
             <DeleteIcon/>
           </IconButton>
         </TableCell>
