@@ -11,7 +11,7 @@ const styles = theme => ({
 })
 
 const Preloader = props => {
-  const {classes} = props
+  const { classes } = props
   return (
     <div className='preloader'>
       <CircularProgress className={classes.progress}/>

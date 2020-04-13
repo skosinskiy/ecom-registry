@@ -78,8 +78,8 @@ class LoginForm extends Component {
   }
 
   render () {
-    const {submitLoginForm, currentUser, isCurrentUserLoading, classes} = this.props
-    const {email, password} = this.state
+    const { submitLoginForm, currentUser, isCurrentUserLoading, classes } = this.props
+    const { email, password } = this.state
 
     if (isCurrentUserLoading) {
       return <Preloader/>

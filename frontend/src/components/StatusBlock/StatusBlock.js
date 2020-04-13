@@ -13,7 +13,7 @@ const useStyles = makeStyles({
 })
 
 export const StatusBlock = props => {
-  const {text} = props
+  const { text } = props
   const classes = useStyles(props)
   return (
     <span className={classes.root}>

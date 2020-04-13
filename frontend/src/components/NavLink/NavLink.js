@@ -10,7 +10,7 @@ const useStyles = makeStyles({
 })
 
 export const CustomNavLink = props => {
-  const {to, children} = props
+  const { to, children } = props
   const classes = useStyles()
 
   return (

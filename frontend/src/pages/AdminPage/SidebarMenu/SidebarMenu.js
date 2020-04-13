@@ -11,7 +11,7 @@ import {CustomNavLink} from '../../../components/NavLink/NavLink'
 
 class SidebarMenu extends Component {
   render () {
-    const {user} = this.props
+    const { user } = this.props
 
     return (
       <div>

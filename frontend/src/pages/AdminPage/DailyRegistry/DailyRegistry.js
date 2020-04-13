@@ -71,7 +71,7 @@ export const DailyRegistry = () => {
   }
 
   const registryItems = dailyRegistryList === null ? null : dailyRegistryList.map(registry => {
-    const {user, registryItem, createdDate, status, parsedRegistryItem} = registry
+    const { user, registryItem, createdDate, status, parsedRegistryItem } = registry
     const date = registry.registryDate
     const registryItemExtension = registryItem.extension
 

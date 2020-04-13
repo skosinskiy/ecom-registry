@@ -7,7 +7,7 @@ export const submitLoginForm = (event, email, password) => dispatch => {
   event.preventDefault()
   dispatch(ACTIONS.currentUserLoading(true))
 
-  const data = {email, password}
+  const data = { email, password }
 
   return api.post('/api/auth', data).then(res => {
     setLocalStorageTokens(res)

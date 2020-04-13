@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid'
 import Alert from '@material-ui/lab/Alert'
 
 export const DatePicker = props => {
-  const {isFileDropped, date, handleDateChange, dateParsed, disabled} = props
+  const { isFileDropped, date, handleDateChange, dateParsed, disabled } = props
 
   const alert = dateParsed
     ? <Alert severity="success">Registry date successfully parsed from file name</Alert>

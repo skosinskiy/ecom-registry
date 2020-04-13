@@ -1,9 +1,16 @@
 spring:
   jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation:
+              true
     open-in-view: false
   datasource:
-    url: jdbc:h2:mem:ecom-registry;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
+    url: jdbc:postgresql://localhost:5430/parser
+    username: parser
+    password: parser
   servlet:
     multipart:
       max-file-size: 30MB
@@ -16,8 +23,3 @@ jwt:
   secret: ${random.uuid}
   refresh-token-exp-ms: 1209600000
   access-token-exp-ms: 900000
-
-aws:
-  s3:
-    credentials:
-      path: src/main/resources/aws/s3/credentials

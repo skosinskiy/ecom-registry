@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const RegistryDropzoneAlert = props => {
-  const {disabled, text} = props
+  const { disabled, text } = props
   const classes = useStyles()
 
   if (disabled) {

@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const ParseButton = props => {
-  const {status, parseHandler, downloadHandler} = props
+  const { status, parseHandler, downloadHandler } = props
   const classes = useStyles()
 
   if (status === 'CREATED') {

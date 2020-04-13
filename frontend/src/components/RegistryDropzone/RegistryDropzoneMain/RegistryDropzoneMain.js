@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const RegistryDropzoneMain = props => {
-  const {file, valid} = props
+  const { file, valid } = props
   const classes = useStyles()
 
   if (file && valid) {

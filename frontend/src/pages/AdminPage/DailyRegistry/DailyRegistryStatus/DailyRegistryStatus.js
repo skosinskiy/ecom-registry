@@ -19,7 +19,7 @@ const getColors = color => {
 }
 
 export const DailyRegistryStatus = props => {
-  const {status} = props
+  const { status } = props
   const theme = useTheme()
   return <StatusBlock text={status} colors={getColors(getColorByStatus(status, theme))}/>
 }

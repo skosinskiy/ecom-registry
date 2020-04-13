@@ -1,14 +1,9 @@
 package com.kosinskyi.ecom.registry.config;
 
-import com.amazonaws.auth.PropertiesFileCredentialsProvider;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.kosinskyi.ecom.registry.entity.file.constants.Extension;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,9 +15,6 @@ import java.util.Locale;
 
 @Configuration
 public class ApplicationBeans {
-
-  @Value("${aws.s3.credentials.path}")
-  private String s3CredentialsPath;
 
   @Bean
   public ModelMapper modelMapper() {
@@ -41,15 +33,6 @@ public class ApplicationBeans {
     SessionLocaleResolver slr = new SessionLocaleResolver();
     slr.setDefaultLocale(Locale.US);
     return slr;
-  }
-
-  @Bean
-  public AmazonS3Client amazonS3() {
-    return (AmazonS3Client) AmazonS3ClientBuilder
-        .standard()
-        .withRegion(Regions.EU_CENTRAL_1)
-        .withCredentials(new PropertiesFileCredentialsProvider(s3CredentialsPath))
-        .build();
   }
 
   @Bean

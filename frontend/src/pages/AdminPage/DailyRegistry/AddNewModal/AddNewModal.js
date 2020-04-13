@@ -12,7 +12,7 @@ import {uploadDailyRegistry} from '../../../../store/registry/daily/operations'
 import {LinearProgressDeterminate} from '../../../../components/LinearProgressDeterminate/LinearProgress'
 
 export const AddNewModal = props => {
-  const {isOpen, handleClose} = props
+  const { isOpen, handleClose } = props
   const [file, setFile] = useState(null)
   const [date, setDate] = useState(new Date())
   const [dateParsed, setDateParsed] = useState(false)

@@ -6,7 +6,7 @@ import AdminPage from '../../pages/AdminPage/AdminPage'
 import {connect} from 'react-redux'
 
 const AppRoutes = props => {
-  const {currentUser} = props
+  const { currentUser } = props
 
   return (
     <Switch>
@@ -16,7 +16,7 @@ const AppRoutes = props => {
   )
 }
 
-export const ProtectedRoute = ({component: Component, authenticated, ...rest}) => (
+export const ProtectedRoute = ({ component: Component, authenticated, ...rest }) => (
   <Route
     {...rest}
     render={props => authenticated ? <Component {...props} /> : <Redirect to="/login"/>}

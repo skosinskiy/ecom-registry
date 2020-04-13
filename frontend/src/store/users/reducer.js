@@ -18,7 +18,7 @@ const usersReducer = (state = initialState, action) => {
         isCurrentUserLoading: action.payload
       }
     default:
-      return {...state}
+      return { ...state }
   }
 }
 

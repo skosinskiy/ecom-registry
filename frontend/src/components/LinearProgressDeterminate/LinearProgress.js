@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const LinearProgressDeterminate = props => {
-  const {disabled, progress} = props
+  const { disabled, progress } = props
   const classes = useStyles()
 
   if (disabled) {
@@ -26,7 +26,7 @@ export const LinearProgressDeterminate = props => {
           Uploading file
       </DialogContentText>
       <LinearProgress
-        classes={{colorPrimary: classes.colorPrimary, barColorPrimary: classes.barColorPrimary}}
+        classes={{ colorPrimary: classes.colorPrimary, barColorPrimary: classes.barColorPrimary }}
         variant="determinate"
         value={progress} />
     </div>
