@@ -48,7 +48,7 @@ export const DailyRegistryTableRow = props => {
   const dispatch = useDispatch()
 
   return (
-    <TableRow key={id}>
+    <TableRow hover key={id}>
       <TableCell>{registryDate}</TableCell>
       <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
       <TableCell>{`${convertBytesToMegaBytes(registryItem.size)} MB`}</TableCell>

@@ -13,7 +13,6 @@ import { LinearProgressDeterminate } from '../../../../components/LinearProgress
 
 export const AddNewModal = props => {
   const { isOpen, handleClose, date } = props
-  const registryList = useSelector(state => state.dailyRegistry.registryList)
   const page = useSelector(state => state.dailyRegistry.page)
   const [file, setFile] = useState(null)
   const [registryDate, setRegistryDate] = useState(new Date())
@@ -53,8 +52,7 @@ export const AddNewModal = props => {
 
   const handleSubmit = () => {
     setUploading(true)
-    const increasePage = registryList.length === 10
-    dispatch(uploadDailyRegistry(registryDate, file, setUploadProgressWrapper, date, page, increasePage))
+    dispatch(uploadDailyRegistry(registryDate, file, setUploadProgressWrapper, date, page))
   }
 
   return (
