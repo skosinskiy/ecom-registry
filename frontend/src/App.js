@@ -5,9 +5,9 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import { connect } from 'react-redux'
 import { usersOperations } from './store/users'
 import ToastrMessage from './components/ToastrMessage/ToastrMessage'
-import Preloader from './components/Preloader/Preloader'
 import { ThemeProvider } from '@material-ui/core/styles'
 import { theme } from './theme/theme'
+import { Preloader } from './components/Preloader/Preloader'
 
 class App extends Component {
   componentDidMount () {
@@ -16,7 +16,11 @@ class App extends Component {
 
   render () {
     if (this.props.isCurrentUserLoading) {
-      return <Preloader/>
+      return (
+        <ThemeProvider theme={theme}>
+          <Preloader/>
+        </ThemeProvider>
+      )
     }
 
     return (

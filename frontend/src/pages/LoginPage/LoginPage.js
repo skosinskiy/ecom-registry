@@ -11,8 +11,8 @@ import BackgroundImage from '../../img/LoginPage/background.jpg'
 import { connect } from 'react-redux'
 import { usersOperations } from '../../store/users'
 import { Redirect } from 'react-router-dom'
-import Preloader from '../../components/Preloader/Preloader'
 import withStyles from '@material-ui/core/styles/withStyles'
+import { Preloader } from '../../components/Preloader/Preloader'
 
 const styles = theme => ({
   root: {
