@@ -13,7 +13,7 @@ import CloudDownloadRoundedIcon from '@material-ui/icons/CloudDownloadRounded'
 import DeleteIconRounded from '@material-ui/icons/DeleteRounded'
 import React from 'react'
 import makeStyles from '@material-ui/core/styles/makeStyles'
-import {useDispatch} from "react-redux";
+import { useDispatch } from 'react-redux'
 
 const useStyles = makeStyles((theme) => ({
   actionCell: {
