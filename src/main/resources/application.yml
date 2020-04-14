@@ -7,17 +7,10 @@ spring:
             non_contextual_creation:
               true
     open-in-view: false
-  datasource:
-    url: jdbc:postgresql://localhost:5430/parser
-    username: parser
-    password: parser
   servlet:
     multipart:
       max-file-size: 30MB
       max-request-size: 30MB
-
-server:
-  port: 10000
 
 jwt:
   secret: ${random.uuid}
