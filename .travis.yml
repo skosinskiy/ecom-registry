@@ -10,6 +10,8 @@ jdk:
 node_js:
   - "10"
 
+install: skip
+
 cache:
   directories:
     - $HOME/.m2
