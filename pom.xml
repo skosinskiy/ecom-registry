@@ -178,6 +178,7 @@
                 <executions>
                     <execution>
                         <id>install frontend node and npm</id>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>install-node-and-npm</goal>
                         </goals>
@@ -188,6 +189,7 @@
                     </execution>
                     <execution>
                         <id>install frontend</id>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>npm</goal>
                         </goals>
@@ -198,6 +200,7 @@
                     </execution>
                     <execution>
                         <id>Build admin panel</id>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>npm</goal>
                         </goals>
@@ -216,7 +219,7 @@
                 <executions>
                     <execution>
                         <id>copy-frontend-resources</id>
-                        <phase>compile</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>

@@ -16,10 +16,9 @@ cache:
     - frontend/node_modules/
 before_script:
   - npm install --prefix frontend/
-  - npm rebuild node-sass
 
 script:
-  - mvn clean package sonar:sonar
+  - mvn clean test sonar:sonar
   - npm run build --prefix frontend/
 after_success:
   - bash <(curl -s https://codecov.io/bash)
