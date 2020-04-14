@@ -14,10 +14,13 @@ import com.kosinskyi.ecom.registry.service.file.FileItemService;
 import com.kosinskyi.ecom.registry.service.registry.daily.parsing.DailyRegistryParseService;
 import com.kosinskyi.ecom.registry.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -89,5 +92,9 @@ public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteS
     dailyRegistry.setParsedRegistryItem(fileItem);
     dailyRegistry.setStatus(DailyRegistryStatus.PARSED);
     jpaRepository.save(dailyRegistry);
+  }
+
+  public Page<DailyRegistry> findAllByYearAndMonth(Integer year, Integer month, Pageable pageable) {
+    return findAll(specification.yearEquals(year).and(specification.monthEquals(month)), pageable);
   }
 }

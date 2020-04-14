@@ -10,11 +10,6 @@ export const dailyRegistryFetched = dailyRegistryList => ({
   payload: dailyRegistryList
 })
 
-export const dailyRegistryDeleted = dailyRegistry => ({
-  type: TYPES.DAILY_REGISTRY_DELETED,
-  payload: dailyRegistry
-})
-
 export const dailyRegistryParsed = dailyRegistry => ({
   type: TYPES.DAILY_REGISTRY_PARSING,
   payload: dailyRegistry

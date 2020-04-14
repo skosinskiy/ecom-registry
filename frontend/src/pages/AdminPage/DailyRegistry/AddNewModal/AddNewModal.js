@@ -9,12 +9,12 @@ import Dialog from '@material-ui/core/Dialog'
 import { DatePicker } from './DatePicker/DatePicker'
 import { useDispatch } from 'react-redux'
 import { uploadDailyRegistry } from '../../../../store/registry/daily/operations'
-import { LinearProgressDeterminate } from '../../../../components/LinearProgressDeterminate/LinearProgress'
+import { LinearProgressDeterminate } from '../../../../components/LinearProgressDeterminate/LinearProgressDeterminate'
 
 export const AddNewModal = props => {
-  const { isOpen, handleClose } = props
+  const { isOpen, handleClose, date, page } = props
   const [file, setFile] = useState(null)
-  const [date, setDate] = useState(new Date())
+  const [registryDate, setRegistryDate] = useState(new Date())
   const [dateParsed, setDateParsed] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -23,7 +23,7 @@ export const AddNewModal = props => {
   const handleFileDrop = file => {
     const fileName = file.name
     if (fileName.match('^([0-2][0-9]|(3)[0-1])(\\.)(((0)[0-9])|((1)[0-2]))(\\.)\\d{4}.*$')) {
-      setDate(new Date(fileName.substring(6, 10), fileName.substring(3, 5) - 1, fileName.substring(0, 2)))
+      setRegistryDate(new Date(fileName.substring(6, 10), fileName.substring(3, 5) - 1, fileName.substring(0, 2)))
       setDateParsed(true)
     }
     setFile(file)
@@ -31,7 +31,7 @@ export const AddNewModal = props => {
 
   const resetState = () => {
     setFile(null)
-    setDate(new Date())
+    setRegistryDate(new Date())
     setDateParsed(false)
     setUploading(false)
     setUploadProgress(0)
@@ -42,16 +42,16 @@ export const AddNewModal = props => {
     handleClose()
   }
 
-  const setUploadProgressWrapper = progress => {
+  const setUploadProgressWrapper = (progress, finished) => {
     setUploadProgress(progress)
-    if (progress === 100) {
-      setTimeout(handleCloseWithReset, 550)
+    if (finished) {
+      handleCloseWithReset()
     }
   }
 
   const handleSubmit = () => {
     setUploading(true)
-    dispatch(uploadDailyRegistry(date, file, setUploadProgressWrapper))
+    dispatch(uploadDailyRegistry(registryDate, file, setUploadProgressWrapper, date, page))
   }
 
   return (
@@ -69,8 +69,8 @@ export const AddNewModal = props => {
           disabled={uploading}
           dateParsed={dateParsed}
           isFileDropped={!!file}
-          date={date}
-          handleDateChange={setDate}
+          date={registryDate}
+          handleDateChange={setRegistryDate}
         />
         <LinearProgressDeterminate
           disabled={!uploading}
