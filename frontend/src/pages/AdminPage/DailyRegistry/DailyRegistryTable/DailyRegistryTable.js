@@ -6,10 +6,10 @@ import { TableCell } from '@material-ui/core'
 import TableBody from '@material-ui/core/TableBody'
 import TablePagination from '@material-ui/core/TablePagination'
 import Paper from '@material-ui/core/Paper'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { LinearIndeterminate } from '../../../../components/LinearProgress/LinearProgress'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchDailyRegistry } from '../../../../store/registry/daily/operations'
+import { fetchDailyRegistry, updatePage } from '../../../../store/registry/daily/operations'
 import { DailyRegistryTableRow } from './DailyRegistryTableRow/DailyRegistryTableRow'
 
 export const DailyRegistryTable = props => {
@@ -18,22 +18,20 @@ export const DailyRegistryTable = props => {
   const dailyRegistryList = useSelector(state => state.dailyRegistry.registryList)
   const { date } = props
 
-  const [page, setPage] = useState(0)
+  const page = useSelector(state => state.dailyRegistry.page)
 
   const dispatch = useDispatch()
 
   useEffect(() => dispatch(fetchDailyRegistry(date, page)), [date, page, dispatch])
 
   const handleChangePage = (event, newPage) => {
-    setPage(newPage)
+    dispatch(updatePage(newPage))
   }
-
-  const progress = isLoading ? <LinearIndeterminate/> : null
 
   return (
     <Paper>
       <TableContainer>
-        {progress}
+        <LinearIndeterminate color={'secondary'} disabled={!isLoading}/>
         <Table stickyHeader aria-label="sticky table" size={'small'}>
           <TableHead>
             <TableRow>
@@ -47,7 +45,15 @@ export const DailyRegistryTable = props => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {dailyRegistryList.map(registry => <DailyRegistryTableRow registry={registry} date={date} page={page}/>)}
+            {dailyRegistryList.map((registry, i) =>
+              <DailyRegistryTableRow
+                key={i}
+                registry={registry}
+                date={date}
+                page={page}
+                decreasePage={i === 0 && dailyRegistryList.length === 1 && page > 0}
+              />
+            )}
           </TableBody>
         </Table>
       </TableContainer>

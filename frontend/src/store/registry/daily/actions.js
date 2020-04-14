@@ -15,7 +15,7 @@ export const dailyRegistryParsed = dailyRegistry => ({
   payload: dailyRegistry
 })
 
-export const dailyRegistryUploaded = dailyRegistry => ({
-  type: TYPES.DAILY_REGISTRY_UPLOADED,
-  payload: dailyRegistry
+export const pageUpdated = page => ({
+  type: TYPES.PAGE_UPDATED,
+  payload: page
 })

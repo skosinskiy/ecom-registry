@@ -14,8 +14,9 @@ const useStyles = makeStyles((theme) => ({
 
 export const DailyRegistryHeader = props => {
   const { date, setDate } = props
-  const classes = useStyles()
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const classes = useStyles()
 
   return (
     <Grid container justify={'space-between'}>
@@ -36,7 +37,7 @@ export const DailyRegistryHeader = props => {
       >
           Add registry
       </Button>
-      <AddNewModal isOpen={isModalOpen} date={date} page={0} handleClose={() => setIsModalOpen(false)}/>
+      <AddNewModal isOpen={isModalOpen} date={date} handleClose={() => setIsModalOpen(false)}/>
     </Grid>
   )
 }

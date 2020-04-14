@@ -7,12 +7,14 @@ import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
 import { DatePicker } from './DatePicker/DatePicker'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { uploadDailyRegistry } from '../../../../store/registry/daily/operations'
 import { LinearProgressDeterminate } from '../../../../components/LinearProgressDeterminate/LinearProgressDeterminate'
 
 export const AddNewModal = props => {
-  const { isOpen, handleClose, date, page } = props
+  const { isOpen, handleClose, date } = props
+  const registryList = useSelector(state => state.dailyRegistry.registryList)
+  const page = useSelector(state => state.dailyRegistry.page)
   const [file, setFile] = useState(null)
   const [registryDate, setRegistryDate] = useState(new Date())
   const [dateParsed, setDateParsed] = useState(false)
@@ -51,7 +53,8 @@ export const AddNewModal = props => {
 
   const handleSubmit = () => {
     setUploading(true)
-    dispatch(uploadDailyRegistry(registryDate, file, setUploadProgressWrapper, date, page))
+    const increasePage = registryList.length === 10
+    dispatch(uploadDailyRegistry(registryDate, file, setUploadProgressWrapper, date, page, increasePage))
   }
 
   return (

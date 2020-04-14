@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const DailyRegistryTableRow = props => {
-  const { registry, date, page } = props
+  const { registry, date, page, decreasePage } = props
   const { id, user, registryItem, createdDate, registryDate, status, parsedRegistryItem } = registry
 
   const classes = useStyles()
@@ -76,7 +76,7 @@ export const DailyRegistryTableRow = props => {
           className={classNames(classes.actionCell, classes.deleteButton)}
           disabled={status === 'PARSING'}
           size="small"
-          onClick={() => dispatch(deleteDailyRegistry(id, date, page))}>
+          onClick={() => dispatch(deleteDailyRegistry(id, date, page, decreasePage))}>
           <DeleteIconRounded/>
         </IconButton>
       </TableCell>

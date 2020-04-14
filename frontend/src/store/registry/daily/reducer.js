@@ -3,7 +3,8 @@ import * as TYPES from './types'
 const initialState = {
   registryList: [],
   isLoading: false,
-  totalElements: 0
+  totalElements: 0,
+  page: 0
 }
 
 const usersReducer = (state = initialState, action) => {
@@ -28,6 +29,11 @@ const usersReducer = (state = initialState, action) => {
           }
           return registry
         })
+      }
+    case TYPES.PAGE_UPDATED:
+      return {
+        ...state,
+        page: action.payload
       }
     default:
       return { ...state }
