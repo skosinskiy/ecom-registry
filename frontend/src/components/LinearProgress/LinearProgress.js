@@ -4,6 +4,8 @@ import LinearProgress from '@material-ui/core/LinearProgress'
 
 const useStyles = makeStyles((theme) => ({
   root: {
+    height: '4px',
+    boxSizing: 'border-box',
     width: '100%',
     '& > * + *': {
       marginTop: theme.spacing(2)
@@ -11,12 +13,15 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export const LinearIndeterminate = () => {
+export const LinearIndeterminate = props => {
   const classes = useStyles()
+  const { disabled, color = 'secondary' } = props
+
+  const progress = disabled ? null : <LinearProgress color={color}/>
 
   return (
     <div className={classes.root}>
-      <LinearProgress color={'secondary'}/>
+      {progress}
     </div>
   )
 }
