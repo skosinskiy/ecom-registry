@@ -1,7 +1,7 @@
 import * as ACTIONS from './actions'
 import api from '../../components/Axios/Axios'
-import {toastr} from 'react-redux-toastr'
-import {setLocalStorageTokens} from '../../service/jwtService'
+import { toastr } from 'react-redux-toastr'
+import { setLocalStorageTokens } from '../../service/jwtService'
 
 export const submitLoginForm = (event, email, password) => dispatch => {
   event.preventDefault()

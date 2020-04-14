@@ -1,8 +1,8 @@
 import Dropzone from 'react-dropzone'
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import makeStyles from '@material-ui/core/styles/makeStyles'
-import {RegistryDropzoneAlert} from './RegistryDropzoneAlert/RegistryDropzoneAlert'
-import {RegistryDropzoneMain} from './RegistryDropzoneMain/RegistryDropzoneMain'
+import { RegistryDropzoneAlert } from './RegistryDropzoneAlert/RegistryDropzoneAlert'
+import { RegistryDropzoneMain } from './RegistryDropzoneMain/RegistryDropzoneMain'
 
 const useStyles = makeStyles((theme) => ({
   dropzone: {

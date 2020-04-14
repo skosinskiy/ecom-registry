@@ -1,9 +1,9 @@
 import React from 'react'
-import {Redirect, Route, Switch, withRouter} from 'react-router-dom'
+import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
 import LoginPage from '../../pages/LoginPage/LoginPage'
 import * as PropTypes from 'prop-types'
 import AdminPage from '../../pages/AdminPage/AdminPage'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 const AppRoutes = props => {
   const { currentUser } = props

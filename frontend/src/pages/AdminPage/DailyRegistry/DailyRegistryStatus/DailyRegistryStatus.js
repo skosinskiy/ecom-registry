@@ -1,7 +1,7 @@
-import {StatusBlock} from '../../../../components/StatusBlock/StatusBlock'
+import { StatusBlock } from '../../../../components/StatusBlock/StatusBlock'
 import React from 'react'
 import useTheme from '@material-ui/core/styles/useTheme'
-import {fade} from '@material-ui/core/styles/colorManipulator'
+import { fade } from '@material-ui/core/styles/colorManipulator'
 
 const getColorByStatus = (status, theme) => {
   switch (status) {

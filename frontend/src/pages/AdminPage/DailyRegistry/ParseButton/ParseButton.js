@@ -2,7 +2,7 @@ import React from 'react'
 import IconButton from '@material-ui/core/IconButton'
 import FolderRounded from '@material-ui/icons/FolderRounded'
 import FolderOpenRounded from '@material-ui/icons/FolderOpenRounded'
-import {makeStyles} from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
   downloadButton: {

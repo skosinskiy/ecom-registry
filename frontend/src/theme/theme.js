@@ -1,4 +1,4 @@
-import {createMuiTheme} from '@material-ui/core'
+import { createMuiTheme } from '@material-ui/core'
 import green from '@material-ui/core/colors/green'
 import orange from '@material-ui/core/colors/orange'
 

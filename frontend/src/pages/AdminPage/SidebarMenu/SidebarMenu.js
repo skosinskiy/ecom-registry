@@ -1,13 +1,13 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
-import {Grant} from '../../../constants/permissions'
-import {connect} from 'react-redux'
+import { Grant } from '../../../constants/permissions'
+import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined'
-import {hasGrant} from '../../../utils/hasGrant'
-import {CustomNavLink} from '../../../components/NavLink/NavLink'
+import { hasGrant } from '../../../utils/hasGrant'
+import { CustomNavLink } from '../../../components/NavLink/NavLink'
 
 class SidebarMenu extends Component {
   render () {

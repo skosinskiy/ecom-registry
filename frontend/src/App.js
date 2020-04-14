@@ -1,13 +1,13 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import AppRoutes from './components/AppRoutes/AppRoutes'
-import {withRouter} from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import {connect} from 'react-redux'
-import {usersOperations} from './store/users'
+import { connect } from 'react-redux'
+import { usersOperations } from './store/users'
 import ToastrMessage from './components/ToastrMessage/ToastrMessage'
 import Preloader from './components/Preloader/Preloader'
-import {ThemeProvider} from '@material-ui/core/styles'
-import {theme} from './theme/theme'
+import { ThemeProvider } from '@material-ui/core/styles'
+import { theme } from './theme/theme'
 
 class App extends Component {
   componentDidMount () {

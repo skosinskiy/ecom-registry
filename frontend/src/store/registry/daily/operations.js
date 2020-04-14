@@ -1,7 +1,7 @@
 import * as ACTIONS from './actions'
 import api from '../../../components/Axios/Axios'
-import {getDateString} from '../../../utils/dateUtils'
-import {toastr} from 'react-redux-toastr'
+import { getDateString } from '../../../utils/dateUtils'
+import { toastr } from 'react-redux-toastr'
 
 export const fetchDailyRegistry = () => dispatch => {
   dispatch(ACTIONS.dailyRegistryLoading(true))

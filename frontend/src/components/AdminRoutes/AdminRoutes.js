@@ -1,10 +1,10 @@
-import React, {Component} from 'react'
-import {Redirect, Route, Switch, withRouter} from 'react-router-dom'
-import {connect} from 'react-redux'
+import React, { Component } from 'react'
+import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import {Grant} from '../../constants/permissions'
-import {hasGrant} from '../../utils/hasGrant'
-import {DailyRegistry} from '../../pages/AdminPage/DailyRegistry/DailyRegistry'
+import { Grant } from '../../constants/permissions'
+import { hasGrant } from '../../utils/hasGrant'
+import { DailyRegistry } from '../../pages/AdminPage/DailyRegistry/DailyRegistry'
 
 class AdminRouter extends Component {
   render () {
