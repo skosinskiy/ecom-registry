@@ -10,6 +10,8 @@ jdk:
 node_js:
   - "10"
 
+install: skip
+
 cache:
   directories:
     - $HOME/.m2
@@ -18,7 +20,8 @@ before_script:
   - npm install --prefix frontend/
 
 script:
-  - mvn clean package sonar:sonar
+  - mvn clean test sonar:sonar
+  - npm rebuild node-sass
   - npm run build --prefix frontend/
 after_success:
   - bash <(curl -s https://codecov.io/bash)

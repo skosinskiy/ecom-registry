@@ -1,8 +1,8 @@
 import Dropzone from 'react-dropzone'
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import makeStyles from '@material-ui/core/styles/makeStyles'
-import {RegistryDropzoneAlert} from './RegistryDropzoneAlert/RegistryDropzoneAlert'
-import {RegistryDropzoneMain} from './RegistryDropzoneMain/RegistryDropzoneMain'
+import { RegistryDropzoneAlert } from './RegistryDropzoneAlert/RegistryDropzoneAlert'
+import { RegistryDropzoneMain } from './RegistryDropzoneMain/RegistryDropzoneMain'
 
 const useStyles = makeStyles((theme) => ({
   dropzone: {
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 const allowedTypes = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
 
 export const RegistryDropzone = props => {
-  const {onDrop, file} = props
+  const { onDrop, file } = props
   const classes = useStyles()
   const [valid, setValid] = useState(true)
 
@@ -44,10 +44,10 @@ export const RegistryDropzone = props => {
       multiple={false}
       accept={allowedTypes}
       onDrop={fileDropWrapper}>
-      {({getRootProps, getInputProps}) => (
+      {({ getRootProps, getInputProps }) => (
           <>
             <RegistryDropzoneAlert disabled={valid} text={'Only xls/xlsx file format allowed for uploading!'}/>
-            <div {...getRootProps({className: classes.dropzone})}>
+            <div {...getRootProps({ className: classes.dropzone })}>
               <input{...getInputProps()}/>
               <RegistryDropzoneMain file={file} valid={valid}/>
             </div>

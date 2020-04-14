@@ -1,4 +1,4 @@
-import {NavLink} from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import React from 'react'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 
@@ -10,7 +10,7 @@ const useStyles = makeStyles({
 })
 
 export const CustomNavLink = props => {
-  const {to, children} = props
+  const { to, children } = props
   const classes = useStyles()
 
   return (

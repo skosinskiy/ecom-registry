@@ -1,0 +1,12 @@
+spring:
+  flyway:
+    enabled: true
+  jpa:
+    show-sql: false
+  datasource:
+    url: jdbc:h2:mem:app;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    initialization-mode: never
+
+server:
+  port: 10000

@@ -1,7 +1,7 @@
-import {StatusBlock} from '../../../../components/StatusBlock/StatusBlock'
+import { StatusBlock } from '../../../../components/StatusBlock/StatusBlock'
 import React from 'react'
 import useTheme from '@material-ui/core/styles/useTheme'
-import {fade} from '@material-ui/core/styles/colorManipulator'
+import { fade } from '@material-ui/core/styles/colorManipulator'
 
 const getColorByStatus = (status, theme) => {
   switch (status) {
@@ -19,7 +19,7 @@ const getColors = color => {
 }
 
 export const DailyRegistryStatus = props => {
-  const {status} = props
+  const { status } = props
   const theme = useTheme()
   return <StatusBlock text={status} colors={getColors(getColorByStatus(status, theme))}/>
 }

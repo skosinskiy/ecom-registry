@@ -1,18 +1,18 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
-import {RegistryDropzone} from '../../../../components/RegistryDropzone/RegistryDropzone'
+import { RegistryDropzone } from '../../../../components/RegistryDropzone/RegistryDropzone'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
-import {DatePicker} from './DatePicker/DatePicker'
-import {useDispatch} from 'react-redux'
-import {uploadDailyRegistry} from '../../../../store/registry/daily/operations'
-import {LinearProgressDeterminate} from '../../../../components/LinearProgressDeterminate/LinearProgress'
+import { DatePicker } from './DatePicker/DatePicker'
+import { useDispatch } from 'react-redux'
+import { uploadDailyRegistry } from '../../../../store/registry/daily/operations'
+import { LinearProgressDeterminate } from '../../../../components/LinearProgressDeterminate/LinearProgress'
 
 export const AddNewModal = props => {
-  const {isOpen, handleClose} = props
+  const { isOpen, handleClose } = props
   const [file, setFile] = useState(null)
   const [date, setDate] = useState(new Date())
   const [dateParsed, setDateParsed] = useState(false)

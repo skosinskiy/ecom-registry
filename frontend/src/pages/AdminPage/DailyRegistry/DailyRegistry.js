@@ -1,25 +1,25 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import Table from '@material-ui/core/Table'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
-import {TableCell} from '@material-ui/core'
+import { TableCell } from '@material-ui/core'
 import Paper from '@material-ui/core/Paper'
-import {useDispatch, useSelector} from 'react-redux'
-import {deleteDailyRegistry, fetchDailyRegistry, parseDailyRegistry} from '../../../store/registry/daily/operations'
+import { useDispatch, useSelector } from 'react-redux'
+import { deleteDailyRegistry, fetchDailyRegistry, parseDailyRegistry } from '../../../store/registry/daily/operations'
 import Preloader from '../../../components/Preloader/Preloader'
-import {getDateTimeString} from '../../../utils/dateUtils'
+import { getDateTimeString } from '../../../utils/dateUtils'
 import TableBody from '@material-ui/core/TableBody'
-import {convertBytesToMegaBytes} from '../../../utils/sizeConverter'
+import { convertBytesToMegaBytes } from '../../../utils/sizeConverter'
 import Button from '@material-ui/core/Button'
-import {AddNewModal} from './AddNewModal/AddNewModal'
+import { AddNewModal } from './AddNewModal/AddNewModal'
 import Grid from '@material-ui/core/Grid'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIconRounded from '@material-ui/icons/DeleteRounded'
 import CloudDownloadRoundedIcon from '@material-ui/icons/CloudDownloadRounded'
-import {saveFile} from '../../../helpers/dailyRegistry'
-import {makeStyles} from '@material-ui/core/styles'
-import {ParseButton} from './ParseButton/ParseButton'
-import {DailyRegistryStatus} from './DailyRegistryStatus/DailyRegistryStatus'
+import { saveFile } from '../../../helpers/dailyRegistry'
+import { makeStyles } from '@material-ui/core/styles'
+import { ParseButton } from './ParseButton/ParseButton'
+import { DailyRegistryStatus } from './DailyRegistryStatus/DailyRegistryStatus'
 import ExcelIcon from '../../../icons/excel.svg'
 
 const useStyles = makeStyles((theme) => ({
@@ -71,7 +71,7 @@ export const DailyRegistry = () => {
   }
 
   const registryItems = dailyRegistryList === null ? null : dailyRegistryList.map(registry => {
-    const {user, registryItem, createdDate, status, parsedRegistryItem} = registry
+    const { user, registryItem, createdDate, status, parsedRegistryItem } = registry
     const date = registry.registryDate
     const registryItemExtension = registryItem.extension
 

@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import api from '../components/Axios/Axios'
 
 export const getJwtToken = (requestTimeout) => {
-  const {jwtAccessToken, jwtRefreshToken, jwtRefreshTokenExpireTime} = getLocalStorageTokens()
+  const { jwtAccessToken, jwtRefreshToken, jwtRefreshTokenExpireTime } = getLocalStorageTokens()
   if (!jwtAccessToken) {
     return null
   }
@@ -13,7 +13,7 @@ export const getJwtToken = (requestTimeout) => {
 }
 
 export const setLocalStorageTokens = jwtAccessTokens => {
-  const {jwtAccessToken, jwtRefreshToken, jwtRefreshTokenExpireDate} = jwtAccessTokens
+  const { jwtAccessToken, jwtRefreshToken, jwtRefreshTokenExpireDate } = jwtAccessTokens
   window.localStorage.setItem('jwt_access_token', jwtAccessToken)
   window.localStorage.setItem('jwt_refresh_token', jwtRefreshToken)
   window.localStorage.setItem('jwt_refresh_token_expire', jwtRefreshTokenExpireDate)

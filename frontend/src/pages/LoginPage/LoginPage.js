@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
@@ -8,9 +8,9 @@ import Grid from '@material-ui/core/Grid'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import Typography from '@material-ui/core/Typography'
 import BackgroundImage from '../../img/LoginPage/background.jpg'
-import {connect} from 'react-redux'
-import {usersOperations} from '../../store/users'
-import {Redirect} from 'react-router-dom'
+import { connect } from 'react-redux'
+import { usersOperations } from '../../store/users'
+import { Redirect } from 'react-router-dom'
 import Preloader from '../../components/Preloader/Preloader'
 import withStyles from '@material-ui/core/styles/withStyles'
 
@@ -78,8 +78,8 @@ class LoginForm extends Component {
   }
 
   render () {
-    const {submitLoginForm, currentUser, isCurrentUserLoading, classes} = this.props
-    const {email, password} = this.state
+    const { submitLoginForm, currentUser, isCurrentUserLoading, classes } = this.props
+    const { email, password } = this.state
 
     if (isCurrentUserLoading) {
       return <Preloader/>
