@@ -1,11 +1,18 @@
-# This docker file is only for production.
+#
+# Build stage
+#
+FROM maven:3.6.0-jdk-11-slim AS build
+COPY src /src
+COPY checkstyle_config.xml /checkstyle_config.xml
+COPY frontend/src /frontend/src
+COPY frontend/public /frontend/public
+COPY frontend/package.json /frontend/package.json
+COPY pom.xml /pom.xml
+RUN mvn -f /pom.xml clean package
 
-# Build from jdk image
-FROM openjdk:11
-
-# Copy fat jar into container
-ADD /target/*.jar app.jar
-
-# Run spring boot application
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","app.jar"]
+#
+# Package stage
+#
+FROM openjdk:11-jre-slim
+COPY --from=build /target/*.jar app.jar
 

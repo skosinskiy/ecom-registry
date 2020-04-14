@@ -29,7 +29,7 @@
   },
   "scripts": {
     "start": "npm run eslint-build && react-scripts start",
-    "build": "npm run eslint-build && react-scripts build",
+    "build": "eslint \"src/**/*.js\" && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "eslint-build": "eslint \"src/**/*.js\"",

@@ -3,11 +3,13 @@ version: "3.4"
 services:
   parser:
     container_name: parser
+    env_file:
+      - ./registry.env
     build:
       context: ./
     depends_on:
       - db
-    entrypoint: "java -Djava.security.egd=file:/dev/./urandom -jar app.jar"
+    entrypoint: "java -Djava.security.egd=file:/dev/./urandom -jar app.jar --spring.profiles.active=docker"
     volumes:
       - ./storage:/storage
       - ./logs:/logs
@@ -18,10 +20,14 @@ services:
     container_name: parser-db
     image: postgres:12.2-alpine
     environment:
-      POSTGRES_DB: 'parser'
-      POSTGRES_USER: 'parser'
-      POSTGRES_PASSWORD: 'parser'
+      POSTGRES_DB: "parser"
+      POSTGRES_USER: "parser"
+      POSTGRES_PASSWORD: "parser"
+      PGDATA: /data/postgres
     ports:
       - '5430:5432'
     volumes:
-      - ./data/postgres:/data/postgres
+     - parser-db-v:/data/postgres
+
+volumes:
+  parser-db-v:
