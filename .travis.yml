@@ -21,6 +21,7 @@ before_script:
 
 script:
   - mvn clean test sonar:sonar
+  - npm rebuild node-sass
   - npm run build --prefix frontend/
 after_success:
   - bash <(curl -s https://codecov.io/bash)
