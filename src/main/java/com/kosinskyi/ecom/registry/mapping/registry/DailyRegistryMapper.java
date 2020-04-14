@@ -9,10 +9,13 @@ import com.kosinskyi.ecom.registry.service.crud.ReadService;
 import com.kosinskyi.ecom.registry.service.registry.daily.DailyRegistryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class DailyRegistryMapper implements ReadMapper<DailyRegistry>, DeleteMapper<DailyRegistry> {
@@ -48,5 +51,10 @@ public class DailyRegistryMapper implements ReadMapper<DailyRegistry>, DeleteMap
 
   public DailyRegistryResponse parse(Long registryId) {
     return mapEntityToResponseDto(service.parse(registryId), DailyRegistryResponse.class);
+  }
+
+  public Page<DailyRegistryResponse> findAllByYearAndMonth(
+      Integer year, Integer month, Pageable pageable, Class<DailyRegistryResponse> responseClass) {
+    return mapEntityPage(service.findAllByYearAndMonth(year, month, pageable), responseClass);
   }
 }
