@@ -126,16 +126,12 @@ public class DailyRegistryParseService {
     criteriaRowsMap.forEach((criteria, rows) -> {
       log.debug("Creating workbook for {}", criteria.getName());
       long s = System.currentTimeMillis();
-      try (Workbook workbook = createWorkbookWithHeader(headerRow)) {
-        Sheet sheet = workbook.getSheetAt(0);
-        rows.forEach(row -> copyRow(row, sheet.createRow(sheet.getLastRowNum() + 1), getDateStyle(workbook)));
-        zipMap.put(getRegistryFileName(criteria.getName(), date), getBytesFromWorkbook(workbook));
-        long t = System.currentTimeMillis() - s;
-        log.debug("Creating workbook for {} finished in {} ms", criteria.getName(), t);
-      } catch (IOException exc) {
-        log.error(exc.getMessage());
-        throw new ApplicationException(exc.getMessage(), exc);
-      }
+      Workbook workbook = createWorkbookWithHeader(headerRow);
+      Sheet sheet = workbook.getSheetAt(0);
+      rows.forEach(row -> copyRow(row, sheet.createRow(sheet.getLastRowNum() + 1), getDateStyle(workbook)));
+      zipMap.put(getRegistryFileName(criteria.getName(), date), getBytesFromWorkbook(workbook));
+      long t = System.currentTimeMillis() - s;
+      log.debug("Creating workbook for {} finished in {} ms", criteria.getName(), t);
     });
     long time = System.currentTimeMillis() - start;
     log.info("Transforming rows to workbooks finished in {} seconds", time / 1000);
@@ -143,10 +139,14 @@ public class DailyRegistryParseService {
   }
 
   private Workbook createWorkbookWithHeader(Row headerRow) {
-    Workbook createdWorkbook = new XSSFWorkbook();
-    Sheet createdWorkbookSheet = createdWorkbook.createSheet();
-    copyRow(headerRow, createdWorkbookSheet.createRow(0));
-    return createdWorkbook;
+    try (Workbook createdWorkbook = new XSSFWorkbook()) {
+      Sheet createdWorkbookSheet = createdWorkbook.createSheet();
+      copyRow(headerRow, createdWorkbookSheet.createRow(0));
+      return createdWorkbook;
+    } catch (IOException exc) {
+      log.error(exc.getMessage());
+      throw new ApplicationException(exc.getMessage(), exc);
+    }
   }
 
   private CellStyle getDateStyle(Workbook workbook) {
