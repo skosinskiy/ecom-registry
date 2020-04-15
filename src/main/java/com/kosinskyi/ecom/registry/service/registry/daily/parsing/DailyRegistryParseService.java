@@ -53,7 +53,7 @@ public class DailyRegistryParseService {
   public CompletableFuture<FileItem> parse(DailyRegistry dailyRegistry) {
     Long id = dailyRegistry.getId();
     LocalDate date = dailyRegistry.getRegistryDate();
-    log.info("Received request for parsing daily registry: {}, date: {}", id, date);
+    log.info("Received request for parsing daily registry with id={}, date={}", id, date);
     long start = System.currentTimeMillis();
     Sheet originalSheet = getWorkbook(dailyRegistry.getRegistryItem()).getSheetAt(0);
     Row headerRow = originalSheet.getRow(originalSheet.getFirstRowNum());
@@ -62,7 +62,7 @@ public class DailyRegistryParseService {
     Map<String, byte[]> zipMap = transformProcessedRowsToWorkbookBytes(criteriaRowsMap, date, headerRow);
     FileItem fileItem = fileItemService.saveZip(zipMap);
     long time = System.currentTimeMillis() - start;
-    log.info("Successfully parsed daily registry: {}, date: {} in {} seconds", id, date, time / 1000);
+    log.info("Successfully parsed daily registry with id={}, date={} in {} seconds", id, date, time / 1000);
     return CompletableFuture.completedFuture(fileItem);
   }
 
@@ -70,11 +70,11 @@ public class DailyRegistryParseService {
     try {
       byte[] binaryFile = fileItemService.getBinary(fileItem);
       Long id = fileItem.getId();
-      log.info("Transforming binary file with id: {} to workbook", id);
+      log.info("Transforming binary file with id={} to workbook", id);
       long start = System.currentTimeMillis();
       XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(binaryFile));
       long time = System.currentTimeMillis() - start;
-      log.info("Transformed binary file with id: {} to workbook successfully in {} seconds", id, time / 1000);
+      log.info("Transformed binary file with id={} to workbook successfully in {} seconds", id, time / 1000);
       return workbook;
     } catch (IOException exc) {
       log.error(exc.getMessage());
@@ -86,7 +86,7 @@ public class DailyRegistryParseService {
       Sheet originalSheet, DailyRegistryParseCache cache) {
     Long id = cache.getId();
     LocalDate date = cache.getDate();
-    log.info("Starting parsing daily registry: {}, date: {}", id, date);
+    log.info("Starting parsing daily registry with id={}, date={}", id, date);
     long start = System.currentTimeMillis();
     Map<DailyRegistryParseCriteria, List<Row>> criteriaRowMap = new HashMap<>();
     IntStream
@@ -99,7 +99,7 @@ public class DailyRegistryParseService {
               criteriaRowMap.put(criteria, rowList);
             }));
     long time = System.currentTimeMillis() - start;
-    log.info("Processing finished for daily registry: {}, date: {} in {} seconds", id, date, time / 1000);
+    log.info("Processing finished for daily registry with id={}, date={} in {} seconds", id, date, time / 1000);
     return criteriaRowMap;
   }
 
@@ -124,30 +124,21 @@ public class DailyRegistryParseService {
     long start = System.currentTimeMillis();
     Map<String, byte[]> zipMap = new HashMap<>();
     criteriaRowsMap.forEach((criteria, rows) -> {
-      log.debug("Creating workbook for {}", criteria.getName());
-      long s = System.currentTimeMillis();
-      Workbook workbook = createWorkbookWithHeader(headerRow);
-      Sheet sheet = workbook.getSheetAt(0);
-      rows.forEach(row -> copyRow(row, sheet.createRow(sheet.getLastRowNum() + 1), getDateStyle(workbook)));
-      zipMap.put(getRegistryFileName(criteria.getName(), date), getBytesFromWorkbook(workbook));
-      long t = System.currentTimeMillis() - s;
-      log.debug("Creating workbook for {} finished in {} ms", criteria.getName(), t);
+      try (Workbook workbook = new XSSFWorkbook()) {
+        Sheet sheet = workbook.createSheet();
+        copyRow(headerRow, sheet.createRow(0));
+        rows.forEach(row -> copyRow(row, sheet.createRow(sheet.getLastRowNum() + 1), getDateStyle(workbook)));
+        zipMap.put(getRegistryFileName(criteria.getName(), date), getBytesFromWorkbook(workbook));
+      } catch (IOException exc) {
+        log.error(exc.getMessage());
+        throw new ApplicationException(exc.getMessage(), exc);
+      }
     });
     long time = System.currentTimeMillis() - start;
     log.info("Transforming rows to workbooks finished in {} seconds", time / 1000);
     return zipMap;
   }
 
-  private Workbook createWorkbookWithHeader(Row headerRow) {
-    try (Workbook createdWorkbook = new XSSFWorkbook()) {
-      Sheet createdWorkbookSheet = createdWorkbook.createSheet();
-      copyRow(headerRow, createdWorkbookSheet.createRow(0));
-      return createdWorkbook;
-    } catch (IOException exc) {
-      log.error(exc.getMessage());
-      throw new ApplicationException(exc.getMessage(), exc);
-    }
-  }
 
   private CellStyle getDateStyle(Workbook workbook) {
     CellStyle cellStyle = workbook.createCellStyle();

@@ -1,4 +1,4 @@
-version: "3.4"
+version: "2.4"
 
 services:
   parser:
@@ -9,7 +9,7 @@ services:
       context: ./
     depends_on:
       - db
-    entrypoint: "java -Djava.security.egd=file:/dev/./urandom -jar app.jar --spring.profiles.active=docker"
+    entrypoint: "java -Xmx3g -Djava.security.egd=file:/dev/./urandom -jar app.jar --spring.profiles.active=docker"
     volumes:
       - ./storage:/storage
       - ./logs:/logs

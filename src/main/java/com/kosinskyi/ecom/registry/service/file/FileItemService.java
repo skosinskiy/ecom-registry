@@ -78,9 +78,9 @@ public class FileItemService implements ReadService<FileItem> {
 
   public byte[] getBinary(FileItem fileItem) {
     Long id = fileItem.getId();
-    log.info("Getting binary file with id: {}", id);
+    log.info("Getting binary file with id={}", id);
     byte[] binaryFile = storageFileService.getBinaryFile(fileItem);
-    log.info("Binary file with id: {} downloaded", id);
+    log.info("Binary file with id={} downloaded", id);
     return binaryFile;
   }
 
