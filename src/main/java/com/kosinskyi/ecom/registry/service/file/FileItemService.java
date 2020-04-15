@@ -9,6 +9,7 @@ import com.kosinskyi.ecom.registry.repository.base.JpaSpecificationExecutorRepos
 import com.kosinskyi.ecom.registry.repository.file.FileItemRepository;
 import com.kosinskyi.ecom.registry.service.crud.ReadService;
 import com.kosinskyi.ecom.registry.service.file.storage.StorageFileService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class FileItemService implements ReadService<FileItem> {
 
   private static final Map<String, Extension> ALLOWED_MIME_TYPES = Collections.unmodifiableMap(getAllowedMimeTypes());
@@ -75,7 +77,11 @@ public class FileItemService implements ReadService<FileItem> {
   }
 
   public byte[] getBinary(FileItem fileItem) {
-    return storageFileService.getBinaryFile(fileItem);
+    Long id = fileItem.getId();
+    log.info("Getting binary file with id: {}", id);
+    byte[] binaryFile = storageFileService.getBinaryFile(fileItem);
+    log.info("Binary file with id: {} downloaded", id);
+    return binaryFile;
   }
 
   public FileItem uploadFile(MultipartFile multipartFile) {
@@ -93,6 +99,9 @@ public class FileItemService implements ReadService<FileItem> {
   }
 
   public FileItem saveZip(Map<String, byte[]> fileNameBytesMap) {
-    return getFileItem(storageFileService.saveZip(fileNameBytesMap), Extension.ZIP);
+    log.info("Saving zip");
+    FileItem fileItem = getFileItem(storageFileService.saveZip(fileNameBytesMap), Extension.ZIP);
+    log.info("Zip saved successfully");
+    return fileItem;
   }
 }

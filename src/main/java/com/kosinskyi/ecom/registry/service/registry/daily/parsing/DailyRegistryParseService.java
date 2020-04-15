@@ -4,14 +4,14 @@ import com.kosinskyi.ecom.registry.entity.file.FileItem;
 import com.kosinskyi.ecom.registry.entity.file.constants.Extension;
 import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistry;
 import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistryParseCriteria;
-import com.kosinskyi.ecom.registry.error.exception.ActionForbiddenException;
 import com.kosinskyi.ecom.registry.error.exception.ApplicationException;
 import com.kosinskyi.ecom.registry.service.file.FileItemService;
+import com.kosinskyi.ecom.registry.service.registry.daily.parsing.cache.DailyRegistryParseCache;
+import com.kosinskyi.ecom.registry.service.registry.daily.parsing.cache.DailyRegistryParseCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -25,14 +25,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy.CREATE_NULL_AS_BLANK;
@@ -42,103 +40,123 @@ import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy.CREATE_NULL_AS_B
 public class DailyRegistryParseService {
 
   private FileItemService fileItemService;
-  private DailyRegistryParseCriteriaService parseCriteriaService;
+  private DailyRegistryParseCacheService cacheService;
+
 
   @Autowired
-  public DailyRegistryParseService(
-      FileItemService fileItemService,
-      DailyRegistryParseCriteriaService parseCriteriaService) {
+  public DailyRegistryParseService(FileItemService fileItemService, DailyRegistryParseCacheService cacheService) {
     this.fileItemService = fileItemService;
-    this.parseCriteriaService = parseCriteriaService;
+    this.cacheService = cacheService;
   }
 
   @Async
   public CompletableFuture<FileItem> parse(DailyRegistry dailyRegistry) {
-    Long dailyRegistryId = dailyRegistry.getId();
-    LocalDate registryDate = dailyRegistry.getRegistryDate();
-    log.info("Received request for parsing daily registry {}, date: {}", dailyRegistryId, registryDate);
+    Long id = dailyRegistry.getId();
+    LocalDate date = dailyRegistry.getRegistryDate();
+    log.info("Received request for parsing daily registry: {}, date: {}", id, date);
+    long start = System.currentTimeMillis();
     Sheet originalSheet = getWorkbook(dailyRegistry.getRegistryItem()).getSheetAt(0);
-    Map<Long, Workbook> cacheMap = new HashMap<>();
-    List<DailyRegistryParseCriteria> parseCriteriaList = parseCriteriaService.findAll();
-    log.info("Starting parsing daily registry {}, date: {}", dailyRegistryId, registryDate);
-    processOriginalSheet(originalSheet, parseCriteriaList, cacheMap);
-    log.info("Processing finished for daily registry {}, date: {}", dailyRegistryId, registryDate);
-    return CompletableFuture.completedFuture(fileItemService.saveZip(cacheMap
-        .entrySet()
-        .stream()
-        .collect(
-            Collectors.toMap(
-                entry -> getFileName(findCriteriaById(parseCriteriaList, entry.getKey()).getName(), registryDate),
-                entry -> getBytesFromWorkbook(entry.getValue())
-            ))));
-  }
-
-  private void processOriginalSheet(
-      Sheet originalSheet,
-      List<DailyRegistryParseCriteria> parseCriteriaList,
-      Map<Long, Workbook> cacheMap) {
-    for (int i = 1; i <= originalSheet.getLastRowNum(); i++) {
-      Row originalRow = originalSheet.getRow(i);
-      findCriteriaByRow(parseCriteriaList, originalSheet, originalRow).ifPresent(criteria -> {
-        Workbook createdWorkbook = getOrPutWorkbook(cacheMap, criteria.getId(), originalSheet);
-        Sheet sheet = createdWorkbook.getSheetAt(0);
-        copyRow(originalRow, sheet.createRow(sheet.getLastRowNum() + 1), createdWorkbook);
-      });
-    }
-  }
-
-  private Workbook getOrPutWorkbook(Map<Long, Workbook> map, Long criteriaId, Sheet originalSheet) {
-    Workbook workbook = map.get(criteriaId);
-    if (Objects.isNull(workbook)) {
-      workbook = createWorkbook(originalSheet);
-      map.put(criteriaId, workbook);
-    }
-    return workbook;
-  }
-
-  private Workbook createWorkbook(Sheet originalSheet) {
-    Workbook createdWorkbook = new XSSFWorkbook();
-    Sheet createdWorkbookSheet = createdWorkbook.createSheet();
-    createHeaderRow(originalSheet, createdWorkbookSheet, createdWorkbook);
-    return createdWorkbook;
-  }
-
-  private DailyRegistryParseCriteria findCriteriaById(List<DailyRegistryParseCriteria> parseCriteriaList, Long id) {
-    return parseCriteriaList
-        .stream()
-        .filter(c -> c.getId().equals(id))
-        .findFirst()
-        .orElseThrow(NoSuchElementException::new);
-  }
-
-  private Optional<DailyRegistryParseCriteria> findCriteriaByRow(
-      List<DailyRegistryParseCriteria> parseCriteriaList, Sheet sheet, Row row) {
-    return parseCriteriaList
-        .stream()
-        .filter(criteria -> {
-          int searchColumnIndex = getSearchColumnIndex(sheet, criteria.getFilterColumnName());
-          String cellValue = row.getCell(searchColumnIndex, CREATE_NULL_AS_BLANK).getStringCellValue();
-          return criteria.getFilterValues().contains(cellValue);
-        })
-        .findFirst();
-  }
-
-  private void createHeaderRow(Sheet sourceSheet, Sheet targetSheet, Workbook workbook) {
-    Row createdWorkbookSheetRow = targetSheet.createRow(0);
-    copyRow(sourceSheet.getRow(sourceSheet.getFirstRowNum()), createdWorkbookSheetRow, workbook);
-  }
-
-  private String getFileName(String name, LocalDate date) {
-    return String.format("%s %s.%s", name, date, Extension.XLSX.getValue());
+    Row headerRow = originalSheet.getRow(originalSheet.getFirstRowNum());
+    DailyRegistryParseCache cache = cacheService.getCache(headerRow, date, id);
+    Map<DailyRegistryParseCriteria, List<Row>> criteriaRowsMap = processOriginalSheet(originalSheet, cache);
+    Map<String, byte[]> zipMap = transformProcessedRowsToWorkbookBytes(criteriaRowsMap, date, headerRow);
+    FileItem fileItem = fileItemService.saveZip(zipMap);
+    long time = System.currentTimeMillis() - start;
+    log.info("Successfully parsed daily registry: {}, date: {} in {} seconds", id, date, time / 1000);
+    return CompletableFuture.completedFuture(fileItem);
   }
 
   private Workbook getWorkbook(FileItem fileItem) {
     try {
-      return new XSSFWorkbook(new ByteArrayInputStream(fileItemService.getBinary(fileItem)));
+      byte[] binaryFile = fileItemService.getBinary(fileItem);
+      Long id = fileItem.getId();
+      log.info("Transforming binary file with id: {} to workbook", id);
+      long start = System.currentTimeMillis();
+      XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(binaryFile));
+      long time = System.currentTimeMillis() - start;
+      log.info("Transformed binary file with id: {} to workbook successfully in {} seconds", id, time / 1000);
+      return workbook;
     } catch (IOException exc) {
       log.error(exc.getMessage());
       throw new ApplicationException(exc.getMessage(), exc);
     }
+  }
+
+  private Map<DailyRegistryParseCriteria, List<Row>> processOriginalSheet(
+      Sheet originalSheet, DailyRegistryParseCache cache) {
+    Long id = cache.getId();
+    LocalDate date = cache.getDate();
+    log.info("Starting parsing daily registry: {}, date: {}", id, date);
+    long start = System.currentTimeMillis();
+    Map<DailyRegistryParseCriteria, List<Row>> criteriaRowMap = new HashMap<>();
+    IntStream
+        .rangeClosed(1, originalSheet.getLastRowNum())
+        .mapToObj(originalSheet::getRow)
+        .forEach(row -> findCriteriaByRow(cache, row)
+            .ifPresent(criteria -> {
+              List<Row> rowList = criteriaRowMap.getOrDefault(criteria, new ArrayList<>());
+              rowList.add(row);
+              criteriaRowMap.put(criteria, rowList);
+            }));
+    long time = System.currentTimeMillis() - start;
+    log.info("Processing finished for daily registry: {}, date: {} in {} seconds", id, date, time / 1000);
+    return criteriaRowMap;
+  }
+
+  private Optional<DailyRegistryParseCriteria> findCriteriaByRow(DailyRegistryParseCache cacheHolder, Row row) {
+    return cacheHolder
+        .getParseCriteriaList()
+        .stream()
+        .filter(criteria -> {
+          Integer searchColumnIndex = cacheHolder.getCriteriaColumnIndexCache().get(criteria);
+          if (searchColumnIndex != null) {
+            String cellValue = row.getCell(searchColumnIndex, CREATE_NULL_AS_BLANK).getStringCellValue();
+            return criteria.getFilterValues().contains(cellValue);
+          }
+          return false;
+        })
+        .findFirst();
+  }
+
+  private Map<String, byte[]> transformProcessedRowsToWorkbookBytes(
+      Map<DailyRegistryParseCriteria, List<Row>> criteriaRowsMap, LocalDate date, Row headerRow) {
+    log.info("Transforming processed rows to workbooks");
+    long start = System.currentTimeMillis();
+    Map<String, byte[]> zipMap = new HashMap<>();
+    criteriaRowsMap.forEach((criteria, rows) -> {
+      log.debug("Creating workbook for {}", criteria.getName());
+      long s = System.currentTimeMillis();
+      Workbook workbook = createWorkbookWithHeader(headerRow);
+      Sheet sheet = workbook.getSheetAt(0);
+      rows.forEach(row -> copyRow(row, sheet.createRow(sheet.getLastRowNum() + 1), getDateStyle(workbook)));
+      zipMap.put(getRegistryFileName(criteria.getName(), date), getBytesFromWorkbook(workbook));
+      long t = System.currentTimeMillis() - s;
+      log.debug("Creating workbook for {} finished in {} ms", criteria.getName(), t);
+    });
+    long time = System.currentTimeMillis() - start;
+    log.info("Transforming rows to workbooks finished in {} seconds", time / 1000);
+    return zipMap;
+  }
+
+  private Workbook createWorkbookWithHeader(Row headerRow) {
+    try (Workbook createdWorkbook = new XSSFWorkbook()) {
+      Sheet createdWorkbookSheet = createdWorkbook.createSheet();
+      copyRow(headerRow, createdWorkbookSheet.createRow(0));
+      return createdWorkbook;
+    } catch (IOException exc) {
+      log.error(exc.getMessage());
+      throw new ApplicationException(exc.getMessage(), exc);
+    }
+  }
+
+  private CellStyle getDateStyle(Workbook workbook) {
+    CellStyle cellStyle = workbook.createCellStyle();
+    cellStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat("dd/MM/yyyy hh:mm:ss"));
+    return cellStyle;
+  }
+
+  private String getRegistryFileName(String name, LocalDate date) {
+    return String.format("%s %s.%s", name, date, Extension.XLSX.getValue());
   }
 
   private byte[] getBytesFromWorkbook(Workbook workbook) {
@@ -153,19 +171,25 @@ public class DailyRegistryParseService {
     }
   }
 
-  private void copyRow(Row source, Row target, Workbook workbook) {
+  private void copyRow(Row source, Row target) {
     IntStream
         .range(0, source.getLastCellNum())
-        .forEach(i -> copyCell(source.getCell(i, CREATE_NULL_AS_BLANK), target.createCell(i), workbook));
+        .forEach(i -> copyCell(source.getCell(i, CREATE_NULL_AS_BLANK), target.createCell(i), null));
   }
 
-  private void copyCell(Cell source, Cell target, Workbook workbook) {
+  private void copyRow(Row source, Row target, CellStyle dateStyle) {
+    IntStream
+        .range(0, source.getLastCellNum())
+        .forEach(i -> copyCell(source.getCell(i, CREATE_NULL_AS_BLANK), target.createCell(i), dateStyle));
+  }
+
+  private void copyCell(Cell source, Cell target, CellStyle dateStyle) {
     if (source.getCellType().equals(CellType.STRING)) {
       target.setCellValue(source.getStringCellValue());
     }
     if (source.getCellType().equals(CellType.NUMERIC)) {
       if (DateUtil.isCellDateFormatted(source)) {
-        target.setCellStyle(getDateStyle(workbook));
+        target.setCellStyle(dateStyle);
         target.setCellValue(source.getDateCellValue());
       } else {
         target.setCellValue(source.getNumericCellValue());
@@ -180,25 +204,6 @@ public class DailyRegistryParseService {
     if (source.getCellType().equals(CellType.FORMULA)) {
       target.setCellValue(source.getCellFormula());
     }
-  }
-
-  private CellStyle getDateStyle(Workbook workbook) {
-    CellStyle cellStyle = workbook.createCellStyle();
-    CreationHelper createHelper = workbook.getCreationHelper();
-    cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/MM/yyyy hh:mm:ss"));
-    return cellStyle;
-  }
-
-  private Integer getSearchColumnIndex(Sheet sheet, String criteria) {
-    Row row = sheet.getRow(sheet.getFirstRowNum());
-    for (Cell cell : row) {
-      if (cell.getStringCellValue().equals(criteria)) {
-        return cell.getColumnIndex();
-      }
-    }
-    throw new ActionForbiddenException(String.format(
-        "No cell with value %s found in first row", criteria
-    ));
   }
 
 }
