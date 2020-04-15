@@ -13,6 +13,7 @@ import com.kosinskyi.ecom.registry.service.crud.ReadService;
 import com.kosinskyi.ecom.registry.service.file.FileItemService;
 import com.kosinskyi.ecom.registry.service.registry.daily.parsing.DailyRegistryParseService;
 import com.kosinskyi.ecom.registry.service.user.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteService<DailyRegistry> {
 
   private DailyRegistryRepository jpaRepository;
@@ -89,9 +91,12 @@ public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteS
   }
 
   private void setParsedRegistryItem(DailyRegistry dailyRegistry, FileItem fileItem) {
+    Long id = dailyRegistry.getId();
+    log.info("Daily registry with id: {} parsed successfully, updating status", id);
     dailyRegistry.setParsedRegistryItem(fileItem);
     dailyRegistry.setStatus(DailyRegistryStatus.PARSED);
     jpaRepository.save(dailyRegistry);
+    log.info("Daily registry with id: {} status updated", id);
   }
 
   public Page<DailyRegistry> findAllByYearAndMonth(Integer year, Integer month, Pageable pageable) {
