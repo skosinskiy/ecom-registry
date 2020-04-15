@@ -9,7 +9,7 @@ services:
       context: ./
     depends_on:
       - db
-    entrypoint: "java -Xmx3g -Djava.security.egd=file:/dev/./urandom -jar app.jar --spring.profiles.active=docker"
+    entrypoint: "bash -c 'java $${JAVA_OPTIONS} -Djava.security.egd=file:/dev/./urandom -jar app.jar --spring.profiles.active=docker'"
     volumes:
       - ./storage:/storage
       - ./logs:/logs
