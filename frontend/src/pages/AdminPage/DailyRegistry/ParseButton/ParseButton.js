@@ -21,7 +21,7 @@ export const ParseButton = props => {
   const { status, parseHandler, downloadHandler } = props
   const classes = useStyles()
 
-  if (status === 'CREATED') {
+  if (status === 'CREATED' || status === 'PARSE_ERROR') {
     return (
       <IconButton className={classes.parseButton} size={'small'} onClick={parseHandler}>
         <FolderOpenRounded/>

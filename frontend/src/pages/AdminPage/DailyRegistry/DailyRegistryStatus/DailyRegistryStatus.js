@@ -7,6 +7,7 @@ const getColorByStatus = (status, theme) => {
   switch (status) {
     case 'CREATED': return theme.palette.info.light
     case 'PARSING': return theme.palette.warning.light
+    case 'PARSE_ERROR': return theme.palette.error.light
     default : return theme.palette.success.light
   }
 }

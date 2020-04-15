@@ -4,6 +4,7 @@ public enum  DailyRegistryStatus {
 
   CREATED,
   PARSING,
-  PARSED
+  PARSED,
+  PARSE_ERROR
 
 }

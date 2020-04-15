@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -86,17 +86,23 @@ public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteS
   public DailyRegistry parse(Long id) {
     DailyRegistry dailyRegistry = findById(id);
     dailyRegistry.setStatus(DailyRegistryStatus.PARSING);
-    parseService.parse(dailyRegistry).whenCompleteAsync((file, throwable) -> setParsedRegistryItem(dailyRegistry, file));
+    parseService.parse(dailyRegistry)
+        .whenCompleteAsync((file, throwable) -> setParsedRegistryItem(dailyRegistry, file, throwable));
     return jpaRepository.save(dailyRegistry);
   }
 
-  private void setParsedRegistryItem(DailyRegistry dailyRegistry, FileItem fileItem) {
+  private void setParsedRegistryItem(DailyRegistry dailyRegistry, FileItem fileItem, Throwable throwable) {
     Long id = dailyRegistry.getId();
-    log.info("Daily registry with id: {} parsed successfully, updating status", id);
-    dailyRegistry.setParsedRegistryItem(fileItem);
-    dailyRegistry.setStatus(DailyRegistryStatus.PARSED);
+    if (Objects.isNull(throwable)) {
+      log.info("Daily registry with id={} parsed successfully, updating status", id);
+      dailyRegistry.setParsedRegistryItem(fileItem);
+      dailyRegistry.setStatus(DailyRegistryStatus.PARSED);
+    } else {
+      log.info("Error occurred during parsing registry with id={}, updating status", id);
+      dailyRegistry.setStatus(DailyRegistryStatus.PARSE_ERROR);
+    }
+    log.info("Daily registry with id={} status updated", id);
     jpaRepository.save(dailyRegistry);
-    log.info("Daily registry with id: {} status updated", id);
   }
 
   public Page<DailyRegistry> findAllByYearAndMonth(Integer year, Integer month, Pageable pageable) {

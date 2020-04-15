@@ -118,6 +118,9 @@ public class HttpLoggingService {
 
   private String getBodyString(Object body) {
     try {
+      if (body instanceof byte[]) {
+        return "binary";
+      }
       return objectMapper.writeValueAsString(body);
     } catch (JsonProcessingException exc) {
       throw new ApplicationException(exc.getMessage(), exc);
