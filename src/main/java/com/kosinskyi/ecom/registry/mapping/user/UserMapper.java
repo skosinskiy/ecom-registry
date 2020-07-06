@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserMapper implements BaseMapper {
 
-  private ModelMapper modelMapper;
-  private UserService userService;
+  private final ModelMapper modelMapper;
+  private final UserService userService;
 
   @Autowired
   public UserMapper(ModelMapper modelMapper, UserService userService) {

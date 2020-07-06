@@ -19,6 +19,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -31,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy.CREATE_NULL_AS_BLANK;
@@ -39,31 +42,63 @@ import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy.CREATE_NULL_AS_B
 @Slf4j
 public class DailyRegistryParseService {
 
-  private FileItemService fileItemService;
-  private DailyRegistryParseCacheService cacheService;
-
+  private final FileItemService fileItemService;
+  private final DailyRegistryParseCacheService cacheService;
+  private final ThreadPoolTaskExecutor taskExecutor;
 
   @Autowired
-  public DailyRegistryParseService(FileItemService fileItemService, DailyRegistryParseCacheService cacheService) {
+  public DailyRegistryParseService(
+      FileItemService fileItemService,
+      DailyRegistryParseCacheService cacheService,
+      ThreadPoolTaskExecutor taskExecutor) {
     this.fileItemService = fileItemService;
     this.cacheService = cacheService;
+    this.taskExecutor = taskExecutor;
   }
 
   @Async
-  public CompletableFuture<FileItem> parse(DailyRegistry dailyRegistry) {
+  public CompletableFuture<FileItem> parseAsync(DailyRegistry dailyRegistry) {
+    log.info("Parsing daily registry with id={} asynchronously", dailyRegistry.getId());
+    return CompletableFuture.completedFuture(parseWithTimeout(dailyRegistry, 5, TimeUnit.MINUTES));
+  }
+
+  private FileItem parseWithTimeout(DailyRegistry dailyRegistry, long timeout, TimeUnit timeUnit) {
+    Future<FileItem> fileItemFuture = taskExecutor.submit(() -> parse(dailyRegistry));
+    try {
+      return fileItemFuture.get(timeout, timeUnit);
+    } catch (Exception exc) {
+      log.error("Failed to parse daily registry with id={} in timeout {} {}", dailyRegistry.getId(), timeout, timeUnit);
+      boolean cancel = fileItemFuture.cancel(true);
+      log.info("Cancelling submitted task, is cancelled: {}", cancel);
+      throw new ApplicationException(exc.getMessage(), exc);
+    }
+  }
+
+  private FileItem parse(DailyRegistry dailyRegistry) {
     Long id = dailyRegistry.getId();
     LocalDate date = dailyRegistry.getRegistryDate();
     log.info("Received request for parsing daily registry with id={}, date={}", id, date);
     long start = System.currentTimeMillis();
     Sheet originalSheet = getWorkbook(dailyRegistry.getRegistryItem()).getSheetAt(0);
+    checkIsInterrupted();
     Row headerRow = originalSheet.getRow(originalSheet.getFirstRowNum());
     DailyRegistryParseCache cache = cacheService.getCache(headerRow, date, id);
+    checkIsInterrupted();
     Map<DailyRegistryParseCriteria, List<Row>> criteriaRowsMap = processOriginalSheet(originalSheet, cache);
+    checkIsInterrupted();
     Map<String, byte[]> zipMap = transformProcessedRowsToWorkbookBytes(criteriaRowsMap, date, headerRow);
+    checkIsInterrupted();
     FileItem fileItem = fileItemService.saveZip(zipMap);
     long time = System.currentTimeMillis() - start;
     log.info("Successfully parsed daily registry with id={}, date={} in {} seconds", id, date, time / 1000);
-    return CompletableFuture.completedFuture(fileItem);
+    return fileItem;
+  }
+
+  private void checkIsInterrupted() {
+    if (Thread.interrupted()) {
+      log.error("Thread was interrupted");
+      throw new ApplicationException("Parsing daily registry was interrupted");
+    }
   }
 
   private Workbook getWorkbook(FileItem fileItem) {
@@ -92,12 +127,16 @@ public class DailyRegistryParseService {
     IntStream
         .rangeClosed(1, originalSheet.getLastRowNum())
         .mapToObj(originalSheet::getRow)
-        .forEach(row -> findCriteriaByRow(cache, row)
-            .ifPresent(criteria -> {
-              List<Row> rowList = criteriaRowMap.getOrDefault(criteria, new ArrayList<>());
-              rowList.add(row);
-              criteriaRowMap.put(criteria, rowList);
-            }));
+        .forEach(row -> {
+          checkIsInterrupted();
+          findCriteriaByRow(cache, row)
+              .ifPresent(criteria -> {
+                List<Row> rowList = criteriaRowMap.getOrDefault(criteria, new ArrayList<>());
+                rowList.add(row);
+                criteriaRowMap.put(criteria, rowList);
+              });
+
+        });
     long time = System.currentTimeMillis() - start;
     log.info("Processing finished for daily registry with id={}, date={} in {} seconds", id, date, time / 1000);
     return criteriaRowMap;
@@ -124,6 +163,7 @@ public class DailyRegistryParseService {
     long start = System.currentTimeMillis();
     Map<String, byte[]> zipMap = new HashMap<>();
     criteriaRowsMap.forEach((criteria, rows) -> {
+      checkIsInterrupted();
       try (Workbook workbook = new XSSFWorkbook()) {
         Sheet sheet = workbook.createSheet();
         copyRow(headerRow, sheet.createRow(0));

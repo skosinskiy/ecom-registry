@@ -22,8 +22,8 @@ import java.util.UUID;
 @Service
 public class UserService implements UserDetailsService, ReadService<User>, CreateService<User>, UpdateService<User> {
 
-  private UserRepository repository;
-  private UserSpecification specification;
+  private final UserRepository repository;
+  private final UserSpecification specification;
 
   @Autowired
   public UserService(UserRepository repository, UserSpecification specification) {

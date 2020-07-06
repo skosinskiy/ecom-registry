@@ -38,9 +38,9 @@ public class SecurityService {
   public static final String EMAIL_CLAIM = "email";
   public static final String PERMISSIONS_CLAIM = "permissions";
   public static final String IS_ACCOUNT_NON_EXPIRED_CLAIM = "isAccountNonExpired";
-  private AuthenticationManager authenticationManager;
-  private UserService userService;
-  private JwtParser jwtParser;
+  private final AuthenticationManager authenticationManager;
+  private final UserService userService;
+  private final JwtParser jwtParser;
 
   @Value("${jwt.secret}")
   private String jwtSecret;

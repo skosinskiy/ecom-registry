@@ -28,11 +28,11 @@ import java.util.Optional;
 @Slf4j
 public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteService<DailyRegistry> {
 
-  private DailyRegistryRepository jpaRepository;
-  private DailyRegistrySpecification specification;
-  private FileItemService fileItemService;
-  private DailyRegistryParseService parseService;
-  private UserService userService;
+  private final DailyRegistryRepository jpaRepository;
+  private final DailyRegistrySpecification specification;
+  private final FileItemService fileItemService;
+  private final DailyRegistryParseService parseService;
+  private final UserService userService;
 
   @Autowired
   public DailyRegistryService(
@@ -86,7 +86,7 @@ public class DailyRegistryService implements ReadService<DailyRegistry>, DeleteS
   public DailyRegistry parse(Long id) {
     DailyRegistry dailyRegistry = findById(id);
     dailyRegistry.setStatus(DailyRegistryStatus.PARSING);
-    parseService.parse(dailyRegistry)
+    parseService.parseAsync(dailyRegistry)
         .whenCompleteAsync((file, throwable) -> setParsedRegistryItem(dailyRegistry, file, throwable));
     return jpaRepository.save(dailyRegistry);
   }

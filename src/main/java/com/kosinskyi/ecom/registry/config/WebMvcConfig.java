@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-  private GetRequestHandlerInterceptor getRequestHandlerInterceptor;
+  private final GetRequestHandlerInterceptor getRequestHandlerInterceptor;
 
   @Autowired
   public WebMvcConfig(GetRequestHandlerInterceptor getRequestHandlerInterceptor) {

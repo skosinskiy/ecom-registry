@@ -32,9 +32,9 @@ public class FileItemService implements ReadService<FileItem> {
     return allowedMimeTypes;
   }
 
-  private FileItemRepository repository;
-  private FileItemSpecification specification;
-  private StorageFileService storageFileService;
+  private final FileItemRepository repository;
+  private final FileItemSpecification specification;
+  private final StorageFileService storageFileService;
 
   @Autowired
   public FileItemService(

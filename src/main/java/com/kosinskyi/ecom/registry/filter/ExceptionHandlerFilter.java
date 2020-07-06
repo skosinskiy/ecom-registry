@@ -15,7 +15,7 @@ import java.io.IOException;
 @Component
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
-  private GenericExceptionHandler genericExceptionHandler;
+  private final GenericExceptionHandler genericExceptionHandler;
 
   public ExceptionHandlerFilter(GenericExceptionHandler genericExceptionHandler) {
     this.genericExceptionHandler = genericExceptionHandler;

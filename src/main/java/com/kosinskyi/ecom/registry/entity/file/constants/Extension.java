@@ -6,7 +6,7 @@ public enum Extension {
   XLSX("xlsx"),
   ZIP("zip");
 
-  private String value;
+  private final String value;
 
   Extension(String value) {
     this.value = value;

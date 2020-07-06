@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DailyRegistryParseCriteriaService implements ReadService<DailyRegistryParseCriteria> {
 
-  private DailyRegistryParseCriteriaRepository repository;
+  private final DailyRegistryParseCriteriaRepository repository;
 
   @Autowired
   public DailyRegistryParseCriteriaService(DailyRegistryParseCriteriaRepository repository) {

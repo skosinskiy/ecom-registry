@@ -15,13 +15,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Component
 public class DailyRegistryMapper implements ReadMapper<DailyRegistry>, DeleteMapper<DailyRegistry> {
 
-  private DailyRegistryService service;
-  private ModelMapper modelMapper;
+  private final DailyRegistryService service;
+  private final ModelMapper modelMapper;
 
   @Autowired
   public DailyRegistryMapper(DailyRegistryService service, ModelMapper modelMapper) {

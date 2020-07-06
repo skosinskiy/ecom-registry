@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @ControllerAdvice
 public class LoggingResponseBodyAdviceAdapter implements ResponseBodyAdvice<Object> {
 
-  private HttpLoggingService httpLoggingService;
+  private final HttpLoggingService httpLoggingService;
 
   @Autowired
   public LoggingResponseBodyAdviceAdapter(HttpLoggingService httpLoggingService) {

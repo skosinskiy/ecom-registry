@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/users")
 public class UserController {
 
-  private UserMapper mapper;
+  private final UserMapper mapper;
 
   public UserController(UserMapper mapper) {
     this.mapper = mapper;

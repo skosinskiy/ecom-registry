@@ -32,8 +32,8 @@ public class HttpLoggingService {
   private static final String USER = "user";
   private static final String BODY = "body";
 
-  private ObjectMapper objectMapper;
-  private HttpServletRequest httpServletRequest;
+  private final ObjectMapper objectMapper;
+  private final HttpServletRequest httpServletRequest;
 
   @Autowired
   public HttpLoggingService(ObjectMapper objectMapper, HttpServletRequest httpServletRequest) {

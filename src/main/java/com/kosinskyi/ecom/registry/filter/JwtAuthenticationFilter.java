@@ -1,10 +1,7 @@
 package com.kosinskyi.ecom.registry.filter;
 
 import com.kosinskyi.ecom.registry.security.SecurityService;
-import io.jsonwebtoken.Claims;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,7 +17,7 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-  private SecurityService securityService;
+  private final SecurityService securityService;
 
   @Autowired
   public JwtAuthenticationFilter(SecurityService securityService) {

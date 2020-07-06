@@ -23,7 +23,7 @@ import static com.kosinskyi.ecom.registry.security.SecurityService.AUTHORIZATION
 @Slf4j
 public class GenericExceptionHandler {
 
-  private ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
   @Autowired
   public GenericExceptionHandler(ObjectMapper objectMapper) {
