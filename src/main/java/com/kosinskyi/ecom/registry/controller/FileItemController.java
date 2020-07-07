@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/files")
 public class FileItemController {
 
-  private FileItemService fileItemService;
+  private final FileItemService fileItemService;
 
   @Autowired
   public FileItemController(FileItemService fileItemService) {

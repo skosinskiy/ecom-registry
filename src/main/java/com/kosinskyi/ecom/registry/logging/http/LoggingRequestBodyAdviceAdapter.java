@@ -12,7 +12,7 @@ import java.lang.reflect.Type;
 @ControllerAdvice
 public class LoggingRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
 
-  private HttpLoggingService httpLoggingService;
+  private final HttpLoggingService httpLoggingService;
 
   @Autowired
   public LoggingRequestBodyAdviceAdapter(HttpLoggingService httpLoggingService) {

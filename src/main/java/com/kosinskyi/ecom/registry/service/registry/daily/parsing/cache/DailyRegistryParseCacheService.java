@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 @Service
 public class DailyRegistryParseCacheService {
 
-  private DailyRegistryParseCriteriaService parseCriteriaService;
+  private final DailyRegistryParseCriteriaService parseCriteriaService;
 
   @Autowired
   public DailyRegistryParseCacheService(DailyRegistryParseCriteriaService parseCriteriaService) {

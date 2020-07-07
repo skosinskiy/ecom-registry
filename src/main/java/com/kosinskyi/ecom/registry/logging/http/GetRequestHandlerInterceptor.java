@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class GetRequestHandlerInterceptor implements HandlerInterceptor {
 
-  private HttpLoggingService httpLoggingService;
+  private final HttpLoggingService httpLoggingService;
 
   @Autowired
   public GetRequestHandlerInterceptor(HttpLoggingService httpLoggingService) {

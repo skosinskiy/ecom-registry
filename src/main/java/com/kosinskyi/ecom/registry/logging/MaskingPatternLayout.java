@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
 public class MaskingPatternLayout extends PatternLayout {
 
   private Pattern multilinePattern;
-  private List<String> maskPatterns = new ArrayList<>();
+  private final List<String> maskPatterns = new ArrayList<>();
   private static final String JSON_PATTERN = "\"%s\"\\s*:\\s*\"(.*?)\"[,}]";
   private static final String OBJECT_PATTERN = "((?!, )|(?!\\())%s\\s*=\\s*([\\s\\S]*?)((?=, )|(?=\\)))";
   private static final String PATTERN_DELIMITER = "|";

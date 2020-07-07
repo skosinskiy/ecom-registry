@@ -9,10 +9,10 @@ import org.springframework.boot.logging.LogLevel;
 @Getter
 public class LoggingParamsHolder {
 
-  private Logger log;
-  private String methodName;
-  private String returnType;
-  private LogLevel logLevel;
-  private Object[] args;
+  private final Logger log;
+  private final String methodName;
+  private final String returnType;
+  private final LogLevel logLevel;
+  private final Object[] args;
 
 }
