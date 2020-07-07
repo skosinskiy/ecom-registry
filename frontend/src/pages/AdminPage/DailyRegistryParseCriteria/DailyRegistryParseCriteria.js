@@ -32,15 +32,17 @@ export const DailyRegistryParseCriteria = () => {
         <LinearIndeterminate color={'secondary'} disabled={!isLoading}/>
         <Table stickyHeader aria-label="sticky table" size={'small'}>
           <colgroup>
-            <col style={{ width: '20%' }}/>
-            <col style={{ width: '20%' }}/>
+            <col style={{ width: '12.5%' }}/>
+            <col style={{ width: '12.5%' }}/>
             <col style={{ width: '60%' }}/>
+            <col style={{ width: '15%' }}/>
           </colgroup>
           <TableHead>
             <TableRow>
               <TableCell>Criteria name</TableCell>
               <TableCell>Column name</TableCell>
               <TableCell>Filter values</TableCell>
+              <TableCell/>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -48,8 +50,6 @@ export const DailyRegistryParseCriteria = () => {
               <DailyRegistryParseCriteriaTableRow
                 key={i}
                 criteria={criteria}
-                page={page}
-                decreasePage={i === 0 && criteriaList.length === 1 && page > 0}
               />
             )}
           </TableBody>
