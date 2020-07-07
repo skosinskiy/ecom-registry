@@ -11,6 +11,7 @@ INSERT INTO user_permissions
     (user_id, permission_id)
 VALUES (1, 0),
        (1, 1),
+       (1, 2),
        (3, 0);
 
 INSERT INTO daily_registry_parse_criteria
