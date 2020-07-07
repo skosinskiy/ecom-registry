@@ -78,7 +78,7 @@ public class DailyRegistryParseService {
     Long id = dailyRegistry.getId();
     LocalDate date = dailyRegistry.getRegistryDate();
     log.info("Received request for parsing daily registry with id={}, date={}", id, date);
-    long start = System.currentTimeMillis();
+    final long start = System.currentTimeMillis();
     Sheet originalSheet = getWorkbook(dailyRegistry.getRegistryItem()).getSheetAt(0);
     checkIsInterrupted();
     Row headerRow = originalSheet.getRow(originalSheet.getFirstRowNum());
