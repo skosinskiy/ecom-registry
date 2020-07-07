@@ -1,4 +1,4 @@
-package com.kosinskyi.ecom.registry.mapping.registry;
+package com.kosinskyi.ecom.registry.mapping.registry.daily;
 
 import com.kosinskyi.ecom.registry.dto.response.registry.daily.DailyRegistryResponse;
 import com.kosinskyi.ecom.registry.entity.registry.daily.DailyRegistry;
