@@ -8,7 +8,7 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.49",
     "@material-ui/pickers": "^3.2.10",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "browserslist": "^4.11.1",
     "caniuse-lite": "^1.0.30001041",
     "classnames": "^2.2.6",
